@@ -1,53 +1,55 @@
 ﻿// netlify/functions/updateWarehouse.js
+
+// ⚡ Твой GitHub токен должен быть в переменных окружения Netlify:
+// Key: GITHUB_TOKEN
+// Value: <твой_personal_access_token>
+
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const REPO = 'andreq924-create/admin-panel';
+const REPO = 'andreq924-create/admin-panel'; // username/repo
 const FILE_PATH = 'warehouse.json';
 const BRANCH = 'main';
 
-export async function handler(event) {
+exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  let warehouse;
   try {
-    const body = JSON.parse(event.body);
-    warehouse = body.warehouse;
-    if (!warehouse) return { statusCode: 400, body: 'No warehouse data provided' };
-  } catch (err) {
-    return { statusCode: 400, body: 'Invalid JSON body' };
-  }
+    const { warehouse } = JSON.parse(event.body);
+    if (!warehouse) {
+      return { statusCode: 400, body: 'No warehouse data provided' };
+    }
 
-  try {
-    // Получаем SHA текущего файла
+    // 1️⃣ Получаем SHA текущего файла
     const getResponse = await fetch(
       `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=${BRANCH}`,
       {
         headers: {
           Authorization: `Bearer ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json',
+          'Accept': 'application/vnd.github+json',
         },
       }
     );
 
-    const getText = await getResponse.text();
     if (!getResponse.ok) {
-      throw new Error(`Failed to get file info: ${getText}`);
+      const text = await getResponse.text();
+      throw new Error(`Failed to get file info: ${text}`);
     }
-    const getData = JSON.parse(getText);
+
+    const getData = await getResponse.json();
     const sha = getData.sha;
 
-    // PUT запрос для обновления файла
+    // 2️⃣ Обновляем файл на GitHub
     const putResponse = await fetch(
       `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
       {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json',
+          'Accept': 'application/vnd.github+json',
         },
         body: JSON.stringify({
-          message: `Обновление warehouse.json через Netlify Function`,
+          message: 'Обновление warehouse.json через Netlify Functions',
           content: Buffer.from(JSON.stringify(warehouse, null, 2)).toString('base64'),
           sha: sha,
           branch: BRANCH,
@@ -55,16 +57,16 @@ export async function handler(event) {
       }
     );
 
-    const putText = await putResponse.text();
     if (!putResponse.ok) {
-      throw new Error(`Failed to update file: ${putText}`);
+      const text = await putResponse.text();
+      throw new Error(`Failed to update file: ${text}`);
     }
 
-    const putData = JSON.parse(putText);
-    return { statusCode: 200, body: JSON.stringify({ success: true, data: putData }) };
+    const putData = await putResponse.json();
+    return { statusCode: 200, body: JSON.stringify(putData) };
 
   } catch (err) {
-    console.error('GitHub API error:', err);
-    return { statusCode: 500, body: JSON.stringify({ error: err.message, stack: err.stack }) };
+    console.error(err);
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }
-}
+};
