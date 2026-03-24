@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Регистрация</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="login.html">Войти</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <form id="registerForm">
+            <label for="regUsername">Имя пользователя:</label>
+            <input type="text" id="regUsername" name="username" required>
+
+            <label for="regPassword">Пароль:</label>
+            <input type="password" id="regPassword" name="password" required>
+
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 МКУ "Кировсвет". Все права защищены.</p>
+    </footer>
+
+    <script>
+        const registerForm = document.getElementById('registerForm');
+        
+        registerForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const regUsername = document.getElementById('regUsername').value;
+            const regPassword = document.getElementById('regPassword').value;
+
+            // Сохраняем нового пользователя в localStorage
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            users.push({ username: regUsername, password: regPassword });
+            localStorage.setItem('users', JSON.stringify(users));
+
+            alert("Регистрация успешна! Теперь можете войти.");
+            window.location.href = "login.html";  // Перенаправление на страницу входа
+        });
+    </script>
+</body>
+</html>

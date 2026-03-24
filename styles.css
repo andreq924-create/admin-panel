@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Учет заявок по ремонту электрооборудования</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* HEADER */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: #1e2a38;
+            color: white;
+        }
+
+        .logo-block {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 50px;
+            margin-right: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+        }
+
+        /* HERO */
+        .hero {
+            height: 100vh;
+            background: url('sait1/main-photo.jpg') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 40px;
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        /* CONTENT */
+        .content {
+            padding: 50px;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #eee;
+        }
+
+        /* USER */
+        .user-img {
+            width: 30px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        /* МОДАЛКА */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            width: 300px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="header-container">
+        <div class="logo-block">
+            <img src="sait1/logo.png" alt="Логотип" class="logo">
+            <h1>МКУ "Кировсвет"</h1>
+        </div>
+
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="#" onclick="handleRequestClick(event)">Подача заявки</a></li>
+                <li id="loginLink"><a href="login.html">Войти</a></li>
+                <li id="registerLink"><a href="register.html">Регистрация</a></li>
+
+                <li id="userInfo" style="display:none; cursor: pointer;" onclick="goToDashboard()">
+                    <img id="userImage" src="" class="user-img">
+                    <span id="username"></span>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- MAIN -->
+<main>
+
+    <!-- ПЕРВЫЙ ЭКРАН -->
+    <section class="hero">
+        <h2>Система учета заявок на ремонт электрооборудования</h2>
+    </section>
+
+    <!-- ПРОКРУТКА -->
+    <section class="content">
+        <h2>Добро пожаловать</h2>
+        <p>Здесь вы можете подать заявку на ремонт электрооборудования.</p>
+        <p>Для подачи заявки, войдите или зарегистрируйтесь.</p>
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+    <p>&copy; 2026 МКУ "Кировсвет". Все права защищены.</p>
+</footer>
+
+<!-- МОДАЛКА -->
+<div id="authModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <p>Чтобы подать заявку, необходимо войти в систему.</p>
+        <div style="margin-top: 15px;">
+            <button onclick="goToLogin()">Войти</button>
+            <button onclick="goToRegister()">Зарегистрироваться</button>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPT -->
+<script>
+    // Проверка авторизации
+    if (sessionStorage.getItem('username')) {
+        document.getElementById('loginLink').style.display = 'none';
+        document.getElementById('registerLink').style.display = 'none';
+        document.getElementById('userInfo').style.display = 'flex';
+        document.getElementById('username').textContent = sessionStorage.getItem('username');
+        document.getElementById('userImage').src = sessionStorage.getItem('userImage');
+    }
+
+    function handleRequestClick(event) {
+        event.preventDefault();
+
+        if (!sessionStorage.getItem('username')) {
+            document.getElementById('authModal').style.display = 'block';
+        } else {
+            window.location.href = "submit_request.html";
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('authModal').style.display = 'none';
+    }
+
+    function goToLogin() {
+        window.location.href = "login.html";
+    }
+
+    function goToRegister() {
+        window.location.href = "register.html";
+    }
+
+    function goToDashboard() {
+        const username = sessionStorage.getItem('username');
+
+        if (username) {
+            if (username === 'Admin') {
+                window.location.href = "admin_dashboard.html";
+            } else {
+                window.location.href = "user_dashboard.html";
+            }
+        } else {
+            alert("Пожалуйста, войдите в систему.");
+        }
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('authModal');
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>

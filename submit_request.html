@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Подача заявки</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e2a38, #2f3f52);
+    color: #fff;
+    margin: 0;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+.container {
+    position: relative;
+    max-width: 700px;
+    width: 100%;
+    background: #24344f;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.closeBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    font-size: 32px;
+    font-weight: bold;
+    background-color: #FFD700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #1e2a38;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    user-select: none;
+    transition: 0.2s;
+}
+.closeBtn:hover { background-color: #FFC300; }
+
+h2, h3 { margin-top: 0; color: #FFD700; }
+label { display: block; margin-top: 15px; }
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #1e2a38;
+    color: #fff;
+    outline: none;
+}
+input::placeholder, textarea::placeholder { color: #aaa; }
+
+button {
+    padding: 12px;
+    width: 100%;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.openBtn { background-color: #2196F3; color: #fff; display: none; }
+.openBtn:hover { background-color: #1976D2; }
+
+.submitBtn { background-color: #4CAF50; color: #fff; }
+.submitBtn:hover { background-color: #388E3C; }
+
+.selectedItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    border: 1px solid #555;
+    padding: 10px;
+    border-radius: 10px;
+    background: #1e2a38;
+}
+.left { display: flex; align-items: center; gap: 10px; }
+.left img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #555; }
+.controls { display: flex; align-items: center; gap: 10px; }
+.controls button { width: 30px; height: 30px; cursor: pointer; border-radius: 4px; border: none; background: #444; color: #fff; font-weight: bold; transition: 0.2s; }
+.controls button:hover { background: #666; }
+.delete { background: #f44336; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+.delete:hover { background: #d32f2f; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <button class="closeBtn" title="На главную" onclick="goHome()">×</button>
+    <h2>Заявка</h2>
+
+    <label>Фамилия</label><input type="text" id="lastname">
+    <label>Имя</label><input type="text" id="firstname">
+    <label>Телефон</label><input type="text" id="phone">
+    <label>E-mail</label><input type="email" id="email" placeholder="example@mail.com">
+    <label>Адрес</label><input type="text" id="address">
+
+    <label>Тип работы</label>
+    <select id="workType" onchange="toggleInputs()">
+        <option value="">--- Выберите ---</option>
+        <option value="both">Установка столбов и светильников</option>
+        <option value="repair">Ремонт повреждения электрических сетей</option>
+    </select>
+
+    <!-- Кнопки для установки -->
+    <button class="openBtn" id="polesBtn" onclick="openPage('poles.html')">Установка столбов</button>
+    <button class="openBtn" id="lightBtn" onclick="openPage('light.html')">Установка светильников</button>
+
+    <!-- Поле для описания проблемы -->
+    <div id="problemDiv" style="display:none; margin-top:15px;">
+        <label>Опишите проблему</label>
+        <textarea id="problemDescription" rows="4" placeholder="Опишите повреждение или неисправность..."></textarea>
+    </div>
+
+    <h3>Вы выбрали:</h3>
+    <div id="result"></div>
+
+    <button class="submitBtn" onclick="submitRequest()">Оставить заявку</button>
+</div>
+
+<script>
+const username = sessionStorage.getItem('username');
+if (!username) { alert('Вы не вошли в систему.'); window.location.href='login.html'; }
+
+function goHome() { window.location.href='index.html'; }
+function openPage(page) { window.open(page, "_blank"); }
+
+// Переключение кнопок и текстового поля
+function toggleInputs() {
+    const type = document.getElementById('workType').value;
+    const polesBtn = document.getElementById('polesBtn');
+    const lightBtn = document.getElementById('lightBtn');
+    const problemDiv = document.getElementById('problemDiv');
+
+    if (type === 'both') {
+        polesBtn.style.display = 'block';
+        lightBtn.style.display = 'block';
+        problemDiv.style.display = 'none';
+    } else if (type === 'repair') {
+        polesBtn.style.display = 'none';
+        lightBtn.style.display = 'none';
+        problemDiv.style.display = 'block';
+    } else {
+        polesBtn.style.display = 'none';
+        lightBtn.style.display = 'none';
+        problemDiv.style.display = 'none';
+    }
+}
+
+// Работа с выбранными предметами
+function getData(){ return JSON.parse(localStorage.getItem("selectedItems"))||[]; }
+function saveData(data){ localStorage.setItem("selectedItems", JSON.stringify(data)); render(); }
+
+function render(){
+    const data=getData();
+    const result=document.getElementById("result");
+    result.innerHTML="";
+    data.forEach((item,index)=>{
+        item.qty=Number(item.qty)||1;
+        const div=document.createElement("div");
+        div.className="selectedItem";
+        div.innerHTML=`
+        <div class="left">
+            <img src="${decodeURIComponent(item.img)}">
+            <div>${item.name}</div>
+        </div>
+        <div class="controls">
+            <button onclick="minus(${index})">-</button>
+            <span>${item.qty}</span>
+            <button onclick="plus(${index})">+</button>
+            <button class="delete" onclick="removeItem(${index})">🗑</button>
+        </div>`;
+        result.appendChild(div);
+    });
+}
+function plus(i){ let data=getData(); data[i].qty++; saveData(data);}
+function minus(i){ let data=getData(); if(data[i].qty>1)data[i].qty--; saveData(data);}
+function removeItem(i){ let data=getData(); data.splice(i,1); saveData(data);}
+window.addEventListener("focus",()=>{ render(); });
+
+// Отправка заявки
+function submitRequest(){
+    const lastname=document.getElementById("lastname").value.trim();
+    const firstname=document.getElementById("firstname").value.trim();
+    const phone=document.getElementById("phone").value.trim();
+    const email=document.getElementById("email").value.trim();
+    const address=document.getElementById("address").value.trim();
+    const workType=document.getElementById("workType").value;
+    const items=getData();
+
+    if(!lastname||!firstname||!phone||!email||!address||!workType){
+        alert("Заполните все поля!");
+        return;
+    }
+
+    let problemDescription = "";
+    if(workType === "repair") {
+        problemDescription = document.getElementById("problemDescription").value.trim();
+        if(!problemDescription){
+            alert("Опишите проблему!");
+            return;
+        }
+    }
+
+    const request={
+        username, date:new Date().toLocaleString(),
+        lastname, firstname, phone, email, address,
+        type:workType, items, status:"Новая",
+        problemDescription: problemDescription || undefined,
+        createdAt:new Date().toISOString(),
+        expectedCallTime:new Date(Date.now()+5*60*1000).toISOString()
+    };
+
+    const storedRequests=JSON.parse(localStorage.getItem("requests"))||[];
+    storedRequests.push(request);
+    localStorage.setItem("requests", JSON.stringify(storedRequests));
+    localStorage.removeItem("selectedItems");
+
+    const summary=encodeURIComponent(JSON.stringify(request));
+    window.location.href=`confirmation.html?data=${summary}`;
+}
+</script>
+
+</body>
+</html>

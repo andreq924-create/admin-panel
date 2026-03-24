@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Подтверждение заявки</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* Панель заявки сверху по центру */
+.container {
+    max-width: 700px;
+    width: 90%;
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    margin: 40px auto 0 auto; /* сверху отступ и центр */
+    text-align: center;
+}
+h2 {
+    color: #4CAF50;
+    margin-bottom: 20px;
+}
+.info-section p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+.item-card {
+    display: inline-block;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 8px;
+    text-align: center;
+    background: #f9f9f9;
+}
+.item-card img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+button {
+    margin-top: 20px;
+    padding: 10px 25px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: 0.3s;
+}
+button:hover {
+    background-color: #388E3C;
+}
+.label {
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Ваша заявка принята!</h2>
+    <div class="info-section" id="info"></div>
+    <p style="margin-top:20px;">Через 5 минут с вами свяжутся для подтверждения заявки.</p>
+    <button onclick="goHome()">Вернуться в главное меню</button>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const data = JSON.parse(decodeURIComponent(params.get("data")));
+
+const infoDiv = document.getElementById("info");
+
+// Красивое отображение типа работы
+let workTypeName = "";
+if(data.type === "both") workTypeName = "Установка столбов и светильников";
+else if(data.type === "repair") workTypeName = "Ремонт повреждения электрических сетей";
+else workTypeName = data.type;
+
+let html = `
+<p><span class="label">ФИО:</span> ${data.lastname} ${data.firstname}</p>
+<p><span class="label">Телефон:</span> ${data.phone}</p>
+<p><span class="label">Email:</span> ${data.email}</p>
+<p><span class="label">Адрес:</span> ${data.address}</p>
+<p><span class="label">Тип работы:</span> ${workTypeName}</p>`;
+
+// Если есть описание проблемы, показываем
+if(data.problemDescription){
+    html += `<p><span class="label">Описание проблемы:</span> ${data.problemDescription}</p>`;
+}
+
+// Если есть выбранные предметы, показываем
+if(data.items && data.items.length > 0){
+    html += `<p><span class="label">Выбранные предметы:</span></p><div>`;
+    data.items.forEach(i=>{
+        html += `<div class="item-card">
+            <img src="${i.img}">
+            <div>${i.name} (${i.qty})</div>
+        </div>`;
+    });
+    html += `</div>`;
+}
+
+infoDiv.innerHTML = html;
+
+function goHome(){ window.location.href="index.html"; }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Панель администратора</title>
+<style>
+/* Общие настройки */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f2f5;
+    padding: 20px;
+    margin: 0;
+    color: #333;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+/* Заголовки */
+h2, h3, h4 {
+    margin-bottom: 15px;
+    color: #222;
+}
+
+/* Кнопки */
+button {
+    padding: 8px 15px;
+    cursor: pointer;
+    margin: 3px 2px;
+    border: none;
+    border-radius: 8px;
+    background-color: #007BFF;
+    color: white;
+    font-weight: 500;
+    transition: 0.2s;
+}
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Таблицы */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+th {
+    background-color: #f7f7f7;
+}
+tr:hover {
+    background-color: #f1faff;
+}
+
+/* Inputs & Selects */
+input, select {
+    padding: 8px;
+    margin: 5px 0;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+input:focus, select:focus {
+    outline: none;
+    border-color: #007BFF;
+}
+
+/* Оверлей и попап */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    animation: fadeIn 0.3s;
+}
+.popup {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    max-width: 550px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Выбранные предметы */
+.selected-items div, #productChildrenList div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #fafafa;
+    transition: 0.2s;
+}
+.selected-items div:hover, #productChildrenList div:hover {
+    background: #f0f8ff;
+}
+
+/* Превью картинок */
+img.preview {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 10px;
+    border-radius: 6px;
+}
+
+/* Вкладки */
+.tabs {
+    margin-bottom: 20px;
+}
+.tabs button {
+    background: #f0f2f5;
+    color: #555;
+    border: 1px solid #ddd;
+}
+.tabs button.active {
+    background: #007BFF;
+    color: white;
+}
+
+/* Анимация */
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h2>Админ панель</h2>
+<div class="tabs">
+  <button id="requestsTab" class="active" onclick="showMainTab('requests')">Заявки</button>
+  <button id="warehouseTab" onclick="showMainTab('warehouse')">Склад</button>
+</div>
+<!-- Попап редактирования дочернего объекта -->
+<div id="childEditPopup" class="overlay">
+  <div class="popup">
+     <h3>Редактировать дочерний объект</h3>
+  
+  <label>Название</label>
+  <input type="text" id="childEditName">
+
+  <label>Количество</label>
+  <input type="number" id="childEditQty">
+
+  <label>Описание / Дополнительно</label>
+  <textarea id="childEditInfo" rows="4" style="width:100%;"></textarea>
+
+  <label>Изображение PNG</label>
+  <input type="file" id="childEditFile" accept="image/png">
+
+  <!-- Новый блок для изменения количества -->
+  <label>Изменить количество:</label>
+  <div style="display:flex; gap:5px; align-items:center; margin-bottom:10px;">
+      <input type="number" id="childQtyChange" value="1" style="width:60px; padding:5px; border-radius:4px; border:1px solid #ccc;">
+      <button onclick="changeChildQty(true)">➕ Добавить</button>
+      <button onclick="changeChildQty(false)">➖ Вычесть</button>
+  </div>
+
+  <br>
+  <button onclick="saveChildEdit()">💾 Сохранить</button>
+  <button onclick="closeChildEditPopup()">Отмена</button>
+  <button onclick="deleteChildFromPopup()">🗑 Удалить</button>
+  </div>
+</div>
+<!-- ================= ЗАЯВКИ ================= -->
+<div id="requestsSection">
+  <div class="tabs">
+    <button id="newRequestsBtn" class="active" onclick="showTable('new')">Новые (<span id="newRequestsCount">0</span>)</button>
+    <button id="pendingRequestsBtn" onclick="showTable('pending')">В ожидании (<span id="pendingRequestsCount">0</span>)</button>
+    <button id="completedRequestsBtn" onclick="showTable('completed')">Выполненные (<span id="completedRequestsCount">0</span>)</button>
+  </div>
+  <button onclick="downloadAllRequests()">💾 Скачать все заявки</button>
+
+
+  <table id="newRequestsTable" class="requestsTable">
+  <thead><tr><th>ФИО</th><th>Телефон</th><th>Тип работы</th><th>Выбранные предметы</th><th>Действия</th></tr></thead>
+  <tbody></tbody>
+  </table>
+
+  <table id="pendingRequestsTable" class="requestsTable">
+  <thead><tr><th>ФИО</th><th>Телефон</th><th>Тип работы</th><th>Выбранные предметы</th><th>Дата звонка</th><th>Дата завершения</th><th>Действия</th></tr></thead>
+  <tbody></tbody>
+  </table>
+
+  <table id="completedRequestsTable" class="requestsTable">
+  <thead><tr><th>ФИО</th><th>Телефон</th><th>Тип работы</th><th>Выбранные предметы</th><th>Дата завершения</th></tr></thead>
+  <tbody></tbody>
+  </table>
+</div>
+
+<!-- ================= СКЛАД ================= -->
+<div id="warehouseSection" style="display:none;">
+<h3>Склад</h3>
+<button onclick="openProductPopup()">+ Добавить товар</button>
+<button onclick="downloadWarehouse()">💾 Скачать JSON</button>
+
+<table id="warehouseTable">
+<thead>
+<tr><th>Название</th><th>Картинка</th><th>Категория</th><th>Кол-во</th><th>Действия</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<!-- ====== Попап редактирования заявки ====== -->
+<div id="overlay" class="overlay">
+<div class="popup">
+<h3>Редактировать заявку</h3>
+
+<h4>Выбранные предметы:</h4>
+<div class="selected-items" id="selectedItems"></div>
+
+<label>Фамилия</label><input type="text" id="editLastname">
+<label>Имя</label><input type="text" id="editFirstname">
+<label>Телефон</label><input type="text" id="editPhone">
+<label>E-mail</label><input type="email" id="editEmail">
+<label>Адрес</label><input type="text" id="editAddress">
+<label>Тип работы</label><input type="text" id="editWorkType">
+<label>Дата звонка</label><input type="date" id="editCallDate">
+<label>Дата завершения</label><input type="date" id="editCompletionDate">
+
+<h4>Добавить товар со склада:</h4>
+<div style="display:flex; gap:10px;">
+  <button onclick="openWarehousePopup(true)">Выбрать товар</button>
+  <button onclick="window.open('light.html?forAdmin=1','_blank')">Вторая кнопка</button>
+</div>
+<br><br>
+<button onclick="saveRequestChanges()">Сохранить</button>
+<button id="statusActionBtn"></button>
+<button onclick="closePopup()">Отмена</button>
+</div>
+</div>
+
+<!-- ====== Попап товара для склада ====== -->
+<div id="productPopup" class="overlay">
+<div class="popup">
+<h3>Товар</h3>
+
+<label>Название товара</label>
+<input type="text" id="productName">
+
+<label>Категория</label>
+<select id="productCategory">
+  <option value="light">Освещение</option>
+  <option value="pole">Столбы</option>
+</select>
+ 
+ 
+
+ 
+<label>PNG с компьютера</label><input type="file" id="productFile" accept="image/png">
+ 
+<!-- Дочерние объекты (редактирование) -->
+<div id="productChildrenContainer">
+  <h4>Дочерние объекты</h4>
+  <div id="productChildrenList"></div>
+
+  <input type="text" id="productChildSize" placeholder="Имя дочернего объекта">
+  <input type="number" id="productChildQty" placeholder="Кол-во">
+   <label>Изображение PNG</label>
+  <input type="file" id="productChildFile" accept="image/png">
+<textarea id="productChildInfo" placeholder="Информация о дочернем объекте" rows="5" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;"></textarea>
+  <button type="button" onclick="addProductChild()">Добавить</button>
+</div>
+
+<br>
+<button onclick="saveProduct()">Сохранить</button>
+<button onclick="closeProductPopup()">Отмена</button>
+</div>
+</div>
+
+<!-- ====== Выбор товара для заявки ====== -->
+<div id="warehouseSelectPopup" class="overlay">
+<div class="popup">
+<h3>Выбрать товар со склада</h3>
+<div id="warehouseSelectList"></div>
+<button onclick="closeWarehousePopup()">Отмена</button>
+</div>
+</div>
+
+<script>
+let currentRequestCopy = null;
+let editIndex = null;
+let productChildren = []; // дочерние элементы товара
+let productName, productCategory, productQty;
+
+// ==== Табы ====
+function showMainTab(tab){
+  document.getElementById('requestsSection').style.display='none';
+  document.getElementById('warehouseSection').style.display='none';
+  if(tab=='requests') document.getElementById('requestsSection').style.display='block';
+  if(tab=='warehouse') document.getElementById('warehouseSection').style.display='block';
+}
+function showTable(name){
+  document.querySelectorAll('.requestsTable').forEach(t=>t.style.display='none');
+  document.getElementById(name+'RequestsTable').style.display='table';
+}
+
+// ==== Заявки ====
+function loadRequests(){
+
+  let requests = JSON.parse(localStorage.getItem('requests'))||[];
+  const today = new Date().toISOString().split('T')[0];
+  requests.forEach(r=>{ if(r.status=='В процессе' && r.completionDate && r.completionDate<=today) r.status='Завершена'; });
+  localStorage.setItem('requests',JSON.stringify(requests));
+
+  const newR=requests.filter(r=>r.status=='Новая');
+  const pendingR=requests.filter(r=>r.status=='В процессе');
+  const completedR=requests.filter(r=>r.status=='Завершена');
+
+  document.getElementById('newRequestsCount').textContent=newR.length;
+  document.getElementById('pendingRequestsCount').textContent=pendingR.length;
+  document.getElementById('completedRequestsCount').textContent=completedR.length;
+
+  renderRequests(newR,'newRequestsTable');
+  renderRequests(pendingR,'pendingRequestsTable');
+  renderRequests(completedR,'completedRequestsTable');
+  showTable('new');
+}
+
+// Словарь отображаемых названий типов работ
+const workTypeNames = {
+    both: "Установка столбов и освещения",
+    repair: "Ремонт повреждения электрических сетей"
+};
+
+// Функция рендеринга заявок
+// Функция рендеринга заявок
+function renderRequests(requests, tableId) {
+    const tbody = document.getElementById(tableId).querySelector('tbody');
+    tbody.innerHTML = '';
+
+    requests.forEach(r => {
+        // Формируем строку выбранных предметов
+        const itemsStr = r.items && r.items.length > 0
+            ? r.items.map(i => {
+                // Если есть описание проблемы у предмета (поле info), добавляем его
+                const info = i.info ? ` — ${i.info}` : '';
+                return `${i.name} (x${i.qty})${info}`;
+              }).join(', ')
+            : '-';
+
+        // Также отображаем описание проблемы (если оно есть)
+        const problemDescription = r.problemDescription ? `<span>${r.problemDescription}</span>` : '';
+
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+            <td>${r.lastname} ${r.firstname}</td>
+            <td>${r.phone}</td>
+            <td>${workTypeNames[r.type] || r.type}</td>
+            <td>${itemsStr}${problemDescription}</td> <!-- Добавляем описание проблемы сюда -->
+            <td><button onclick="editRequest('${r.createdAt}')">Обработать</button></td>
+        `;
+
+        tbody.appendChild(row);
+    });
+}
+
+// ==== Редактирование заявки ====
+function editRequest(createdAt){
+    let requests = JSON.parse(localStorage.getItem('requests')) || [];
+    const req = requests.find(r => r.createdAt === createdAt);
+    if(!req) return alert('Заявка не найдена');
+
+    currentRequestCopy = JSON.parse(JSON.stringify(req));
+
+    // ======== Вставка сюда ========
+    let updatedRequest = JSON.parse(localStorage.getItem("currentAdminRequest"));
+if (updatedRequest) {
+    if (!currentRequestCopy.items) currentRequestCopy.items = [];
+
+    updatedRequest.items.forEach(newItem => {
+        let existing = currentRequestCopy.items.find(i => i.name === newItem.name);
+
+        if (existing) {
+            existing.qty += newItem.qty;
+        } else {
+            currentRequestCopy.items.push(newItem);
+        }
+    });
+
+    renderSelectedItems();
+    localStorage.removeItem("currentAdminRequest");
+}
+    // ======== конец вставки ========
+
+    // Заполняем поля попапа
+    document.getElementById('editLastname').value = currentRequestCopy.lastname;
+    document.getElementById('editFirstname').value = currentRequestCopy.firstname;
+    document.getElementById('editPhone').value = currentRequestCopy.phone;
+    document.getElementById('editEmail').value = currentRequestCopy.email;
+    document.getElementById('editAddress').value = currentRequestCopy.address;
+    document.getElementById('editWorkType').value = currentRequestCopy.type;
+    document.getElementById('editCallDate').value = currentRequestCopy.callDate || '';
+    document.getElementById('editCompletionDate').value = currentRequestCopy.completionDate || '';
+
+    renderSelectedItems();
+    const statusBtn = document.getElementById('statusActionBtn');
+    if(currentRequestCopy.status == 'Новая'){ statusBtn.textContent='Отправить в ожидание'; statusBtn.onclick=sendToPending; }
+    else if(currentRequestCopy.status == 'В процессе'){ statusBtn.textContent='Выполнено'; statusBtn.onclick=sendToCompleted; }
+
+    document.getElementById('overlay').style.display='flex';
+}
+
+// ==== Выбранные предметы в заявке с раскрытием детей ====
+// Функция рендеринга выбранных предметов
+function renderSelectedItems() {
+    const div = document.getElementById('selectedItems');
+    div.innerHTML = '';
+
+    if (!currentRequestCopy.items || currentRequestCopy.items.length === 0) {
+        // Если items пусто, показываем описание проблемы (если оно есть)
+        div.innerHTML = currentRequestCopy.problemDescription || 'Нет выбранных предметов';
+    } else {
+        currentRequestCopy.items.forEach((item, index) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.style.flexDirection = 'column';
+
+            // Формируем строку с предметом и его количеством
+            const mainRow = document.createElement('div');
+            mainRow.style.display = 'flex';
+            mainRow.style.justifyContent = 'space-between';
+            mainRow.style.alignItems = 'center';
+
+            // Если есть описание проблемы (problemDescription), добавляем его
+            const problemDescription = currentRequestCopy.problemDescription 
+                ? `<span>${currentRequestCopy.problemDescription}</span>` 
+                : ''; // Если описания проблемы нет, ничего не добавляем
+
+            mainRow.innerHTML = `<span>${item.name} (x${item.qty})${problemDescription}</span>
+                <div>
+                    <button onclick="changeQty(${index}, 1)">+</button>
+                    <button onclick="changeQty(${index}, -1)">-</button>
+                    <button onclick="removeSelected(${index})">Удалить</button>
+                </div>`;
+            itemDiv.appendChild(mainRow);
+
+            // Дочерние объекты (если есть)
+            const childrenDiv = document.createElement('div');
+            childrenDiv.style.display = 'none';
+            childrenDiv.style.paddingLeft = '15px';
+
+            if (item.children && item.children.length > 0) {
+                item.children.forEach(c => {
+                    const childEl = document.createElement('div');
+                    childEl.style.whiteSpace = "pre-wrap"; // сохраняем переносы строк
+                    childrenDiv.appendChild(childEl);
+                });
+                mainRow.onclick = () => {
+                    childrenDiv.style.display = childrenDiv.style.display === 'none' ? 'block' : 'none';
+                };
+            }
+
+            itemDiv.appendChild(childrenDiv);
+            div.appendChild(itemDiv);
+        });
+    }
+}
+
+function changeQty(index,delta){ 
+  let item=currentRequestCopy.items[index]; 
+  item.qty=Number(item.qty)||1; 
+  item.qty+=delta; 
+  if(item.qty<1) item.qty=1; 
+  renderSelectedItems(); 
+}
+function removeSelected(index){ 
+  let item=currentRequestCopy.items[index]; 
+  returnStock(item); 
+  currentRequestCopy.items.splice(index,1); 
+  renderSelectedItems(); 
+}
+function saveRequestChanges(){
+  currentRequestCopy.lastname=document.getElementById('editLastname').value.trim();
+  currentRequestCopy.firstname=document.getElementById('editFirstname').value.trim();
+  currentRequestCopy.phone=document.getElementById('editPhone').value.trim();
+  currentRequestCopy.email=document.getElementById('editEmail').value.trim();
+  currentRequestCopy.address=document.getElementById('editAddress').value.trim();
+  currentRequestCopy.type=document.getElementById('editWorkType').value.trim();
+  currentRequestCopy.callDate=document.getElementById('editCallDate').value;
+  currentRequestCopy.completionDate=document.getElementById('editCompletionDate').value;
+
+  let requests=JSON.parse(localStorage.getItem('requests'))||[];
+  requests=requests.map(r=>r.createdAt===currentRequestCopy.createdAt?currentRequestCopy:r);
+  localStorage.setItem('requests',JSON.stringify(requests));
+  closePopup();
+  loadRequests();
+}
+function sendToPending(){ currentRequestCopy.status='В процессе'; saveRequestChanges(); }
+function sendToCompleted(){ currentRequestCopy.status='Завершена'; if(!currentRequestCopy.completionDate) currentRequestCopy.completionDate=new Date().toISOString().split('T')[0]; saveRequestChanges(); }
+function closePopup(){ document.getElementById('overlay').style.display='none'; currentRequestCopy=null; }
+
+// ==== Склад ====
+function loadWarehouse() {
+    const data = JSON.parse(localStorage.getItem('warehouse')) || [];
+    const tbody = document.querySelector("#warehouseTable tbody");
+    tbody.innerHTML = '';
+
+    const categories = {
+        light: { name: "Освещение", opened: false },
+        pole: { name: "Столбы", opened: false }
+    };
+
+    // Группируем товары по категориям
+    const grouped = {
+        light: data.filter(i => i.category === 'light'),
+        pole: data.filter(i => i.category === 'pole')
+    };
+
+    Object.keys(categories).forEach(catKey => {
+        let cat = categories[catKey];
+        let items = grouped[catKey];
+
+        // ===== строка категории =====
+        const catRow = document.createElement('tr');
+        catRow.style.cursor = "pointer";
+        catRow.style.background = "#eee";
+        catRow.innerHTML = `<td colspan="6">▶ ${cat.name}</td>`;
+        tbody.appendChild(catRow);
+
+        let itemRows = [];
+
+        // ===== товары внутри категории =====
+        items.forEach((item, i) => {
+            const realIndex = data.indexOf(item);
+            let opened = false;
+
+            const row = document.createElement('tr');
+            row.style.display = "none";
+            row.style.cursor = "pointer";
+
+            const parentImgSrc = item.img ? item.img : ''; // используем img родителя
+            row.innerHTML = `
+                <td style="padding-left:20px">▶ ${item.name}</td>
+                <td>${parentImgSrc ? `<img src="${parentImgSrc}" class="preview">` : '-'}</td>
+                <td>${item.category === 'light' ? 'Освещение' : 'Столбы'}</td>
+                 <td>${item.qty}</td>
+                <td>
+                    <button onclick="event.stopPropagation(); editProduct(${realIndex})">✏️</button> 
+                    <button onclick="event.stopPropagation(); deleteProduct(${realIndex})">🗑</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+            itemRows.push(row);
+
+            // ===== дочерние объекты товара =====
+            let childRows = [];
+            if (item.children && item.children.length > 0) {
+                item.children.forEach((c, ci) => {
+                    const childRow = document.createElement('tr');
+                    childRow.style.display = "none";
+
+                    // используем imgFileName как основной путь
+                    const childImgSrc = c.imgFileName ? `images/${c.imgFileName}` : (c.img || '');
+
+                 childRow.innerHTML = `
+    <td style="padding-left:40px">↳ ${c.name}</td>
+    <td>${childImgSrc ? `<img src="${childImgSrc}" class="preview">` : '-'}</td>
+    <td>-</td>
+    <td>${c.qty}</td>
+    <td>
+	<button onclick="event.stopPropagation(); editChildSettings(${realIndex}, ${ci});">⚙️</button>
+        <button onclick="event.stopPropagation(); deleteChild(${realIndex},${ci})">🗑</button>
+    </td>
+`;
+                    tbody.appendChild(childRow);
+                    childRows.push(childRow);
+                });
+            }
+
+            // ===== раскрытие товара =====
+            row.onclick = function () {
+                opened = !opened;
+                row.cells[0].innerHTML = (opened ? "▼ " : "▶ ") + item.name;
+                childRows.forEach(r => {
+                    r.style.display = opened ? "table-row" : "none";
+                });
+            };
+        });
+
+        // ===== раскрытие категории =====
+        catRow.onclick = function () {
+            cat.opened = !cat.opened;
+            catRow.cells[0].innerHTML = (cat.opened ? "▼ " : "▶ ") + cat.name;
+            itemRows.forEach(r => {
+                r.style.display = cat.opened ? "table-row" : "none";
+            });
+        };
+    });
+}
+
+function renderProductChildren() {
+    const div = document.getElementById('productChildrenList');
+    div.innerHTML = '';
+    productChildren.forEach((c, i) => {
+        const el = document.createElement('div');
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.marginBottom = '5px';
+
+        el.innerHTML = `
+            ${c.img ? `<img src="${c.img}" class="preview">` : ''}
+            <span style="margin-left: 10px;">${c.name} (x${c.qty})</span>
+           
+        `;
+        div.appendChild(el);
+    });
+}
+
+let currentChildIndex = null;
+
+function editChildSettings(parentIndex, childIndex) {
+    const data = JSON.parse(localStorage.getItem('warehouse')) || [];
+    const child = data[parentIndex].children[childIndex];
+    if (!child) return alert('Дочерний объект не найден');
+
+    currentChildIndex = childIndex;
+    editIndex = parentIndex; // <- важное исправление
+
+    document.getElementById('childEditName').value = child.name;
+    document.getElementById('childEditQty').value = child.qty;
+    document.getElementById('childEditInfo').value = child.info || '';
+
+    document.getElementById('childEditPopup').style.display = 'flex';
+}
+function changeChildQty(add = true) {
+    if (currentChildIndex === null || editIndex === null) return;
+
+    const delta = parseInt(document.getElementById('childQtyChange').value) || 0;
+    if (delta === 0) return;
+
+    const data = JSON.parse(localStorage.getItem('warehouse')) || [];
+    const parent = data[editIndex];
+    const child = parent.children[currentChildIndex];
+
+    if (!child) return;
+
+    if (add) child.qty += delta;
+    else child.qty = Math.max(1, child.qty - delta);
+
+    // Обновляем поле в попапе
+    document.getElementById('childEditQty').value = child.qty;
+
+    // Сохраняем сразу
+    localStorage.setItem('warehouse', JSON.stringify(data));
+
+    // Обновляем визуально
+    renderProductChildren();
+    loadWarehouse();
+}
+
+// Удаление дочернего объекта из попапа
+function deleteChildFromPopup() {
+    if (currentChildIndex === null || editIndex === null) return;
+
+    if (!confirm('Удалить дочерний объект?')) return;
+
+    const data = JSON.parse(localStorage.getItem('warehouse')) || [];
+    data[editIndex].children.splice(currentChildIndex, 1);
+    localStorage.setItem('warehouse', JSON.stringify(data));
+
+    closeChildEditPopup();
+    renderProductChildren();
+    loadWarehouse();
+}
+
+function saveChildEdit() {
+    if (currentChildIndex === null || editIndex === null) return;
+
+    const data = JSON.parse(localStorage.getItem('warehouse')) || [];
+    const child = data[editIndex].children[currentChildIndex];
+
+    child.name = document.getElementById('childEditName').value.trim();
+    child.qty = parseInt(document.getElementById('childEditQty').value);
+    child.info = document.getElementById('childEditInfo').value.trim();
+
+    const fileInput = document.getElementById('childEditFile');
+    if (fileInput.files[0]) {
+        child.img = `images/${fileInput.files[0].name}`;
+        child.imgFileName = fileInput.files[0].name;
+    }
+
+    localStorage.setItem('warehouse', JSON.stringify(data));
+    renderProductChildren();
+    loadWarehouse();
+    closeChildEditPopup();
+}
+
+function closeChildEditPopup() {
+    document.getElementById('childEditPopup').style.display = 'none';
+    currentChildIndex = null;
+    document.getElementById('childEditFile').value = '';
+    document.getElementById('childQtyChange').value = 1;
+}
+// ==== Редактирование дочернего объекта ====
+function editChild(parentIndex, childIndex){
+  const data = JSON.parse(localStorage.getItem('warehouse'))||[];
+  const child = data[parentIndex].children[childIndex];
+
+  // заполняем поля попапа товара
+  productName.value = child.name;
+  productCategory.value = data[parentIndex].category; // наследуем категорию родителя
+ 
+   productChildren = data[parentIndex].children.slice(); // копируем всех детей
+  editIndex = parentIndex; // редактируем родителя
+  renderProductChildren();
+
+  // временно удаляем редактируемого ребёнка, чтобы сохранить потом новые данные
+  productChildren.splice(childIndex,1);
+
+  document.getElementById('productPopup').style.display='flex';
+}
+
+// ==== Удаление дочернего объекта ====
+function deleteChild(parentIndex, childIndex){
+  if(!confirm('Удалить дочерний объект?')) return;
+  const data = JSON.parse(localStorage.getItem('warehouse'))||[];
+  data[parentIndex].children.splice(childIndex,1);
+  localStorage.setItem('warehouse', JSON.stringify(data));
+  loadWarehouse();
+}
+// ==== Дочерние объекты товара ====
+function addProductChild() {
+    const name = document.getElementById('productChildSize').value.trim();
+    const qty = parseInt(document.getElementById('productChildQty').value);
+    const info = document.getElementById('productChildInfo').value.trim();
+    const fileInput = document.getElementById('productChildFile');
+    const fileObj = fileInput.files[0];
+
+    if (!name || !qty) {
+        alert('Заполните имя и количество дочернего объекта');
+        return;
+    }
+
+    // Создаем объект нового ребенка
+    const childObj = {
+        name: name,
+        qty: qty,
+        info: info,
+        imgFileName: fileObj ? fileObj.name : '',        // имя файла
+        img: fileObj ? `images/${fileObj.name}` : ''    // путь к PNG
+    };
+
+    // **Добавляем нового ребенка в массив, не очищая предыдущих**
+    if (!productChildren) productChildren = [];
+    productChildren.push(childObj);
+
+    // Обновляем визуально
+    renderProductChildren();
+    clearChildInputs();
+}
+
+
+
+function saveProduct() {
+    const name = productName.value.trim();
+    const category = productCategory.value;
+    const fileInput = document.getElementById('productFile');
+
+    // путь к PNG родителя
+    let imgPath = '';
+    if (fileInput.files[0]) {
+        imgPath = `images/${fileInput.files[0].name}`;
+    } else if (editIndex !== null) {
+        const data = JSON.parse(localStorage.getItem('warehouse')) || [];
+        imgPath = data[editIndex].img || '';
+    }
+
+    if (!name) {
+        alert('Заполните имя товара');
+        return;
+    }
+    if (!imgPath && editIndex === null) {
+        alert('Укажите PNG для нового товара');
+        return;
+    }
+
+    // массив детей с правильными путями к PNG
+    const children = productChildren.map(c => ({
+        name: c.name,
+        qty: c.qty,
+        info: c.info || '',
+        img: c.imgFileName ? `images/${c.imgFileName}` : (c.img || '')
+    }));
+
+    const product = {
+        name: name,
+        category: category,
+        img: imgPath,
+        children: children
+    };
+
+    const data = JSON.parse(localStorage.getItem('warehouse')) || [];
+    if (editIndex !== null) {
+        data[editIndex] = product;
+    } else {
+        data.push(product);
+    }
+
+    localStorage.setItem('warehouse', JSON.stringify(data));
+    closeProductPopup();
+    loadWarehouse();
+	 saveWarehouseToGitHub(data);
+ }
+function clearChildInputs(){
+    document.getElementById('productChildSize').value='';
+    document.getElementById('productChildQty').value='';
+     document.getElementById('productChildInfo').value=''; // очистка нового поля
+    document.getElementById('productChildFile').value='';
+}
+function removeProductChild(i){ productChildren.splice(i,1); renderProductChildren(); }
+
+// ==== Попап товара ====
+function openProductPopup(){ 
+  editIndex = null; 
+  productName.value=''; 
+  productCategory.value='light'; 
+  productFile.value=''; 
+  
+  
+  productChildren=[]; 
+  renderProductChildren(); 
+
+  // Скрываем блок дочерних объектов при добавлении нового товара
+  document.getElementById('productChildrenContainer').style.display = 'none';
+
+  document.getElementById('productPopup').style.display='flex'; 
+}
+function closeProductPopup(){ document.getElementById('productPopup').style.display='none'; }
+function editProduct(i){ 
+  let data = JSON.parse(localStorage.getItem('warehouse')) || []; 
+  editIndex = i; 
+  let item = data[i]; 
+  productChildren = item.children || []; 
+  renderProductChildren();
+
+  productName.value = item.name; 
+  productCategory.value = item.category; 
+ 
+ 
+
+  // Показываем блок дочерних объектов при редактировании
+  document.getElementById('productChildrenContainer').style.display = 'block';
+
+  document.getElementById('productPopup').style.display='flex'; 
+}
+ 
+function deleteProduct(i){ if(!confirm('Удалить товар?')) return; const data=JSON.parse(localStorage.getItem('warehouse'))||[]; data.splice(i,1); localStorage.setItem('warehouse',JSON.stringify(data)); loadWarehouse(); }
+
+
+
+ 
+// ==== Выбор товара для заявки ====
+let selectForAdmin = false;
+function openWarehousePopup(forAdmin = false){
+  selectForAdmin = forAdmin; // сохраняем контекст
+  // вместо внутреннего popup открываем страницу выбора
+  if(selectForAdmin){
+ 	localStorage.setItem("currentAdminRequest", JSON.stringify(currentRequestCopy));
+	window.open('poles.html?forAdmin=1', '_blank');
+  } else {
+    // старое поведение для заявки
+    const data = JSON.parse(localStorage.getItem('warehouse'))||[];
+    const div = document.getElementById('warehouseSelectList');
+    div.innerHTML='';
+    data.forEach((item,index)=>{
+        if(item.qty<1) return;
+        const btn = document.createElement('button');
+        btn.innerHTML=`<img src="${item.img}" class="preview">${item.name} (осталось ${item.qty})`;
+        btn.onclick=function(){ addItemFromWarehouse(item,index); };
+        div.appendChild(btn);
+    });
+    document.getElementById('warehouseSelectPopup').style.display='flex';
+  }
+}
+
+
+function addItemFromWarehouse(item, index){
+  if(selectForAdmin){
+    if (!currentRequestCopy) return;
+
+    // Проверяем, есть ли уже товар с таким именем
+    let existing = currentRequestCopy.items.find(i => i.name === item.name);
+    if (existing) {
+        existing.qty = (Number(existing.qty) || 0) + 1;
+    } else {
+        // добавляем копию товара, включая дочерние объекты
+        currentRequestCopy.items.push({
+            name: item.name,
+            qty: 1,
+            children: item.children ? JSON.parse(JSON.stringify(item.children)) : []
+        });
+    }
+
+    // Обновляем визуально блок "Выбранные предметы"
+    renderSelectedItems();
+  } else {
+    // Обычное добавление в заявку
+    if(!currentRequestCopy) return;
+    let existing = currentRequestCopy.items.find(i=>i.name===item.name);
+    if(existing){ existing.qty=(Number(existing.qty)||0)+1; }
+    else { currentRequestCopy.items.push({ name:item.name, qty:1, children:item.children ? JSON.parse(JSON.stringify(item.children)) : [] }); }
+    decreaseStock(item.name);
+    renderSelectedItems();
+  }
+
+  closeWarehousePopup();
+}
+function closeWarehousePopup(){ document.getElementById('warehouseSelectPopup').style.display='none'; }
+function addItemToRequest(item,index){
+  if(!currentRequestCopy) return;
+  let existing=currentRequestCopy.items.find(i=>i.name===item.name);
+  if(existing){ existing.qty=(Number(existing.qty)||0)+1; }
+  else { currentRequestCopy.items.push({ name:item.name, qty:1, children:item.children ? JSON.parse(JSON.stringify(item.children)) : [] }); }
+  decreaseStock(item.name); renderSelectedItems(); closeWarehousePopup();
+}
+function decreaseStock(name){ const data=JSON.parse(localStorage.getItem('warehouse'))||[]; for(let i=0;i<data.length;i++){ if(data[i].name===name){ data[i].qty-=1; break; } } localStorage.setItem('warehouse',JSON.stringify(data)); loadWarehouse(); }
+function returnStock(item){ const data=JSON.parse(localStorage.getItem('warehouse'))||[]; for(let i=0;i<data.length;i++){ if(data[i].name===item.name){ data[i].qty+=item.qty; break; } } localStorage.setItem('warehouse',JSON.stringify(data)); loadWarehouse(); }
+function downloadWarehouse() {
+    const data = JSON.parse(localStorage.getItem('warehouse') || '[]');
+
+    // Просто используем текущий data — все пути к PNG уже в поле "img"
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'warehouse.json';
+    a.click();
+}
+// ==== INIT ====
+async function loadWarehouseFromJSON() {
+    try {
+        const response = await fetch('./warehouse.json');
+        if (!response.ok) throw new Error('Файл warehouse.json не найден');
+        let data = await response.json();
+
+        // Корректируем пути к картинкам
+        data.forEach(item => {
+            if(item.img && !item.img.startsWith('images/')) item.img = `images/${item.img}`;
+            if(item.children && item.children.length > 0){
+                item.children.forEach(c => { 
+                    if(c.img && !c.img.startsWith('images/')) c.img = `images/${c.img}`; 
+                });
+            }
+        });
+
+        // Сохраняем в localStorage
+        localStorage.setItem('warehouse', JSON.stringify(data));
+
+        // Загружаем склад на страницу
+        loadWarehouse();
+
+    } catch (err) {
+        alert('Ошибка загрузки склада: ' + err.message);
+        // На случай ошибки пытаемся загрузить из localStorage, если там есть данные
+        const localData = localStorage.getItem('warehouse');
+        if(localData) loadWarehouse();
+    }
+}
+
+async function loadRequestsFromJSON() {
+    // Если уже есть заявки в localStorage — используем их
+    const localData = localStorage.getItem('requests');
+    if (localData && localData.length > 0) {
+        loadRequests();
+        return;
+    }
+
+    try {
+        const response = await fetch('./requests_all.json');
+        if (!response.ok) throw new Error('Файл requests_all.json не найден');
+        const data = await response.json();
+
+        // Проверка структуры на всякий случай
+        if (!Array.isArray(data)) throw new Error('Неверный формат JSON заявок');
+
+        localStorage.setItem('requests', JSON.stringify(data));
+        loadRequests();
+    } catch (err) {
+        alert('Ошибка загрузки заявок: ' + err.message);
+        loadRequests();
+    }
+}
+window.addEventListener('DOMContentLoaded', function() {
+    productName = document.getElementById('productName');
+    productCategory = document.getElementById('productCategory');
+    
+    productQty = document.getElementById('productQty');
+
+    loadRequestsFromJSON(); // <-- вот здесь
+    loadWarehouseFromJSON();
+});
+
+window.addEventListener('focus', function () {
+    if (!currentRequestCopy) return;
+
+    let updatedRequest = JSON.parse(localStorage.getItem("currentAdminRequest"));
+    if (updatedRequest && updatedRequest.items) {
+
+        if (!currentRequestCopy.items) currentRequestCopy.items = [];
+
+        updatedRequest.items.forEach(newItem => {
+            let existing = currentRequestCopy.items.find(i => i.name === newItem.name);
+
+            if (existing) {
+                existing.qty += newItem.qty;
+            } else {
+                currentRequestCopy.items.push(newItem);
+            }
+        });
+
+        renderSelectedItems();
+        localStorage.removeItem("currentAdminRequest");
+    }
+});
+async function loadRequestsFromFile() {
+    try {
+        const response = await fetch('requests_all.json');
+        if (!response.ok) throw new Error('Файл requests_all.json не найден');
+        const requests = await response.json(); // просто массив
+
+        // Сохраняем в localStorage
+        localStorage.setItem('requests', JSON.stringify(requests));
+
+        // Загружаем таблицы
+        loadRequests();
+    } catch (err) {
+        alert('Ошибка загрузки заявок: ' + err.message);
+        loadRequests(); // fallback на localStorage
+    }
+}
+
+async function saveWarehouseToGitHub(updatedData) {
+    try {
+        const response = await fetch('/.netlify/functions/updateWarehouse', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ warehouse: updatedData })
+        });
+
+        let result;
+        try {
+            // пробуем распарсить JSON
+            result = await response.json();
+        } catch (err) {
+            // если сервер прислал текст вместо JSON
+            const text = await response.text();
+            console.error('Ответ сервера не в формате JSON:', text);
+            alert('Ошибка сервера при сохранении склада. Смотрите консоль.');
+            return;
+        }
+
+        if (!response.ok) {
+            console.error('Ошибка сервера:', result.error || result);
+            alert('Не удалось сохранить склад: ' + (result.error || 'Неизвестная ошибка'));
+            return;
+        }
+
+        console.log('Склад успешно обновлён на GitHub:', result);
+        alert('Склад успешно сохранён!');
+    } catch (err) {
+        console.error('Ошибка сети или запроса:', err);
+        alert('Ошибка при соединении с сервером. Проверьте интернет или Netlify Function.');
+    }
+}
+// Пример Node.js / Netlify Function
+exports.handler = async function(event, context) {
+  try {
+    const data = JSON.parse(event.body);
+    // ... обработка данных
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true })
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message }) // <- возвращаем JSON, а не plain text
+    };
+  }
+};
+function downloadAllRequests() {
+    const requests = JSON.parse(localStorage.getItem('requests')) || [];
+
+    const blob = new Blob([JSON.stringify(requests, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'requests_all.json';
+    a.click();
+}
+// Добавить товар в текущую редактируемую заявку
+function addItemToAdminRequest(item) {
+    if (!currentRequestCopy) return;
+
+    let existing = currentRequestCopy.items.find(i => i.name === item.name);
+    if (existing) existing.qty += 1;
+    else currentRequestCopy.items.push({
+        name: item.name,
+        qty: 1,
+        children: item.children ? JSON.parse(JSON.stringify(item.children)) : []
+    });
+
+    renderSelectedItems(); // обновляет визуально блок “Выбранные предметы”
+}
+</script>
+</body>
+</html>       

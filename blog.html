@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Освещение — Блог</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Roboto', sans-serif; margin: 0; background: #f4f6f8; color: #333; }
+    header { text-align: center; padding: 40px 20px; background: linear-gradient(135deg,#4facfe 0%,#00f2fe 100%); color: white; }
+    header h1 { margin:0; font-size:2.5em; }
+    header p { margin-top:5px; font-size:1.2em; }
+    .container { display:flex; max-width:1200px; margin:20px auto; gap:20px; padding:0 20px; }
+    .sidebar { flex:0 0 250px; background:white; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.1); padding:20px; }
+    .sidebar h2 { font-size:1.2em; margin-bottom:15px; color:#4facfe; }
+    .category { padding:10px; margin-bottom:8px; border-radius:8px; cursor:pointer; transition: background 0.3s; background:#f0f4f8; }
+    .category:hover, .category.active { background:#4facfe; color:white; }
+    .content { flex:1; display:flex; flex-direction:column; gap:20px; }
+    .card { display:flex; background:white; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; }
+    .card:hover { transform: translateY(-5px); box-shadow:0 15px 30px rgba(0,0,0,0.15); }
+    .card img { width:200px; object-fit:cover; }
+    .card-body { padding:15px 20px; display:flex; flex-direction:column; justify-content:center; }
+    .card-title { font-size:1.3em; font-weight:500; margin-bottom:10px; }
+    .card-text { font-size:1em; color:#555; line-height:1.5; }
+    @media(max-width:900px){ .container{flex-direction:column;} .card{flex-direction:column;} .card img{width:100%; height:200px;} }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Блог о свете</h1>
+  <p>Категории освещения</p>
+</header>
+
+<div class="container">
+  <!-- Сайдбар с категориями -->
+  <div class="sidebar">
+    <h2>Категории</h2>
+    <div class="category" data-category="streets">Освещение улиц</div>
+    <div class="category" data-category="parks">Освещение парков</div>
+    <div class="category" data-category="factories">Освещение цехов</div>
+  </div>
+
+  <!-- Контент справа -->
+  <div class="content" id="content-area">
+    <!-- Улица Чистопрудненская -->
+    <div class="card" data-category="streets">
+      <img src="blog/streets/street1.jpg" alt="Улица Чистопрудненская">
+      <div class="card-body">
+        <div class="card-title">Улица Чистопрудненская</div>
+        <div class="card-text">На улице Чистопрудненской были установлены новые столбы ОГКФ и светильники SLP Ex. Эти обновления обеспечивают высококачественное освещение, улучшая видимость и безопасность на улице в темное время суток. Столбы ОГКФ отличаются своей прочностью и долговечностью, а светильники SLP Ex обеспечивают равномерное и яркое освещение, создавая комфортную атмосферу для пешеходов и водителей. Эти изменения значительно повысили уровень безопасности на улице и сделали её более удобной для прогулок и транспортировки.</div>
+      </div>
+    </div>
+
+    <!-- Октябрьский проспект -->
+    <div class="card" data-category="streets">
+      <img src="blog/streets/street2.jpg" alt="Октябрьский проспект">
+      <div class="card-body">
+        <div class="card-title">Октябрьский проспект</div>
+        <div class="card-text">На Октябрьском проспекте проведена замена освещения на более мощное. Новые светильники обеспечивают яркое и равномерное освещение всей территории, повышая безопасность для пешеходов и водителей. Благодаря этим изменениям проспект стал более комфортным для вечерних и ночных прогулок, а также визуально более современным и ухоженным.</div>
+      </div>
+    </div>
+
+    <!-- Парк С.М. Кирова -->
+    <div class="card" data-category="parks">
+      <img src="blog/parks/park1.jpg" alt="Парк С.М. Кирова">
+      <div class="card-body">
+        <div class="card-title">Парк С.М. Кирова</div>
+        <div class="card-text">В парке имени Кирова обновили освещение, установив новые торшерные опоры с модулями STREET-30. Это создает безопасные и уютные тропинки для прогулок в темное время суток, делая парк более привлекательным и комфортным для отдыха. Современные светильники обеспечивают мягкое, но яркое освещение, подчеркивая природную красоту парка и создавая атмосферу уюта. Теперь жители города могут наслаждаться вечерними прогулками без страха споткнуться или повредиться.</div>
+      </div>
+    </div>
+
+    <!-- Парк Победы -->
+    <div class="card" data-category="parks">
+      <img src="blog/parks/park2.jpg" alt="Парк Победы">
+      <div class="card-body">
+        <div class="card-title">Парк Победы</div>
+        <div class="card-text">В Парке Победы также были проведены работы по улучшению освещения. Здесь установлены новые столбы ОТФ с современными светильниками ДКУ, которые обеспечивают яркое и равномерное освещение всей территории. Эти изменения значительно повысили безопасность на пешеходных дорожках парка, а также сделали вечерние прогулки более комфортными. Новый свет придает парку еще более торжественный вид, подчеркивая его значение как важного места для отдыха и патриотических мероприятий. Теперь жители и гости города могут спокойно наслаждаться прогулками даже в темное время суток.</div>
+      </div>
+    </div>
+
+    <!-- Жестяной цех -->
+    <div class="card" data-category="factories">
+      <img src="blog/factories/factory1.jpg" alt="Жестяной цех">
+      <div class="card-body">
+        <div class="card-title">Жестяной цех</div>
+        <div class="card-text">В Жестяном цехе были установлены новые светильники LEDek. Эти современные светильники обеспечивают яркое и экономичное освещение, что улучшило видимость и безопасность на территории. Благодаря LED технологиям, освещение стало более эффективным и долговечным, что особенно важно для производственных помещений. Теперь рабочие зоны стали более комфортными и безопасными для сотрудников.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const categories = document.querySelectorAll('.category');
+  const cards = document.querySelectorAll('.card');
+
+  // Функция фильтрации карточек по категории
+  function showCategory(category) {
+    categories.forEach(c => c.classList.remove('active')); // снимаем активный класс
+
+    // Подсвечиваем выбранную категорию
+    if(category){
+      const activeCat = document.querySelector(`.category[data-category="${category}"]`);
+      if(activeCat) activeCat.classList.add('active');
+    }
+
+    // Показываем или скрываем карточки
+    cards.forEach(card => {
+      card.style.display = (!category || card.dataset.category === category) ? 'flex' : 'none';
+    });
+  }
+
+  // Считываем параметр category из URL, например blog.html?category=parks
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialCategory = urlParams.get('category');
+
+  // Показываем карточки сразу при загрузке страницы
+  showCategory(initialCategory);
+
+  // Фильтруем по клику на категории в сайдбаре
+  categories.forEach(cat => {
+    cat.addEventListener('click', () => {
+      const category = cat.dataset.category;
+      showCategory(category);
+    });
+  });
+</script>
+
+</body>
+</html>

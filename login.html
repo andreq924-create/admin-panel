@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вход</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e2a38, #2f3f52);
+    color: #fff;
+}
+
+/* HEADER */
+header {
+    background-color: #1e2a38;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    margin: 0;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+nav a:hover {
+    color: #FFD700;
+}
+
+/* MAIN */
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 140px);
+}
+
+/* FORM */
+form {
+    background: #fff;
+    color: #000;
+    padding: 30px;
+    border-radius: 12px;
+    width: 320px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+form label {
+    font-size: 14px;
+}
+
+form input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: 0.2s;
+}
+
+form input:focus {
+    border-color: #FFD700;
+}
+
+/* BUTTON */
+form button {
+    margin-top: 10px;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #FFD700;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+form button:hover {
+    background-color: #FFC300;
+}
+
+/* ERROR */
+#error {
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* FOOTER */
+footer {
+    background: #000;
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+    <h1>Вход в систему</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Главная</a></li>
+            <li><a href="register.html">Регистрация</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <div>
+        <form id="loginForm">
+            <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Войти</button>
+        </form>
+
+        <div id="error" style="color: red; display: none;">
+            Неверный логин или пароль!
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2026 МКУ "Кировсвет". Все права защищены.</p>
+</footer>
+
+<script>
+const loginForm = document.getElementById('loginForm');
+const errorMessage = document.getElementById('error');
+
+loginForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (username === 'Admin' && password === 'Admin') {
+        sessionStorage.setItem('username', username);
+        window.location.href = "admin_dashboard.html";
+    } else {
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const user = users.find(u => u.username === username && u.password === password);
+
+        if (user) {
+            sessionStorage.setItem('username', user.username);
+            window.location.href = "user_dashboard.html";
+        } else {
+            errorMessage.style.display = 'block';
+        }
+    }
+});
+</script>
+
+</body>
+</html>
