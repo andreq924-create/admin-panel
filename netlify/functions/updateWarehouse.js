@@ -1,12 +1,10 @@
-﻿// netlify/functions/updateWarehouse.js (Node 18+)
-import fetch from 'node-fetch';
-
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Fine-grained token
-const REPO = 'твое_имя_пользователя/имя_репозитория'; // пример: 'itogiv/admin-panel'
+﻿// netlify/functions/updateWarehouse.js
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const REPO = 'andreq924-create/admin-panel';
 const FILE_PATH = 'warehouse.json';
 const BRANCH = 'main';
 
-export async function handler(event, context) {
+export async function handler(event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -15,20 +13,18 @@ export async function handler(event, context) {
   try {
     const body = JSON.parse(event.body);
     warehouse = body.warehouse;
-    if (!warehouse) {
-      return { statusCode: 400, body: 'No warehouse data provided' };
-    }
+    if (!warehouse) return { statusCode: 400, body: 'No warehouse data provided' };
   } catch (err) {
     return { statusCode: 400, body: 'Invalid JSON body' };
   }
 
   try {
-    // 1️⃣ Получаем SHA текущего файла
+    // Получаем SHA текущего файла
     const getResponse = await fetch(
       `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=${BRANCH}`,
       {
         headers: {
-          Authorization: `Bearer ${GITHUB_TOKEN}`, // Bearer для fine-grained token
+          Authorization: `Bearer ${GITHUB_TOKEN}`,
           'Accept': 'application/vnd.github.v3+json',
         },
       }
@@ -36,14 +32,12 @@ export async function handler(event, context) {
 
     const getText = await getResponse.text();
     if (!getResponse.ok) {
-      // выводим полный текст ошибки GitHub
       throw new Error(`Failed to get file info: ${getText}`);
     }
-
     const getData = JSON.parse(getText);
     const sha = getData.sha;
 
-    // 2️⃣ Подготавливаем PUT запрос для обновления файла
+    // PUT запрос для обновления файла
     const putResponse = await fetch(
       `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
       {
@@ -67,20 +61,10 @@ export async function handler(event, context) {
     }
 
     const putData = JSON.parse(putText);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true, data: putData }),
-    };
+    return { statusCode: 200, body: JSON.stringify({ success: true, data: putData }) };
 
   } catch (err) {
     console.error('GitHub API error:', err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        error: err.message,
-        stack: err.stack
-      }),
-    };
+    return { statusCode: 500, body: JSON.stringify({ error: err.message, stack: err.stack }) };
   }
 }
