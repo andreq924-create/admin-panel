@@ -9,49 +9,43 @@
 body { margin: 0; font-family: Arial, sans-serif; }
 
 /* HEADER */
-.header-container { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding: 15px 30px; 
-    background-color: #1e2a38; 
-    color: white; 
-    flex-wrap: wrap;
-}
+.header-container { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background-color: #1e2a38; color: white; flex-wrap: wrap; }
+.logo { width: 35px; margin-right: 10px; }
+.nav-menu { display: flex; list-style: none; gap: 20px; align-items: center; margin:0; padding:0; }
+.nav-menu a { color: white; text-decoration: none; padding: 5px 10px; transition: 0.3s; }
+.nav-menu a:hover { color: #FFD700; }
 
-.logo-block { 
-    display: flex; 
-    align-items: center; 
+/* Хедер фиксированный */
+#mainHeader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1e2a38;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
 }
-
-.logo { 
-    width: 50px; 
-    margin-right: 10px; 
-}
-
-.nav-menu { 
-    display: flex; 
-    list-style: none; 
-    gap: 20px; 
-    align-items: center; 
-    flex-wrap: wrap;
-}
-
-.nav-menu a { 
-    color: white; 
-    text-decoration: none; 
-    padding: 5px 10px;
-    transition: 0.3s;
-}
-
-.nav-menu a:hover { 
-    color: #FFD700; 
-}
-
-.nav-menu li { 
-    display: flex; 
+.header-inner {
+    max-width: 1200px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
+#mainHeader.scrolled {
+    padding: 10px 30px;
+    background-color: rgba(30, 42, 56, 0.5);
+}
+
+/* Пользователь */
+#userInfo { display: none; align-items: center; gap: 10px; cursor: pointer; margin-left: 20px; }
+#userInfo img { width: 30px; height: 30px; border-radius: 50%; }
 
 /* HERO */
 .hero { height: 100vh; background: url('sait1/main-photo.jpg') center/cover no-repeat; display: flex; align-items: center; padding-left: 60px; color: white; }
@@ -64,103 +58,33 @@ body { margin: 0; font-family: Arial, sans-serif; }
 .hero-buttons button { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; background-color: #FFD700; color: #000; font-size: 14px; transition: 0.3s; }
 .hero-buttons button:hover { background-color: #FFC300; }
 
-/* БЛОК "Что мы устанавливаем" */
-.install-section { background-color: #FFD700; padding: 100px 80px; position: relative; }
-.install-section h2 { font-size: 60px; margin-top: -50px; margin-bottom: 40px; color: #000; text-align: left; }
-.install-buttons { display: flex; gap: 20px; justify-content: center; }
-.install-buttons button {
-    position: relative;
-    flex: 1;
-    height: 400px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    background-size: cover;
-    background-position: center;
-    overflow: hidden;
-    color: #fff;
-    transition: 0.3s;
-}
-.install-buttons button:hover { filter: brightness(1.1); }
-.install-buttons button span {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-size: 26px;
-    font-weight: bold;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-}
-.install-section .install-text {
-    position: absolute;
-    bottom: 0px;
-    right: 5px;
-    font-size: 60px;
-    font-weight: 900;
-    color: #444;
-    letter-spacing: 2px;
-    line-height: 1;
-    white-space: nowrap;
-}
+/* Блоки установок и кейсов */
+.install-section, .cases-section { padding: 100px 80px; position: relative; background-color: #FFD700; }
+.install-buttons, .cases-buttons { display: flex; gap: 20px; justify-content: center; }
+.install-buttons button, .cases-buttons button { position: relative; flex: 1; height: 400px; border: none; border-radius: 12px; cursor: pointer; background-size: cover; background-position: center; overflow: hidden; color: #fff; transition: 0.3s; }
+.install-buttons button:hover, .cases-buttons button:hover { filter: brightness(1.1); }
+.install-buttons span, .cases-buttons span { position: absolute; bottom: 10px; right: 10px; font-size: 26px; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.7); }
+.install-section h2, .cases-section h2 { font-size: 60px; margin-top: -50px; margin-bottom: 40px; color: #000; text-align: left; }
 
-/* Блок "Почему мы?" */
+/* Почему мы */
 .why-section { background-color: #333; color: #eee; padding: 80px 60px; text-align: center; }
 .why-section h2 { font-size: 50px; margin-bottom: 50px; color: #FFD700; }
 .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; justify-items: center; align-items: start; }
-.why-item { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; max-width: 220px; }
 .why-item img { width: 100px; margin-bottom: 20px; }
 .why-title { font-weight: bold; font-size: 16px; margin: 5px 0; color: #fff; }
 .why-desc { font-weight: normal; font-size: 14px; color: #ccc; line-height: 1.4; margin-top: 5px; }
 
-/* Блок "Кейсы" */
-.cases-section { background-color: #FFD700; padding: 100px 80px; position: relative; }
-.cases-section h2 { font-size: 60px; margin-top: -50px; margin-bottom: 40px; color: #000; text-align: left; }
-.cases-buttons { display: flex; gap: 20px; justify-content: center; }
-.cases-buttons button {
-    position: relative;
-    flex: 1;
-    height: 400px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    background-size: cover;
-    background-position: center;
-    overflow: hidden;
-    color: #fff;
-    transition: 0.3s;
-}
-.cases-buttons button:hover { filter: brightness(1.1); }
-.cases-buttons button span {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-size: 26px;
-    font-weight: bold;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-}
-.cases-section .cases-text {
-    position: absolute;
-    bottom: 0px;
-    left: 5px;
-    font-size: 60px;
-    font-weight: 900;
-    color: #444;
-    letter-spacing: 2px;
-    line-height: 1;
-    white-space: nowrap;
-    transform: rotate(-90deg);
-    transform-origin: left bottom;
-}
+/* Видео и текст */
+.video-text-section { display: flex; gap: 40px; background: linear-gradient(90deg, #444 35%, #222 65%); padding: 60px 40px; flex-wrap: wrap; align-items: center; justify-content: center; }
+.video-text-section .video-text { flex: 1; color: white; padding: 20px; min-width: 250px; font-size: 18px; }
+.video-text-section iframe { flex: 2; min-width: 400px; height: 450px; border: none; }
 
-/* USER */
-.user-img { width: 30px; border-radius: 50%; margin-right: 5px; }
-
-/* МОДАЛКА */
+/* Модалка */
 .modal { display: none; position: fixed; z-index: 1000; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
 .modal-content { background: #fff; margin: auto; padding: 30px 25px; width: 320px; border-radius: 12px; text-align: center; position: relative; top: 50%; transform: translateY(-50%); box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from {opacity: 0; transform: translateY(-60%);} to {opacity: 1; transform: translateY(-50%);} }
 .close { position: absolute; right: 15px; top: 10px; font-size: 22px; cursor: pointer; color: #888; }
 .close:hover { color: #000; }
-.modal-content p { font-size: 16px; margin-bottom: 20px; }
 .modal-buttons { display: flex; gap: 10px; justify-content: center; }
 .modal-buttons button { flex: 1; padding: 10px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; transition: 0.2s; }
 .login-btn { background-color: #1e2a38; color: #fff; }
@@ -168,78 +92,54 @@ body { margin: 0; font-family: Arial, sans-serif; }
 .register-btn { background-color: #FFD700; color: #000; }
 .register-btn:hover { background-color: #FFC300; }
 
-/* ВИДЕО + ТЕКСТ */
-.video-text-section { display: flex; gap: 40px; background: linear-gradient(90deg, #444 35%, #222 65%); padding: 60px 40px; flex-wrap: wrap; align-items: center; justify-content: center; }
-.video-text-section .video-text { flex: 1; color: white; padding: 20px; min-width: 250px; font-size: 18px; }
-.video-text-section .video-text h2 { font-size: 32px; }
-.video-text-section iframe { flex: 2; min-width: 400px; height: 450px; border: none; }
-
- 
-/* Хедер по умолчанию — тонкая панель */
-#mainHeader {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: #1e2a38;
-    z-index: 1000;
-    transition: all 0.3s ease;
-    padding: 15px 30px; /* уменьшаем высоту */
-    display: flex;
-    justify-content: center; /* центрируем внутренний блок */
-    box-sizing: border-box;
-}
-
-/* Внутренний контейнер для центрирования контента */
-.header-inner {
-    max-width: 1200px; /* фиксированная ширина контента */
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px; /* внутренние отступы */
-    box-sizing: border-box;
-}
-html {
-    scroll-behavior: smooth;
-}
-/* Хедер при скролле — ещё тоньше и с прозрачностью */
-#mainHeader.scrolled {
-    padding: 10px 30px;
-    background-color: rgba(30, 42, 56, 0.5);
-}
-.logo { 
-    width: 35px; 
-    margin-right: 10px; 
-}
-/* Ссылки навигации и кнопки вход/регистрация — чуть меньше шрифт */
-.nav-menu a,
-#loginLink a,
-#registerLink a {
-    color: #fff;
-    font-size: 16px; /* меньше шрифт для компактности */
+/* Цвета для ссылок входа и регистрации */
+#loginLink a, #registerLink a {
+    color: white;
     text-decoration: none;
-    transition: color 0.3s;
-    line-height: 1.2;
 }
 
-/* При наведении ссылки становятся жёлтыми */
-.nav-menu a:hover,
-#loginLink a:hover,
-#registerLink a:hover {
+#loginLink a:hover, #registerLink a:hover {
+    color: #FFD700; /* Можно изменить на другой цвет, если требуется */
+}
+
+/* Нижний блок */
+footer {
+    background-color: #000;
+    color: #fff;
+    padding: 20px 0;
+    width: 100%;
+    text-align: center;
+}
+
+footer .footer-container {
+    display: flex;
+    justify-content: center; /* Центрируем элементы по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+    gap: 30px; /* Добавим отступы между элементами */
+    width: 100%;
+    font-size: 16px;
+}
+
+footer a {
     color: #FFD700;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #FFC300;
 }
 
 </style>
 </head>
 <body>
+
 <header id="mainHeader">
   <div class="header-inner">
     <!-- Левый блок: логотип + меню -->
     <div style="display: flex; align-items: center; gap: 30px;">
       <img src="sait1/logo.png" alt="Логотип" class="logo">
       <nav>
-        <ul class="nav-menu" style="display: flex; gap: 35px; margin: 0; padding: 0; list-style: none;">
+        <ul class="nav-menu">
           <li><a href="#installSection">Каталог</a></li>
           <li><a href="#casesSection">Работы</a></li>
           <li><a href="ContacMap.html">Контакты</a></li>
@@ -248,11 +148,17 @@ html {
       </nav>
     </div>
 
-    <!-- Правый блок: телефон + вход/регистрация -->
+    <!-- Правый блок -->
     <div style="display: flex; align-items: center; gap: 20px; font-size: 18px;">
       <div style="font-weight: bold; color: #fff;">+7 919 519 15 28</div>
+
       <div id="loginLink"><a href="login.html">Войти</a></div>
       <div id="registerLink"><a href="register.html">Регистрация</a></div>
+
+      <div id="userInfo" onclick="goToDashboard()">
+        <img id="userImage" src="" alt="User">
+        <span id="username" style="color:#fff; font-weight:bold;"></span>
+      </div>
     </div>
   </div>
 </header>
@@ -289,86 +195,41 @@ html {
             <span>Светильники</span>
         </button>
     </div>
-    <span class="install-text">УСТАНОВКА</span>
 </section>
 
-<!-- Блок "Почему мы?" -->
+<!-- Почему мы -->
 <section class="why-section">
     <h2>Почему мы?</h2>
     <div class="why-grid">
-        <div class="why-item">
-            <img src="sait1/icon1.png" alt="Научный подход">
-            <p class="why-title">Научный подход</p>
-            <p class="why-desc">У нас 9 патентов и инженеры со степенью PhD и MTech</p>
-        </div>
-        <div class="why-item">
-            <img src="sait1/icon2.png" alt="Мы стараемся">
-            <p class="why-title">Мы стараемся!</p>
-            <p class="why-desc">Мы пока не №1 на светотехническом рынке, поэтому очень стараемся</p>
-        </div>
-        <div class="why-item">
-            <img src="sait1/icon3.png" alt="Гарантия">
-            <p class="why-title">5 лет гарантии!</p>
-            <p class="why-desc">Без разбора ситуации ремонтируем или меняем сбойный светильник</p>
-        </div>
-        <div class="why-item">
-            <img src="sait1/icon4.png" alt="Цена">
-            <p class="why-title">По честной цене!</p>
-            <p class="why-desc">Наши цены "не кусаются" и всегда обоснованы</p>
-        </div>
-        <div class="why-item">
-            <img src="sait1/icon5.png" alt="Надежность">
-            <p class="why-title">Мы надежные</p>
-            <p class="why-desc">Нас проверили Халык Банк и АО «Фонд развития предпринимательства «Даму»</p>
-        </div>
-        <div class="why-item">
-            <img src="sait1/icon6.png" alt="Бюджет">
-            <p class="why-title">На любой бюджет!</p>
-            <p class="why-desc">Всегда можно найти решение под любой бюджет, дайте направление и рамки</p>
-        </div>
+        <div class="why-item"><img src="sait1/icon1.png"><p class="why-title">Научный подход</p><p class="why-desc">У нас 9 патентов и инженеры PhD и MTech</p></div>
+        <div class="why-item"><img src="sait1/icon2.png"><p class="why-title">Мы стараемся!</p><p class="why-desc">Мы пока не №1 на рынке, поэтому очень стараемся</p></div>
+        <div class="why-item"><img src="sait1/icon3.png"><p class="why-title">5 лет гарантии!</p><p class="why-desc">Ремонтируем или меняем сбойный светильник</p></div>
+        <div class="why-item"><img src="sait1/icon4.png"><p class="why-title">По честной цене!</p><p class="why-desc">Наши цены обоснованы</p></div>
+        <div class="why-item"><img src="sait1/icon5.png"><p class="why-title">Мы надежные</p><p class="why-desc">Нас проверили Халык Банк и Даму</p></div>
+        <div class="why-item"><img src="sait1/icon6.png"><p class="why-title">На любой бюджет!</p><p class="why-desc">Можно найти решение под любой бюджет</p></div>
     </div>
 </section>
-  
-<!-- Блок "Кейсы" -->
+
+<!-- Кейсы -->
 <section class="cases-section" id="casesSection">
     <h2>Кейсы</h2>
     <div class="cases-buttons">
-        <button style="background-image: url('sait1/case1.jpg');" onclick="location.href='blog.html?category=streets'">
-            <span>Улица</span>
-        </button>
-        <button style="background-image: url('sait1/case2.jpg');" onclick="location.href='blog.html?category=parks'">
-            <span>Парки</span>
-        </button>
-        <button style="background-image: url('sait1/case3.jpg');" onclick="location.href='blog.html?category=factories'">
-            <span>Цех</span>
-        </button>
+        <button style="background-image: url('sait1/case1.jpg');" onclick="location.href='blog.html?category=streets'"><span>Улица</span></button>
+        <button style="background-image: url('sait1/case2.jpg');" onclick="location.href='blog.html?category=parks'"><span>Парки</span></button>
+        <button style="background-image: url('sait1/case3.jpg');" onclick="location.href='blog.html?category=factories'"><span>Цех</span></button>
     </div>
-    <span class="cases-text">КЕЙСЫ</span>
 </section>
 
-<!-- Блок "Видео и текст" -->
+<!-- Видео -->
 <section class="video-text-section" id="videoSection">
     <div class="video-text">
         <h2>Видео про нас</h2>
-        <p>Посмотрите наше видео, чтобы узнать о деятельности МКУ "Кировсвет", наших проектах, установках светильников и опор, а также о том, как мы обеспечиваем качественное освещение в городе Киров.</p>
+        <p>Посмотрите наше видео, чтобы узнать о деятельности МКУ "Кировсвет".</p>
     </div>
     <iframe src="https://rutube.ru/play/embed/9d8a7dd4cd6e8657183748b31ed77d64" allowfullscreen></iframe>
 </section>
 
-<!-- ЧЕРНЫЙ КОНТАКТНЫЙ БЛОК -->
-<section style="background-color: #000; color: #fff; padding: 30px 20px; display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap;">
-    <div style="font-weight: bold;">&copy; МКУ "Кировсвет" 2026</div>
-    <div>Телефон: <a href="tel:+79195191528" style="color: #FFD700; text-decoration: none;">+7 919 519 15 28</a></div>
-    <div>Email: <a href="mailto:andreq924@gmail.com" style="color: #FFD700; text-decoration: none;">andreq924@gmail.com</a></div>
-    <div>
-        <a href="https://vk.com/mku_kirovsvet" target="_blank" style="display: inline-flex; align-items: center; color: #FFD700; text-decoration: none; gap: 8px;">
-            <img src="sait1/vk-icon.png" alt="ВКонтакте" style="width: 24px; height: 24px;">
-            ВКонтакте
-        </a>
-    </div>
-</section>
-
-<!-- МОДАЛКА -->
+<!-- Модалка -->
 <div id="authModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -382,49 +243,69 @@ html {
 </div>
 
 <script>
+// Отображение пользователя
 if(sessionStorage.getItem('username')){
-    document.getElementById('loginLink').style.display='none';
-    document.getElementById('registerLink').style.display='none';
-    document.getElementById('userInfo').style.display='flex';
-    document.getElementById('username').textContent=sessionStorage.getItem('username');
-    document.getElementById('userImage').src=sessionStorage.getItem('userImage');
+    const username = sessionStorage.getItem('username');
+    document.getElementById('loginLink').style.display = 'none';
+    document.getElementById('registerLink').style.display = 'none';
+    const userInfo = document.getElementById('userInfo');
+    userInfo.style.display = 'flex';
+    document.getElementById('username').textContent = username;
+
+    // Иконка
+    if(username === 'Admin'){
+        document.getElementById('userImage').src = 'sait1/admin-icon.png';
+    } else {
+        document.getElementById('userImage').src = 'sait1/user-icon.png';
+    }
 }
 
+// Кнопка заявки
 function handleRequestClick(event){
     event.preventDefault();
     if(!sessionStorage.getItem('username')){
         document.getElementById('authModal').style.display='block';
-    }else{
+    } else {
         window.location.href="submit_request.html";
     }
 }
 
-function closeModal(){document.getElementById('authModal').style.display='none';}
-function goToLogin(){window.location.href="login.html";}
-function goToRegister(){window.location.href="register.html";}
-// Следим за прокруткой
-// Следим за прокруткой
+function closeModal(){ document.getElementById('authModal').style.display='none'; }
+function goToLogin(){ window.location.href="login.html"; }
+function goToRegister(){ window.location.href="register.html"; }
+
+// Прокрутка хедера
 window.addEventListener('scroll', function() {
     const header = document.getElementById('mainHeader');
-    if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
+    if (window.scrollY > 50) header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
 });
+
+// Личный кабинет
 function goToDashboard(){
-    const username=sessionStorage.getItem('username');
+    const username = sessionStorage.getItem('username');
     if(username){
-        if(username==='Admin') window.location.href="admin_dashboard.html";
+        if(username === 'Admin') window.location.href="admin_dashboard.html";
         else window.location.href="user_dashboard.html";
-    }else alert("Пожалуйста, войдите в систему.");
+    } else alert("Пожалуйста, войдите в систему.");
 }
 
-window.onclick=function(event){
-    const modal=document.getElementById('authModal');
-    if(event.target===modal) modal.style.display="none";
+// Закрытие модалки при клике вне
+window.onclick = function(event){
+    const modal = document.getElementById('authModal');
+    if(event.target === modal) modal.style.display = "none";
 }
 </script>
 
+<!-- Нижний блок -->
+<footer>
+    <div class="footer-container">
+        <span>МКУ Кировсвет</span>
+        <span>Телефон: +7 919 519 15 28</span>
+        <span>Email: <a href="mailto:andreq924@gmail.com">andreq924@gmail.com</a></span>
+        <span>Группа ВКонтакте: <a href="https://vk.com/mku_kirovsvet" target="_blank">mku_kirovsvet</a></span>
+    </div>
+</footer>
+
 </body>
-</html>  
+</html>

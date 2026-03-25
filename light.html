@@ -2,64 +2,42 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Освещение</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Освещение - Тёмная тема</title>
 <style>
 body {
     font-family: Arial, sans-serif;
-    padding: 30px;
-    background-color: #f4f4f4;
     margin: 0;
+    padding: 30px;
+    background: linear-gradient(135deg, #1c1c1c, #2a2a2a);
+    color: #eee;
+    box-sizing: border-box;
 }
-h2 { text-align: center; margin-bottom: 20px; color: #333; }
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-}
-.card {
-    border: 1px solid #ccc;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    background-color: #fff;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-.card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 8px;
-}
-.qty-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #007BFF;
-    color: white;
-    padding: 5px 8px;
-    border-radius: 50%;
-}
-button {
-    margin-top: 15px;
-    padding: 10px 20px;
-    cursor: pointer;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 5px;
-}
-button:hover { background-color: #0056b3; }
-.back-btn {
-    margin-top: 20px;
-    background-color: #28a745;
-}
-.back-btn:hover { background-color: #218838; }
+h2 { text-align: center; margin-bottom: 20px; font-size: 2.5rem; color: #FFD700; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
+.grid .card, .size-grid .card { flex: 0 0 350px; }
+.size-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; padding: 20px 0; }
+.card { background-color: #2f2f2f; border: 1px solid #444; border-radius: 12px; overflow: hidden;
+       text-align: left; cursor: pointer; position: relative; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+       display: flex; flex-direction: column; gap: 15px; }
+.card:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.5); border-color: #FFD700; }
+.card img { width: 100%; height: 280px; object-fit: contain; border-bottom: 1px solid #444; background-color: #1c1c1c; }
+.card h3 { margin: 12px; font-size: 1.3rem; color: #FFD700; }
+.qty-badge { position: absolute; top: 10px; right: 10px; background: #FFD700; color: #000;
+             padding: 6px 12px; border-radius: 4px; font-size: 16px; font-weight: bold; min-width: 24px; text-align: center; }
+button { margin-top: 20px; padding: 12px 25px; background-color: #FFD700; color: #000; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; transition: background 0.3s; }
+button:hover { background-color: #FFC300; }
+button.back-btn, button.clear-cart { position: fixed; top: 20px; padding: 10px 20px; border-radius: 6px; font-size: 16px; cursor: pointer; color: #fff; font-weight: bold; }
+button.back-btn { left: 20px; background-color: #28a745; } button.back-btn:hover { background-color: #218838; }
+button.clear-cart { right: 20px; background-color: #dc3545; } button.clear-cart:hover { background-color: #c82333; }
+.details-container { display: flex; flex-direction: row; gap: 40px; margin-top: 20px; flex-wrap: nowrap; align-items: flex-start; }
+.details-container .image { width: 550px; flex: 0 0 auto; text-align: left; }
+.details-container .image img { width: 100%; height: 400px; object-fit: contain; display: block; border-radius: 12px; border: 1px solid #444; }
+.details-container .info { flex: 1 1 auto; max-width: 600px; padding: 20px 15px; background-color: #2f2f2f; border: 1px solid #444; border-radius: 12px;
+                          white-space: normal; overflow-wrap: break-word; word-break: break-word; }
+.details-container table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
+.details-container td:first-child { width: 180px; font-weight: bold; color: #FFD700; text-align: left; }
+@media (max-width: 800px) { .details-container { flex-direction: column; } .details-container .info, .details-container .image { width: 100%; } .grid { flex-direction: column; } .size-grid { flex-direction: column; align-items: center; } }
 </style>
 </head>
 <body>
@@ -70,185 +48,138 @@ button:hover { background-color: #0056b3; }
 <script>
 const warehouseKey = 'warehouse';
 const grid = document.getElementById("grid");
-
-// ===== режим админа =====
 const urlParams = new URLSearchParams(window.location.search);
 const isAdmin = urlParams.get('forAdmin') === '1';
 
-// ===== Инициализация =====
-if(!localStorage.getItem(warehouseKey)) {
-    const initialData = [
-        { 
-            name: "Люстра", 
-            img: "lustr.jpg", 
-            category: "light", 
-            qty: 6,
-            children: [
-                { name: "Люстра 3 лампы", qty: 2, price: 1500 },
-                { name: "Люстра 5 ламп", qty: 3, price: 2200 },
-                { name: "Люстра 7 ламп", qty: 1, price: 3000 }
-            ]
-        },
-        { 
-            name: "Светильник настольный", 
-            img: "lamp.jpg", 
-            category: "light", 
-            qty: 8,
-            children: [
-                { name: "LED лампа", qty: 5, price: 800 },
-                { name: "Лампа накаливания", qty: 3, price: 500 }
-            ]
-        }
-    ];
-    localStorage.setItem(warehouseKey, JSON.stringify(initialData));
+let currentLights = []; // глобальная переменная для фильтрованного массива
+
+// ===== Инициализация данных =====
+function initWarehouse() {
+    if(!localStorage.getItem(warehouseKey)) {
+        const initialData = [
+            { 
+                name: "Люстры", 
+                category: "light", 
+                img: "lustr.jpg",
+                children: [
+                    { name: "Люстра 3 лампы", qty: 2, price: 1500, info: "Материал: металл\nЦвет: золотой" },
+                    { name: "Люстра 5 ламп", qty: 3, price: 2200, info: "Материал: металл\nЦвет: серебро" }
+                ]
+            },
+            { 
+                name: "Настольные светильники", 
+                category: "light", 
+                img: "lamp.jpg",
+                children: [
+                    { name: "LED лампа", qty: 5, price: 800, info: "Мощность: 10W\nЦвет света: холодный" },
+                    { name: "Лампа накаливания", qty: 3, price: 500, info: "Мощность: 60W\nЦвет света: тёплый" }
+                ]
+            }
+        ];
+        localStorage.setItem(warehouseKey, JSON.stringify(initialData));
+    }
 }
 
 // ===== Главный экран =====
 function loadGrid() {
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-
+    currentLights = warehouse.filter(item => item.category === 'light'); // сохраняем фильтр
     grid.innerHTML = '';
+    document.querySelector('h2').textContent = 'Освещение';
 
-    warehouse.forEach((item, index) => {
-        if(item.category === 'light' && item.qty > 0) {
-
-            const card = document.createElement('div');
-            card.className = 'card';
-
-            card.innerHTML = `
-                <h3>${item.name}</h3>
-                <img src="${item.img}" alt="${item.name}">
-                <span class="qty-badge">${item.qty}</span>
-            `;
-
-            card.onclick = () => showChildren(index);
-
-            grid.appendChild(card);
-        }
+    currentLights.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<img src="${item.img}" alt="${item.name}"><h3>${item.name}</h3>`;
+        card.onclick = () => showChildren(index);
+        grid.appendChild(card);
     });
 }
 
-// ===== Дочерние =====
+// ===== Показ дочерних элементов =====
 function showChildren(parentIndex) {
-    const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-    const parent = warehouse[parentIndex];
+    const parent = currentLights[parentIndex];
     const children = parent.children || [];
 
-    if(children.length === 0) {
-        alert("Нет вариантов");
-        return;
-    }
+    if (!children.length) { alert("Нет вариантов"); return; }
 
-    grid.innerHTML = `
-        <h3>Варианты для ${parent.name}</h3>
-        <div class="grid">
-            ${children.map((c, i) => `
-                <div class="card" onclick="showDetails(${parentIndex}, ${i})">
-                    <h4>${c.name}</h4>
-                    <img src="${parent.img}" alt="${c.name}">
-                    <span class="qty-badge">${c.qty}</span>
-                </div>
-            `).join('')}
-        </div>
-        <button class="back-btn" onclick="loadGrid()">Назад</button>
-    `;
+    let html = `<div class="size-grid">`;
+    children.forEach((child, childIndex) => {
+        html += `<div class="card" onclick="showProductDetails(${parentIndex}, ${childIndex})">
+                    <img src="${child.img || parent.img}" alt="${child.name}"> <!-- используем child.img -->
+                    <h3>${child.name}</h3>
+                    <span class="qty-badge">${child.qty}</span>
+                 </div>`;
+    });
+    html += `</div><button class="back-btn" onclick="loadGrid()">Назад</button>`;
+    grid.innerHTML = html;
 }
 
-// ===== Детали =====
-function showDetails(parentIndex, childIndex) {
-    const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-    const parent = warehouse[parentIndex];
+// ===== Детали продукта =====
+function showProductDetails(parentIndex, childIndex) {
+    const parent = currentLights[parentIndex];
     const child = parent.children[childIndex];
 
-    grid.innerHTML = `
-        <h3>${child.name}</h3>
-        <div style="display:flex; gap:20px; margin-top:20px;">
-            <div style="flex:1;">
-                <img src="${parent.img}" style="width:100%; border-radius:8px;">
-            </div>
-            <div style="flex:2; background:#fff; padding:20px; border-radius:10px; border:1px solid #ccc;">
-                <p><strong>Название:</strong> ${child.name}</p>
-                <p><strong>Цена:</strong> ${child.price}</p>
-                <p><strong>В наличии:</strong> ${child.qty}</p>
-                <button onclick="selectItem(${parentIndex}, ${childIndex})">Выбрать</button>
-            </div>
+    let infoTableHTML = '<table>';
+    if (child.info) {
+        child.info.split('\n').forEach(line => {
+            if (!line.trim()) return;
+            const parts = line.split(':');
+            if (parts.length >= 2) infoTableHTML += `<tr><td>${parts[0].trim()}</td><td>${parts.slice(1).join(':').trim()}</td></tr>`;
+            else infoTableHTML += `<tr><td colspan="2">${line.trim()}</td></tr>`;
+        });
+    } else infoTableHTML += '<tr><td colspan="2">Информация отсутствует</td></tr>';
+    infoTableHTML += '</table>';
+
+    grid.innerHTML = `<div class="details-container">
+        <div class="image"><img src="${child.img || parent.img}" alt="${child.name}"></div> <!-- используем child.img -->
+        <div class="info">
+            <p><strong>Название:</strong> ${child.name}</p>
+            <p><strong>В наличии:</strong> ${child.qty}</p>
+            <p><strong>Информация:</strong></p>${infoTableHTML}
+            <button onclick="selectItem(${parentIndex}, ${childIndex})">Выбрать</button>
         </div>
-        <button class="back-btn" onclick="showChildren(${parentIndex})">Назад</button>
-    `;
+    </div>
+    <button class="back-btn" onclick="showChildren(${parentIndex})">Назад</button>`;
 }
 
-// ===== Выбор =====
+// ===== Выбор товара =====
 function selectItem(parentIndex, childIndex) {
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-    const parent = warehouse[parentIndex];
+    const parentName = currentLights[parentIndex].name;
+    const parent = warehouse.find(p => p.name === parentName);
     const child = parent.children[childIndex];
 
-    if(child.qty < 1) {
-        alert("Нет в наличии");
+    if (child.qty < 1) { alert("Нет в наличии"); return; }
+
+    // ===== Админ =====
+    if (isAdmin) {
+        let request = JSON.parse(localStorage.getItem("currentAdminRequest")) || { items: [] };
+        let exist = request.items.find(i => i.name === child.name);
+        if (exist) exist.qty += 1;
+        else request.items.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
+        localStorage.setItem("currentAdminRequest", JSON.stringify(request));
+        alert(`Товар "${child.name}" добавлен в заявку!`);
         return;
     }
 
-    // ===== АДМИН =====
-if (isAdmin) {
-    let currentRequestCopy = JSON.parse(localStorage.getItem("currentAdminRequest"));
-
-    if (!currentRequestCopy) {
-        currentRequestCopy = { items: [] };
-    }
-
-    // ищем товар в заявке
-    let exist = currentRequestCopy.items.find(i => i.name === child.name);
-
-    if (exist) {
-        exist.qty += 1;
-    } else {
-        // создаём новую копию объекта, чтобы не перезаписать другие
-        currentRequestCopy.items.push({
-            name: child.name,
-            price: child.price,
-            qty: 1,
-            img: parent.img
-        });
-    }
-
-    localStorage.setItem("currentAdminRequest", JSON.stringify(currentRequestCopy));
-    alert(`Товар "${child.name}" добавлен в заявку!`);
-    return;
-}
-
-    // ===== ПОЛЬЗОВАТЕЛЬ =====
+    // ===== Пользователь =====
     let selected = JSON.parse(localStorage.getItem("selectedItems")) || [];
-
-    const exist = selected.find(i => i.name === child.name);
-
-    if(exist) {
-        exist.qty += 1;
-    } else {
-        selected.push({
-            name: child.name,
-            price: child.price,
-            qty: 1,
-            img: parent.img
-        });
-    }
-
+    let exist = selected.find(i => i.name === child.name);
+    if (exist) exist.qty += 1;
+    else selected.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
     localStorage.setItem("selectedItems", JSON.stringify(selected));
 
-    // уменьшаем количество
-    child.qty -= 1;
-
-    // пересчет родителя
-    parent.qty = parent.children.reduce((sum, c) => sum + c.qty, 0);
-
-    localStorage.setItem(warehouseKey, JSON.stringify(warehouse));
+ 
 
     alert(`Товар "${child.name}" добавлен в корзину!`);
-
     loadGrid();
 }
 
-// ===== INIT =====
+// ===== Запуск =====
+initWarehouse();
 loadGrid();
 </script>
+
 </body>
 </html>

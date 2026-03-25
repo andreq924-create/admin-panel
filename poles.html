@@ -135,7 +135,6 @@ function showProductDetails(name, img, qty, parentIndex, childIndex) {
     <button class="back-btn" onclick="showChildren(${parentIndex})">Назад</button>`;
 }
 
-// ===== Функция добавления в корзину =====
 function selectItem(parentIndex, childIndex) {
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const parent = warehouse[parentIndex];
@@ -158,13 +157,14 @@ function selectItem(parentIndex, childIndex) {
     else selected.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
     localStorage.setItem("selectedItems", JSON.stringify(selected));
 
-    child.qty -= 1;
-    parent.qty = parent.children.reduce((sum, c) => sum + c.qty, 0);
-    localStorage.setItem(warehouseKey, JSON.stringify(warehouse));
+    // ⚠️ Убираем уменьшение количества на складе
+    // child.qty -= 1;
+    // parent.qty = parent.children.reduce((sum, c) => sum + c.qty, 0);
+    // localStorage.setItem(warehouseKey, JSON.stringify(warehouse));
+
     alert(`Товар "${child.name}" добавлен в корзину!`);
     loadGrid();
 }
-
 // ===== Запуск при загрузке страницы =====
 loadWarehouse();
 </script>

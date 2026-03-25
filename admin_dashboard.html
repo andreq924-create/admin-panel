@@ -229,31 +229,35 @@ img.preview {
 
 <!-- ====== Попап редактирования заявки ====== -->
 <div id="overlay" class="overlay">
-<div class="popup">
-<h3>Редактировать заявку</h3>
+  <div class="popup">
+    <h3>Редактировать заявку</h3>
 
-<h4>Выбранные предметы:</h4>
-<div class="selected-items" id="selectedItems"></div>
+    <h4>Выбранные предметы:</h4>
+    <div class="selected-items" id="selectedItems"></div>
 
-<label>Фамилия</label><input type="text" id="editLastname">
-<label>Имя</label><input type="text" id="editFirstname">
-<label>Телефон</label><input type="text" id="editPhone">
-<label>E-mail</label><input type="email" id="editEmail">
-<label>Адрес</label><input type="text" id="editAddress">
-<label>Тип работы</label><input type="text" id="editWorkType">
-<label>Дата звонка</label><input type="date" id="editCallDate">
-<label>Дата завершения</label><input type="date" id="editCompletionDate">
+    <label>Фамилия</label><input type="text" id="editLastname">
+    <label>Имя</label><input type="text" id="editFirstname">
+    <label>Телефон</label><input type="text" id="editPhone">
+    <label>E-mail</label><input type="email" id="editEmail">
+    <label>Адрес</label><input type="text" id="editAddress">
+    <label>Тип работы</label><input type="text" id="editWorkType">
+    <label>Дата звонка</label><input type="date" id="editCallDate">
+    <label>Дата завершения</label><input type="date" id="editCompletionDate">
 
-<h4>Добавить товар со склада:</h4>
-<div style="display:flex; gap:10px;">
-  <button onclick="openWarehousePopup(true)">Выбрать товар</button>
-  <button onclick="window.open('light.html?forAdmin=1','_blank')">Вторая кнопка</button>
-</div>
-<br><br>
-<button onclick="saveRequestChanges()">Сохранить</button>
-<button id="statusActionBtn"></button>
-<button onclick="closePopup()">Отмена</button>
-</div>
+    <h4>Добавить товар со склада:</h4>
+    <div style="display:flex; gap:10px;">
+      <button onclick="openWarehousePopup(true)">Выбрать товар</button>
+      <button onclick="window.open('light.html?forAdmin=1','_blank')">Вторая кнопка</button>
+    </div>
+    <br><br>
+    
+    <button onclick="saveRequestChanges()">Сохранить</button>
+    <button id="statusActionBtn"></button>
+    <button onclick="closePopup()">Отмена</button>
+
+    <!-- Кнопка для удаления заявки -->
+    <button onclick="deleteRequest()">🗑 Удалить заявку</button>
+  </div>
 </div>
 
 <!-- ====== Попап товара для склада ====== -->
@@ -322,27 +326,37 @@ function showTable(name){
 }
 
 // ==== Заявки ====
-function loadRequests(){
+// Функция загрузки заявок
+function loadRequests() {
+    const requests = JSON.parse(localStorage.getItem('requests')) || [];
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Обновляем статус заявки, если дата завершения прошла
+    requests.forEach(r => { 
+        if (r.status === 'В процессе' && r.completionDate && r.completionDate <= today) {
+            r.status = 'Завершена';
+        }
+    });
 
-  let requests = JSON.parse(localStorage.getItem('requests'))||[];
-  const today = new Date().toISOString().split('T')[0];
-  requests.forEach(r=>{ if(r.status=='В процессе' && r.completionDate && r.completionDate<=today) r.status='Завершена'; });
-  localStorage.setItem('requests',JSON.stringify(requests));
+    // Обновляем localStorage
+    localStorage.setItem('requests', JSON.stringify(requests));
 
-  const newR=requests.filter(r=>r.status=='Новая');
-  const pendingR=requests.filter(r=>r.status=='В процессе');
-  const completedR=requests.filter(r=>r.status=='Завершена');
+    // Разделяем заявки по статусам
+    const newR = requests.filter(r => r.status === 'Новая');
+    const pendingR = requests.filter(r => r.status === 'В процессе');
+    const completedR = requests.filter(r => r.status === 'Завершена');
 
-  document.getElementById('newRequestsCount').textContent=newR.length;
-  document.getElementById('pendingRequestsCount').textContent=pendingR.length;
-  document.getElementById('completedRequestsCount').textContent=completedR.length;
+    // Обновляем количество заявок в разделе
+    document.getElementById('newRequestsCount').textContent = newR.length;
+    document.getElementById('pendingRequestsCount').textContent = pendingR.length;
+    document.getElementById('completedRequestsCount').textContent = completedR.length;
 
-  renderRequests(newR,'newRequestsTable');
-  renderRequests(pendingR,'pendingRequestsTable');
-  renderRequests(completedR,'completedRequestsTable');
-  showTable('new');
+    // Отображаем заявки в таблицах
+    renderRequests(newR, 'newRequestsTable');
+    renderRequests(pendingR, 'pendingRequestsTable');
+    renderRequests(completedR, 'completedRequestsTable');
+    showTable('new');
 }
-
 // Словарь отображаемых названий типов работ
 const workTypeNames = {
     both: "Установка столбов и освещения",
@@ -351,37 +365,53 @@ const workTypeNames = {
 
 // Функция рендеринга заявок
 // Функция рендеринга заявок
+// Функция рендеринга заявок
+// Функция рендеринга заявок
+// Функция рендеринга заявок
+// Функция рендеринга заявок
 function renderRequests(requests, tableId) {
-    const tbody = document.getElementById(tableId).querySelector('tbody');
-    tbody.innerHTML = '';
+  const tbody = document.getElementById(tableId).querySelector('tbody');
+  tbody.innerHTML = '';
 
-    requests.forEach(r => {
-        // Формируем строку выбранных предметов
-        const itemsStr = r.items && r.items.length > 0
-            ? r.items.map(i => {
-                // Если есть описание проблемы у предмета (поле info), добавляем его
-                const info = i.info ? ` — ${i.info}` : '';
-                return `${i.name} (x${i.qty})${info}`;
-              }).join(', ')
-            : '-';
+  requests.forEach(r => {
+    const itemsStr = r.items && r.items.length > 0
+      ? r.items.map(i => {
+        const info = i.info ? ` — ${i.info}` : ''; // Если есть описание
+        return `${i.name} (x${i.qty})${info}`;
+      }).join(', ')
+      : '-';
 
-        // Также отображаем описание проблемы (если оно есть)
-        const problemDescription = r.problemDescription ? `<span>${r.problemDescription}</span>` : '';
+    const row = document.createElement('tr');
 
-        const row = document.createElement('tr');
+    // Если это таблица "Ожидающие", показываем "Дата звонка" и "Дата завершения"
+    if (tableId === 'pendingRequestsTable') {
+      row.innerHTML = `
+        <td>${r.lastname} ${r.firstname}</td>
+        <td>${r.phone}</td>
+        <td>${workTypeNames[r.type] || r.type}</td>
+        <td>${itemsStr}</td>
+        <td>${r.callDate || ''}</td> <!-- Дата звонка -->
+        <td>${r.completionDate || ''}</td> <!-- Дата завершения -->
+        <td style="text-align: center;">
+          <button onclick="editRequest('${r.createdAt}')">Обработать</button> <!-- Кнопка обработать в колонке Действия -->
+        </td>
+      `;
+    } else {
+      // Если это таблица "Новые заявки"
+      row.innerHTML = `
+        <td>${r.lastname} ${r.firstname}</td>
+        <td>${r.phone}</td>
+        <td>${workTypeNames[r.type] || r.type}</td>
+        <td>${itemsStr}</td>
+        <td style="text-align: center;">
+          <button onclick="editRequest('${r.createdAt}')">Обработать</button>
+        </td>
+      `;
+    }
 
-        row.innerHTML = `
-            <td>${r.lastname} ${r.firstname}</td>
-            <td>${r.phone}</td>
-            <td>${workTypeNames[r.type] || r.type}</td>
-            <td>${itemsStr}${problemDescription}</td> <!-- Добавляем описание проблемы сюда -->
-            <td><button onclick="editRequest('${r.createdAt}')">Обработать</button></td>
-        `;
-
-        tbody.appendChild(row);
-    });
+    tbody.appendChild(row);
+  });
 }
-
 // ==== Редактирование заявки ====
 function editRequest(createdAt){
     let requests = JSON.parse(localStorage.getItem('requests')) || [];
@@ -512,7 +542,52 @@ function saveRequestChanges(){
   closePopup();
   loadRequests();
 }
-function sendToPending(){ currentRequestCopy.status='В процессе'; saveRequestChanges(); }
+function sendToPending() {
+    if (!currentRequestCopy || !currentRequestCopy.items) return;
+
+    let warehouse = JSON.parse(localStorage.getItem('warehouse')) || [];
+    let missingItems = [];
+
+    // Проверяем наличие каждого предмета
+    currentRequestCopy.items.forEach(requestItem => {
+        // Находим родителя с таким дочерним элементом
+        let parent = warehouse.find(w => w.children?.some(c => c.name === requestItem.name));
+        if (!parent) {
+            missingItems.push(`${requestItem.name} (родитель не найден)`);
+            return;
+        }
+
+        let child = parent.children.find(c => c.name === requestItem.name);
+        if (!child) {
+            missingItems.push(`${requestItem.name} (не найден у родителя)`);
+            return;
+        }
+
+        if ((child.qty || 0) < (requestItem.qty || 0)) {
+            missingItems.push(`${requestItem.name} (недостаточно на складе: ${child.qty || 0})`);
+        }
+    });
+
+    // Если есть недостающие предметы — выводим уведомление и выходим
+    if (missingItems.length > 0) {
+        alert("Не хватает следующих предметов на складе:\n" + missingItems.join("\n"));
+        return;
+    }
+
+    // Если всё в наличии — вычитаем со склада
+    currentRequestCopy.items.forEach(requestItem => {
+        let parent = warehouse.find(w => w.children?.some(c => c.name === requestItem.name));
+        let child = parent.children.find(c => c.name === requestItem.name);
+        child.qty -= requestItem.qty || 0;
+    });
+
+    localStorage.setItem('warehouse', JSON.stringify(warehouse));
+    loadWarehouse();
+
+    // Меняем статус заявки
+    currentRequestCopy.status = 'В процессе';
+    saveRequestChanges();
+}
 function sendToCompleted(){ currentRequestCopy.status='Завершена'; if(!currentRequestCopy.completionDate) currentRequestCopy.completionDate=new Date().toISOString().split('T')[0]; saveRequestChanges(); }
 function closePopup(){ document.getElementById('overlay').style.display='none'; currentRequestCopy=null; }
 
@@ -685,6 +760,9 @@ function deleteChildFromPopup() {
     data[editIndex].children.splice(currentChildIndex, 1);
     localStorage.setItem('warehouse', JSON.stringify(data));
 
+    // Сохраняем на GitHub
+    saveWarehouseToGitHub(data);
+
     closeChildEditPopup();
     renderProductChildren();
     loadWarehouse();
@@ -743,6 +821,10 @@ function deleteChild(parentIndex, childIndex){
   const data = JSON.parse(localStorage.getItem('warehouse'))||[];
   data[parentIndex].children.splice(childIndex,1);
   localStorage.setItem('warehouse', JSON.stringify(data));
+
+  // Сохраняем на GitHub
+  saveWarehouseToGitHub(data);
+
   loadWarehouse();
 }
 // ==== Дочерние объекты товара ====
@@ -835,7 +917,39 @@ function clearChildInputs(){
     document.getElementById('productChildFile').value='';
 }
 function removeProductChild(i){ productChildren.splice(i,1); renderProductChildren(); }
+// Функция для удаления заявки
+// Функция для удаления заявки
+function deleteRequest() {
+    if (!currentRequestCopy) {
+        alert('Нет заявки для удаления');
+        return;
+    }
 
+    const requests = JSON.parse(localStorage.getItem('requests')) || [];
+    const index = requests.findIndex(r => r.createdAt === currentRequestCopy.createdAt);
+
+    if (index === -1) {
+        alert('Заявка не найдена');
+        return;
+    }
+
+    // Подтверждение удаления
+    if (!confirm('Вы уверены, что хотите удалить эту заявку?')) {
+        return;
+    }
+
+    // Удаляем заявку
+    requests.splice(index, 1);
+    localStorage.setItem('requests', JSON.stringify(requests));
+
+    alert('Заявка удалена');
+
+    // Закрытие попапа
+    closePopup();
+
+    // Обновляем отображение заявок
+    loadRequests();
+}
 // ==== Попап товара ====
 function openProductPopup(){ 
   editIndex = null; 
@@ -871,8 +985,17 @@ function editProduct(i){
   document.getElementById('productPopup').style.display='flex'; 
 }
  
-function deleteProduct(i){ if(!confirm('Удалить товар?')) return; const data=JSON.parse(localStorage.getItem('warehouse'))||[]; data.splice(i,1); localStorage.setItem('warehouse',JSON.stringify(data)); loadWarehouse(); }
+ function deleteProduct(i){ 
+  if(!confirm('Удалить товар?')) return; 
+  const data=JSON.parse(localStorage.getItem('warehouse'))||[]; 
+  data.splice(i,1); 
+  localStorage.setItem('warehouse',JSON.stringify(data)); 
 
+  // Сохраняем на GitHub
+  saveWarehouseToGitHub(data);
+
+  loadWarehouse(); 
+}
 
 
  
@@ -1130,4 +1253,4 @@ function addItemToAdminRequest(item) {
 }
 </script>
 </body>
-</html>       
+</html>          
