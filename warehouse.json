@@ -78,6 +78,13 @@
     "name": "вен",
     "category": "pole",
     "img": "images/oporaНФГ1.png",
-    "children": []
+    "children": [
+      {
+        "name": "ц4у5",
+        "qty": 2345,
+        "info": "23415",
+        "img": "images/oporaНФГ1.png"
+      }
+    ]
   }
 ]
