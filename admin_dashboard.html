@@ -539,6 +539,8 @@ function saveRequestChanges(){
   let requests=JSON.parse(localStorage.getItem('requests'))||[];
   requests=requests.map(r=>r.createdAt===currentRequestCopy.createdAt?currentRequestCopy:r);
   localStorage.setItem('requests',JSON.stringify(requests));
+  saveAllRequests();
+
   closePopup();
   loadRequests();
 }
@@ -580,6 +582,7 @@ function sendToPending() {
         let child = parent.children.find(c => c.name === requestItem.name);
         child.qty -= requestItem.qty || 0;
     });
+	saveAllRequests();
 
     localStorage.setItem('warehouse', JSON.stringify(warehouse));
     loadWarehouse();
@@ -588,7 +591,21 @@ function sendToPending() {
     currentRequestCopy.status = 'В процессе';
     saveRequestChanges();
 }
-function sendToCompleted(){ currentRequestCopy.status='Завершена'; if(!currentRequestCopy.completionDate) currentRequestCopy.completionDate=new Date().toISOString().split('T')[0]; saveRequestChanges(); }
+function sendToCompleted() {
+    // Изменяем статус текущего запроса на 'Завершена'
+    currentRequestCopy.status = 'Завершена';
+
+    // Если дата завершения ещё не установлена, добавляем текущую дату
+    if (!currentRequestCopy.completionDate) {
+        currentRequestCopy.completionDate = new Date().toISOString().split('T')[0];
+    }
+
+    // Сохраняем изменения текущего запроса
+    saveRequestChanges();
+
+    // Сохраняем все запросы
+    saveAllRequests();
+}
 function closePopup(){ document.getElementById('overlay').style.display='none'; currentRequestCopy=null; }
 
 // ==== Склад ====
@@ -949,6 +966,8 @@ function deleteRequest() {
 
     // Обновляем отображение заявок
     loadRequests();
+		saveAllRequests();
+
 }
 // ==== Попап товара ====
 function openProductPopup(){ 
@@ -1250,6 +1269,36 @@ function addItemToAdminRequest(item) {
     });
 
     renderSelectedItems(); // обновляет визуально блок “Выбранные предметы”
+}
+
+function saveAllRequests() {
+  const requests = JSON.parse(localStorage.getItem('requests')) || [];
+  saveRequestsAll(requests); // Отправляем все заявки на сервер
+}
+
+async function saveRequestsAll(requestsData) {
+  try {
+    const response = await fetch('/.netlify/functions/updateRequestsAll', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        requests: requestsData
+      })
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      console.error('Ошибка сервера:', result.error || result);
+      alert('Не удалось сохранить заявки: ' + (result.error || 'Неизвестная ошибка'));
+      return;
+    }
+
+    console.log('Заявки успешно обновлены на GitHub:', result);
+    alert('Заявки успешно сохранены!');
+  } catch (err) {
+    console.error('Ошибка при соединении с сервером:', err);
+    alert('Ошибка при соединении с сервером. Проверьте интернет или Netlify Function.');
+  }
 }
 </script>
 </body>

@@ -232,7 +232,41 @@ function submitRequest(){
 
     const summary=encodeURIComponent(JSON.stringify(request));
     window.location.href=`confirmation.html?data=${summary}`;
+
+	saveAllRequests();
 }
+
+async function saveRequestsAll(requestsData) {
+  try {
+    const response = await fetch('/.netlify/functions/updateRequestsAll', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        requests: requestsData
+      })
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      console.error('Ошибка сервера:', result.error || result);
+      alert('Не удалось сохранить заявки: ' + (result.error || 'Неизвестная ошибка'));
+      return;
+    }
+
+    console.log('Заявки успешно обновлены на GitHub:', result);
+    alert('Заявки успешно сохранены!');
+  } catch (err) {
+    console.error('Ошибка при соединении с сервером:', err);
+    alert('Ошибка при соединении с сервером. Проверьте интернет или Netlify Function.');
+  }
+}
+
+function saveAllRequests() {
+  const requests = JSON.parse(localStorage.getItem('requests')) || [];
+  saveRequestsAll(requests); // Отправляем все заявки на сервер
+}
+
+
 </script>
 
 </body>
