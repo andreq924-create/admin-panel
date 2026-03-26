@@ -1,117 +1,118 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вход</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e2a38, #2f3f52);
-            color: #fff;
-        }
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e2a38, #2f3f52);
+    color: #fff;
+}
 
-        /* HEADER */
-        header {
-            background-color: #1e2a38;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* HEADER */
+header {
+    background-color: #1e2a38;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        header h1 {
-            margin: 0;
-            font-size: 22px;
-        }
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
 
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-            margin: 0;
-        }
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    margin: 0;
+}
 
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            transition: 0.2s;
-        }
+nav a {
+    color: #fff;
+    text-decoration: none;
+    transition: 0.2s;
+}
 
-        nav a:hover {
-            color: #FFD700;
-        }
+nav a:hover {
+    color: #FFD700;
+}
 
-        /* MAIN */
-        main {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: calc(100vh - 140px);
-        }
+/* MAIN */
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 140px);
+}
 
-        /* FORM */
-        form {
-            background: #fff;
-            color: #000;
-            padding: 30px;
-            border-radius: 12px;
-            width: 320px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+/* FORM */
+form {
+    background: #fff;
+    color: #000;
+    padding: 30px;
+    border-radius: 12px;
+    width: 320px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
-        form label {
-            font-size: 14px;
-        }
+form label {
+    font-size: 14px;
+}
 
-        form input {
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            outline: none;
-            transition: 0.2s;
-        }
+form input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: 0.2s;
+}
 
-        form input:focus {
-            border-color: #FFD700;
-        }
+form input:focus {
+    border-color: #FFD700;
+}
 
-        /* BUTTON */
-        form button {
-            margin-top: 10px;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            background-color: #FFD700;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+/* BUTTON */
+form button {
+    margin-top: 10px;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #FFD700;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
 
-        form button:hover {
-            background-color: #FFC300;
-        }
+form button:hover {
+    background-color: #FFC300;
+}
 
-        /* ERROR */
-        #error {
-            text-align: center;
-            margin-top: 10px;
-        }
+/* ERROR */
+#error {
+    text-align: center;
+    margin-top: 10px;
+}
 
-        /* FOOTER */
-        footer {
-            background: #000;
-            text-align: center;
-            padding: 15px;
-            font-size: 14px;
-        }
-    </style>
+/* FOOTER */
+footer {
+    background: #000;
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+}
+</style>
+
 </head>
 <body>
 
@@ -148,29 +149,44 @@
 </footer>
 
 <script>
+// Функция для загрузки данных пользователей из файла users.json
+async function loadUsers() {
+    try {
+        const response = await fetch('users.json');
+        const users = await response.json();
+        return users;
+    } catch (error) {
+        console.error('Ошибка при загрузке данных пользователей:', error);
+        return [];
+    }
+}
+
 const loginForm = document.getElementById('loginForm');
 const errorMessage = document.getElementById('error');
 
-loginForm.addEventListener('submit', function(event) {
+loginForm.addEventListener('submit', async function(event) {
     event.preventDefault();
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    // Проверяем, если это администраторский вход
+    // Проверка на админа
     if (username === 'Admin' && password === 'Admin') {
         sessionStorage.setItem('username', username);
-        window.location.href = "admin_dashboard.html"; // Перенаправление на панель администратора
+        window.location.href = "admin_dashboard.html";  // Страница для администратора
     } else {
-        // Пытаемся найти пользователя в локальном хранилище
-        const users = JSON.parse(localStorage.getItem('users')) || []; // Получаем пользователей из локального хранилища
-        const user = users.find(u => u.username === username && u.password === password); // Ищем соответствие
+        // Загружаем пользователей из JSON
+        const users = await loadUsers();
+
+        // Ищем пользователя в данных
+        const user = users.find(u => u.username === username && u.password === password);
 
         if (user) {
-            sessionStorage.setItem('username', user.username); // Сохраняем имя пользователя в sessionStorage
-            window.location.href = "user_dashboard.html"; // Перенаправление на панель пользователя
+            sessionStorage.setItem('username', user.username);
+            window.location.href = "user_dashboard.html";  // Страница для обычного пользователя
         } else {
-            errorMessage.style.display = 'block'; // Показываем ошибку
+            // Отображаем ошибку
+            errorMessage.style.display = 'block';
         }
     }
 });
