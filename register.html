@@ -138,20 +138,46 @@
 
 <script>
     const registerForm = document.getElementById('registerForm');
-    
-    registerForm.addEventListener('submit', function(event) {
+
+    registerForm.addEventListener('submit', async function(event) {
         event.preventDefault();
 
         const regUsername = document.getElementById('regUsername').value;
         const regPassword = document.getElementById('regPassword').value;
 
-        // Сохраняем нового пользователя в localStorage
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        users.push({ username: regUsername, password: regPassword });
-        localStorage.setItem('users', JSON.stringify(users));
+        const newUser = { username: regUsername, password: regPassword };
 
-        alert("Регистрация успешна! Теперь можете войти.");
-        window.location.href = "login.html";  // Перенаправление на страницу входа
+        // Получаем текущий список пользователей из localStorage (если он существует)
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+
+        // Добавляем нового пользователя
+        users.push(newUser);
+
+        // Отправляем данные на сервер через Netlify Function (updateUsers.js)
+        try {
+            const response = await fetch('/.netlify/functions/updateUsers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ users: users })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.error('Ошибка сервера:', result.error || result);
+                alert('Не удалось сохранить пользователей: ' + (result.error || 'Неизвестная ошибка'));
+                return;
+            }
+
+            console.log('Пользователи успешно обновлены на GitHub:', result);
+            alert('Регистрация успешна! Теперь можете войти.');
+            window.location.href = "login.html";  // Перенаправление на страницу входа
+        } catch (err) {
+            console.error('Ошибка при соединении с сервером:', err);
+            alert('Ошибка при соединении с сервером. Проверьте интернет или Netlify Function.');
+        }
     });
 </script>
 
