@@ -73,5 +73,11 @@
         "img": "images/OporaOTF1.png"
       }
     ]
+  },
+  {
+    "name": "4123",
+    "category": "light",
+    "img": "images/Светильники Street2.png",
+    "children": []
   }
 ]
