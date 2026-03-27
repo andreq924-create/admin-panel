@@ -146,12 +146,45 @@ img.preview {
     from {opacity: 0;}
     to {opacity: 1;}
 }
+
+
+.header {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+}
+
+.menu-button, .logout-button {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.menu-button:hover, .logout-button:hover {
+  background-color: #2980b9;
+}
+
+.content {
+  margin-top: 50px;
+  padding: 20px;
+}
 </style>
 </head>
 <body>
 <div class="container">
 
 <h2>Админ панель</h2>
+<div class="header">
+  <button class="menu-button" onclick="goToMainMenu()">Главное меню</button>
+  <button class="logout-button" onclick="logout()">Выйти</button>
+</div>
 <div class="tabs">
   <button id="requestsTab" class="active" onclick="showMainTab('requests')">Заявки</button>
   <button id="warehouseTab" onclick="showMainTab('warehouse')">Склад</button>
@@ -543,6 +576,16 @@ function saveRequestChanges(){
 
   closePopup();
   loadRequests();
+}
+
+function goToMainMenu() {
+  window.location.href = 'index.html';
+}
+
+function logout() {
+  sessionStorage.removeItem('username');
+        alert('Вы вышли из системы.');
+        window.location.href = 'index.html';
 }
 function sendToPending() {
     if (!currentRequestCopy || !currentRequestCopy.items) return;

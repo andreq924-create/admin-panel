@@ -158,32 +158,41 @@ loginForm.addEventListener('submit', async function(event) {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
+    // Проверка для дефолтного пользователя
+    if (username === '111' && password === '111') {
+        sessionStorage.setItem('username', username);
+        window.location.href = "user_dashboard.html"; // Перенаправление на страницу пользователя
+        return;
+    }
+
+    // Проверка для администратора
     if (username === 'Admin' && password === 'Admin') {
         sessionStorage.setItem('username', username);
-        window.location.href = "admin_dashboard.html";
-    } else {
-        try {
-            // Загружаем данные пользователей из файла users.json
-            const response = await fetch('users.json');
-            if (!response.ok) {
-                throw new Error('Не удалось загрузить данные пользователей');
-            }
+        window.location.href = "admin_dashboard.html"; // Перенаправление на страницу администратора
+        return;
+    }
 
-            const users = await response.json();
-
-            // Проверяем, существует ли такой пользователь и совпадает ли пароль
-            const user = users.find(u => u.username === username && u.password === password);
-
-            if (user) {
-                sessionStorage.setItem('username', user.username);
-                window.location.href = "user_dashboard.html";
-            } else {
-                errorMessage.style.display = 'block';  // Показываем сообщение об ошибке
-            }
-        } catch (error) {
-            console.error('Ошибка при загрузке пользователей:', error);
-            alert('Ошибка при загрузке данных пользователей. Попробуйте позже.');
+    try {
+        // Загружаем данные пользователей из файла users.json
+        const response = await fetch('users.json');
+        if (!response.ok) {
+            throw new Error('Не удалось загрузить данные пользователей');
         }
+
+        const users = await response.json();
+
+        // Проверяем, существует ли такой пользователь и совпадает ли пароль
+        const user = users.find(u => u.username === username && u.password === password);
+
+        if (user) {
+            sessionStorage.setItem('username', user.username);
+            window.location.href = "user_dashboard.html"; // Перенаправление на страницу пользователя
+        } else {
+            errorMessage.style.display = 'block';  // Показываем сообщение об ошибке
+        }
+    } catch (error) {
+        console.error('Ошибка при загрузке пользователей:', error);
+        alert('Ошибка при загрузке данных пользователей. Попробуйте позже.');
     }
 });
 </script>
