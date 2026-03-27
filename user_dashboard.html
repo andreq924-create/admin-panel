@@ -168,10 +168,26 @@ if (!sessionStorage.getItem('username')) {
     displayRequests();
 }
 
+// Загрузка заявок из файла requests_all.json
+async function loadRequestsFromFile() {
+    let requestsData = [];
+    try {
+        const response = await fetch('path/to/requests_all.json'); // Укажите правильный путь к файлу
+        if (response.ok) {
+            requestsData = await response.json();
+        } else {
+            console.error('Ошибка загрузки с сервера:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+    }
+    return requestsData;
+}
+
 // Отображение заявок
-function displayRequests() {
-    const storedRequests = JSON.parse(localStorage.getItem('requests')) || [];
-    const userRequests = storedRequests.filter(request => request.username === sessionStorage.getItem('username'));
+async function displayRequests() {
+    const allRequests = await loadRequestsFromFile();
+    const userRequests = allRequests.filter(request => request.username === sessionStorage.getItem('username'));
 
     const tbody = document.getElementById('requestsTable').getElementsByTagName('tbody')[0];
     tbody.innerHTML = '';
@@ -204,9 +220,9 @@ function displayRequests() {
 }
 
 // Функция для скачивания заявок в файл JSON
-function downloadRequests() {
-    const storedRequests = JSON.parse(localStorage.getItem('requests')) || [];
-    const userRequests = storedRequests.filter(request => request.username === sessionStorage.getItem('username'));
+async function downloadRequests() {
+    const allRequests = await loadRequestsFromFile();
+    const userRequests = allRequests.filter(request => request.username === sessionStorage.getItem('username'));
 
     const blob = new Blob([JSON.stringify(userRequests, null, 2)], { type: 'application/json' });
     const link = document.createElement('a');
