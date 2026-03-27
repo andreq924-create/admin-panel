@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет</title>
     <style>
-        /* ОСНОВА */
+        /* Стиль для страницы */
         html, body {
             height: 100%;
         }
@@ -19,7 +19,6 @@
             flex-direction: column;
         }
 
-        /* HEADER */
         header {
             background-color: #1e2a38;
             padding: 15px 30px;
@@ -50,7 +49,6 @@
             color: #FFD700;
         }
 
-        /* MAIN */
         main {
             padding: 40px;
             flex: 1;
@@ -61,11 +59,10 @@
             color: #FFD700;
         }
 
-        /* ТАБЛИЦА (контрастная, мягкая) */
         table {
             width: 100%;
             border-collapse: collapse;
-            background: #1f3145; /* мягкий тёмно-синий фон */
+            background: #1f3145;
             color: #fff;
             border-radius: 10px;
             overflow: hidden;
@@ -73,8 +70,8 @@
         }
 
         thead {
-            background-color: #1e2a38; /* темнее заголовок */
-            color: #FFD700;            /* золотой заголовок */
+            background-color: #1e2a38;
+            color: #FFD700;
         }
 
         th, td {
@@ -84,40 +81,23 @@
         }
 
         tbody tr:nth-child(even) {
-            background-color: #25394e; /* светлая полоса */
+            background-color: #25394e;
         }
 
         tbody tr:nth-child(odd) {
-            background-color: #1f3145; /* основной цвет */
+            background-color: #1f3145;
         }
 
         tbody tr:hover {
-            background-color: #3a5a7a; /* светлый синий при наведении */
+            background-color: #3a5a7a;
             transition: 0.2s;
         }
 
-        /* FOOTER */
         footer {
             background: #000;
             text-align: center;
             padding: 15px;
             font-size: 14px;
-        }
-
-        /* Кнопка для скачивания JSON */
-        #downloadBtn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        #downloadBtn:hover {
-            background-color: #388E3C;
         }
     </style>
 </head>
@@ -150,9 +130,6 @@
         <tbody>
         </tbody>
     </table>
-
-    <!-- Кнопка для скачивания заявок в формате JSON -->
-    <button id="downloadBtn">Скачать заявки в формате JSON</button>
 </main>
 
 <footer>
@@ -163,34 +140,39 @@
 // Проверка, вошёл ли пользователь
 if (!sessionStorage.getItem('username')) {
     alert('Вы не вошли в систему. Пожалуйста, авторизуйтесь.');
-    window.location.href = 'login.html';
+    window.location.href = 'login.html'; // Перенаправление на страницу входа
 } else {
     displayRequests();
 }
 
-// Загрузка заявок из файла requests_all.json
-async function loadRequestsFromFile() {
-    let requestsData = [];
-    try {
-        const response = await fetch('path/to/requests_all.json'); // Укажите правильный путь к файлу
-        if (response.ok) {
-            requestsData = await response.json();
-        } else {
-            console.error('Ошибка загрузки с сервера:', response.statusText);
-        }
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
+// Загрузка заявок с внешнего источника
+async function loadRequests() {
+    const response = await fetch('https://resilient-syrniki-a7095d.netlify.app/path/to/requests_all.json');
+    
+    if (!response.ok) {
+        alert('Ошибка загрузки данных заявок.');
+        return [];
     }
-    return requestsData;
+    
+    const data = await response.json();
+    return data;
 }
 
-// Отображение заявок
+// Отображение заявок для конкретного пользователя
 async function displayRequests() {
-    const allRequests = await loadRequestsFromFile();
-    const userRequests = allRequests.filter(request => request.username === sessionStorage.getItem('username'));
+    const username = sessionStorage.getItem('username'); // Получаем username из sessionStorage
+    if (!username) {
+        alert('Вы не вошли в систему.');
+        window.location.href = 'login.html'; // Перенаправление на страницу входа
+    }
+
+    const requests = await loadRequests(); // Загружаем все заявки
+
+    // Фильтрация заявок по текущему пользователю
+    const userRequests = requests.filter(request => request.username === username);
 
     const tbody = document.getElementById('requestsTable').getElementsByTagName('tbody')[0];
-    tbody.innerHTML = '';
+    tbody.innerHTML = ''; // Очистить таблицу перед добавлением новых данных
 
     userRequests.forEach(request => {
         const row = tbody.insertRow();
@@ -218,21 +200,6 @@ async function displayRequests() {
         row.insertCell(4).textContent = request.status || 'Новая';
     });
 }
-
-// Функция для скачивания заявок в файл JSON
-async function downloadRequests() {
-    const allRequests = await loadRequestsFromFile();
-    const userRequests = allRequests.filter(request => request.username === sessionStorage.getItem('username'));
-
-    const blob = new Blob([JSON.stringify(userRequests, null, 2)], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'requests.json';  // Имя файла
-    link.click();
-}
-
-// Привязываем действие к кнопке
-document.getElementById('downloadBtn').addEventListener('click', downloadRequests);
 
 // Выход
 function logout() {
