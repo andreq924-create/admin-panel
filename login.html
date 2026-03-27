@@ -149,43 +149,26 @@ footer {
 </footer>
 
 <script>
-// Функция для загрузки данных пользователей из файла users.json
-async function loadUsers() {
-    try {
-        const response = await fetch('users.json');
-        const users = await response.json();
-        return users;
-    } catch (error) {
-        console.error('Ошибка при загрузке данных пользователей:', error);
-        return [];
-    }
-}
-
 const loginForm = document.getElementById('loginForm');
 const errorMessage = document.getElementById('error');
 
-loginForm.addEventListener('submit', async function(event) {
+loginForm.addEventListener('submit', function(event) {
     event.preventDefault();
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    // Проверка на админа
     if (username === 'Admin' && password === 'Admin') {
         sessionStorage.setItem('username', username);
-        window.location.href = "admin_dashboard.html";  // Страница для администратора
+        window.location.href = "admin_dashboard.html";
     } else {
-        // Загружаем пользователей из JSON
-        const users = await loadUsers();
-
-        // Ищем пользователя в данных
+        const users = JSON.parse(localStorage.getItem('users')) || [];
         const user = users.find(u => u.username === username && u.password === password);
 
         if (user) {
             sessionStorage.setItem('username', user.username);
-            window.location.href = "user_dashboard.html";  // Страница для обычного пользователя
+            window.location.href = "user_dashboard.html";
         } else {
-            // Отображаем ошибку
             errorMessage.style.display = 'block';
         }
     }
