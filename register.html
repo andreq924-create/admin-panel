@@ -4,181 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e2a38, #2f3f52);
-            color: #fff;
-        }
-
-        /* HEADER */
-        header {
-            background-color: #1e2a38;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 22px;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-            margin: 0;
-        }
-
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            transition: 0.2s;
-        }
-
-        nav a:hover {
-            color: #FFD700;
-        }
-
-        /* MAIN */
-        main {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: calc(100vh - 140px);
-        }
-
-        /* FORM */
-        form {
-            background: #fff;
-            color: #000;
-            padding: 30px;
-            border-radius: 12px;
-            width: 320px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        form label {
-            font-size: 14px;
-        }
-
-        form input {
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            outline: none;
-            transition: 0.2s;
-        }
-
-        form input:focus {
-            border-color: #FFD700;
-        }
-
-        /* BUTTON */
-        form button {
-            margin-top: 10px;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            background-color: #FFD700;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        form button:hover {
-            background-color: #FFC300;
-        }
-
-        /* FOOTER */
-        footer {
-            background: #000;
-            text-align: center;
-            padding: 15px;
-            font-size: 14px;
-        }
-    </style>
 </head>
 <body>
 
-<header>
-    <h1>Регистрация</h1>
-    <nav>
-        <ul>
-            <li><a href="index.html">Главная</a></li>
-            <li><a href="login.html">Войти</a></li>
-        </ul>
-    </nav>
-</header>
+<h2>Регистрация</h2>
 
-<main>
-    <div>
-        <form id="registerForm">
-            <label for="regUsername">Имя пользователя:</label>
-            <input type="text" id="regUsername" name="username" required>
-
-            <label for="regPassword">Пароль:</label>
-            <input type="password" id="regPassword" name="password" required>
-
-            <button type="submit">Зарегистрироваться</button>
-        </form>
-    </div>
-</main>
-
-<footer>
-    <p>&copy; 2026 МКУ "Кировсвет". Все права защищены.</p>
-</footer>
+<form id="registerForm">
+    <input type="text" id="regUsername" placeholder="Логин" required>
+    <input type="password" id="regPassword" placeholder="Пароль" required>
+    <button type="submit">Зарегистрироваться</button>
+</form>
 
 <script>
-    const registerForm = document.getElementById('registerForm');
+const TOKEN = 'ТВОЙ_GITHUB_TOKEN'; // ⚠️ виден всем
+const REPO = 'andreq924-create/admin-panel';
+const FILE_PATH = 'users.json';
 
-    registerForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
+// Получить файл и SHA
+async function getFile() {
+    const res = await fetch(
+        `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
+        {
+            headers: {
+                Authorization: `Bearer ${TOKEN}`
+            }
+        }
+    );
 
-        const regUsername = document.getElementById('regUsername').value;
-        const regPassword = document.getElementById('regPassword').value;
+    return await res.json();
+}
 
-        const newUser = { username: regUsername, password: regPassword };
+// Сохранить файл
+async function updateFile(users, sha) {
+    return fetch(
+        `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
+        {
+            method: 'PUT',
+            headers: {
+                Authorization: `Bearer ${TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: 'update users',
+                content: btoa(JSON.stringify(users, null, 2)),
+                sha: sha
+            })
+        }
+    );
+}
 
-        // Получаем текущий список пользователей из localStorage (если он существует)
-        const users = JSON.parse(localStorage.getItem('users')) || [];
+// Форма
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        // Добавляем нового пользователя
+    const username = document.getElementById('regUsername').value;
+    const password = document.getElementById('regPassword').value;
+
+    const newUser = { username, password };
+
+    try {
+        // 1. Получаем текущий файл
+        const file = await getFile();
+
+        // 2. Декодируем
+        const content = atob(file.content);
+        const users = JSON.parse(content);
+
+        // 3. Добавляем пользователя
         users.push(newUser);
 
-        // Отправляем данные на сервер через Netlify Function (updateUsers.js)
-        try {
-            const response = await fetch('/.netlify/functions/updateUsers', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ users: users })
-            });
+        // 4. Обновляем файл
+        await updateFile(users, file.sha);
 
-            const result = await response.json();
+        alert('Успешно зарегистрирован!');
+        window.location.href = 'login.html';
 
-            if (!response.ok) {
-                console.error('Ошибка сервера:', result.error || result);
-                alert('Не удалось сохранить пользователей: ' + (result.error || 'Неизвестная ошибка'));
-                return;
-            }
-
-            console.log('Пользователи успешно обновлены на GitHub:', result);
-            alert('Регистрация успешна! Теперь можете войти.');
-            window.location.href = "login.html";  // Перенаправление на страницу входа
-        } catch (err) {
-            console.error('Ошибка при соединении с сервером:', err);
-            alert('Ошибка при соединении с сервером. Проверьте интернет или Netlify Function.');
-        }
-    });
+    } catch (err) {
+        console.error(err);
+        alert('Ошибка регистрации');
+    }
+});
 </script>
 
 </body>
