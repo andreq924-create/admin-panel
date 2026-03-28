@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Освещение - Тёмная тема</title>
 <style>
+/* Оставляем стили такими же, как и раньше */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -43,6 +44,9 @@ button.clear-cart { right: 20px; background-color: #dc3545; } button.clear-cart:
 <body>
 
 <h2>Освещение</h2>
+
+<button id="menuBtn" class="back-btn" onclick="goToMenu()">Главное меню</button>
+
 <div class="grid" id="grid"></div>
 
 <script>
@@ -51,41 +55,47 @@ const grid = document.getElementById("grid");
 const urlParams = new URLSearchParams(window.location.search);
 const isAdmin = urlParams.get('forAdmin') === '1';
 
-let currentLights = []; // глобальная переменная для фильтрованного массива
+// ✅ ДОБАВИЛ
+const fromIndex = urlParams.get('from') === 'index';
 
-// ===== Инициализация данных =====
-function initWarehouse() {
-    if(!localStorage.getItem(warehouseKey)) {
-        const initialData = [
-            { 
-                name: "Люстры", 
-                category: "light", 
-                img: "lustr.jpg",
-                children: [
-                    { name: "Люстра 3 лампы", qty: 2, price: 1500, info: "Материал: металл\nЦвет: золотой" },
-                    { name: "Люстра 5 ламп", qty: 3, price: 2200, info: "Материал: металл\nЦвет: серебро" }
-                ]
-            },
-            { 
-                name: "Настольные светильники", 
-                category: "light", 
-                img: "lamp.jpg",
-                children: [
-                    { name: "LED лампа", qty: 5, price: 800, info: "Мощность: 10W\nЦвет света: холодный" },
-                    { name: "Лампа накаливания", qty: 3, price: 500, info: "Мощность: 60W\nЦвет света: тёплый" }
-                ]
-            }
-        ];
-        localStorage.setItem(warehouseKey, JSON.stringify(initialData));
+let currentLights = [];
+
+function goToMenu() {
+    window.location.href = "index.html";
+}
+
+function toggleMenuBtn(show) {
+    document.getElementById("menuBtn").style.display = show ? "block" : "none";
+}
+
+async function loadWarehouse() {
+    try {
+        const response = await fetch('./warehouse.json');
+        if (!response.ok) throw new Error('Файл warehouse.json не найден');
+        const data = await response.json();
+        localStorage.setItem(warehouseKey, JSON.stringify(data)); 
+        loadGrid();
+    } catch (err) {
+        console.error('Ошибка загрузки JSON:', err);
+        const warehouseLS = localStorage.getItem(warehouseKey);
+        if (warehouseLS) loadGrid();
+        else alert("Данные недоступны!");
     }
 }
 
-// ===== Главный экран =====
 function loadGrid() {
+    toggleMenuBtn(true);
+
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-    currentLights = warehouse.filter(item => item.category === 'light'); // сохраняем фильтр
+    currentLights = warehouse.filter(item => item.category === 'light');
     grid.innerHTML = '';
+
     document.querySelector('h2').textContent = 'Освещение';
+
+    if (currentLights.length === 0) {
+        setTimeout(() => loadGrid(), 100);
+        return;
+    }
 
     currentLights.forEach((item, index) => {
         const card = document.createElement('div');
@@ -96,8 +106,9 @@ function loadGrid() {
     });
 }
 
-// ===== Показ дочерних элементов =====
 function showChildren(parentIndex) {
+    toggleMenuBtn(false);
+
     const parent = currentLights[parentIndex];
     const children = parent.children || [];
 
@@ -106,7 +117,7 @@ function showChildren(parentIndex) {
     let html = `<div class="size-grid">`;
     children.forEach((child, childIndex) => {
         html += `<div class="card" onclick="showProductDetails(${parentIndex}, ${childIndex})">
-                    <img src="${child.img || parent.img}" alt="${child.name}"> <!-- используем child.img -->
+                    <img src="${child.img || parent.img}" alt="${child.name}">
                     <h3>${child.name}</h3>
                     <span class="qty-badge">${child.qty}</span>
                  </div>`;
@@ -115,8 +126,9 @@ function showChildren(parentIndex) {
     grid.innerHTML = html;
 }
 
-// ===== Детали продукта =====
 function showProductDetails(parentIndex, childIndex) {
+    toggleMenuBtn(false);
+
     const parent = currentLights[parentIndex];
     const child = parent.children[childIndex];
 
@@ -132,18 +144,37 @@ function showProductDetails(parentIndex, childIndex) {
     infoTableHTML += '</table>';
 
     grid.innerHTML = `<div class="details-container">
-        <div class="image"><img src="${child.img || parent.img}" alt="${child.name}"></div> <!-- используем child.img -->
+        <div class="image"><img src="${child.img || parent.img}" alt="${child.name}"></div>
         <div class="info">
             <p><strong>Название:</strong> ${child.name}</p>
             <p><strong>В наличии:</strong> ${child.qty}</p>
             <p><strong>Информация:</strong></p>${infoTableHTML}
-            <button onclick="selectItem(${parentIndex}, ${childIndex})">Выбрать</button>
+            <button onclick="handleAction(${parentIndex}, ${childIndex})">
+                ${fromIndex ? "Оставить заявку" : "Выбрать"}
+            </button>
         </div>
     </div>
     <button class="back-btn" onclick="showChildren(${parentIndex})">Назад</button>`;
 }
 
-// ===== Выбор товара =====
+// ✅ НОВАЯ ФУНКЦИЯ
+function handleAction(parentIndex, childIndex) {
+    if (fromIndex) {
+        const parent = currentLights[parentIndex];
+        const child = parent.children[childIndex];
+
+        localStorage.setItem("requestItem", JSON.stringify({
+            name: child.name,
+            price: child.price,
+            img: child.img || parent.img
+        }));
+
+        window.location.href = "submit_request.html";
+    } else {
+        selectItem(parentIndex, childIndex);
+    }
+}
+
 function selectItem(parentIndex, childIndex) {
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const parentName = currentLights[parentIndex].name;
@@ -152,7 +183,6 @@ function selectItem(parentIndex, childIndex) {
 
     if (child.qty < 1) { alert("Нет в наличии"); return; }
 
-    // ===== Админ =====
     if (isAdmin) {
         let request = JSON.parse(localStorage.getItem("currentAdminRequest")) || { items: [] };
         let exist = request.items.find(i => i.name === child.name);
@@ -163,22 +193,17 @@ function selectItem(parentIndex, childIndex) {
         return;
     }
 
-    // ===== Пользователь =====
     let selected = JSON.parse(localStorage.getItem("selectedItems")) || [];
     let exist = selected.find(i => i.name === child.name);
     if (exist) exist.qty += 1;
     else selected.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
     localStorage.setItem("selectedItems", JSON.stringify(selected));
 
- 
-
     alert(`Товар "${child.name}" добавлен в корзину!`);
     loadGrid();
 }
 
-// ===== Запуск =====
-initWarehouse();
-loadGrid();
+loadWarehouse();
 </script>
 
 </body>

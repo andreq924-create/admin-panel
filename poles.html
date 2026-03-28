@@ -44,6 +44,9 @@ button.clear-cart { right: 20px; background-color: #dc3545; } button.clear-cart:
 <body>
 
 <h2>Опоры</h2>
+
+<button id="menuBtn" class="back-btn" onclick="goToMenu()">Главное меню</button>
+
 <div class="grid" id="grid"></div>
 
 <script>
@@ -52,15 +55,24 @@ const grid = document.getElementById("grid");
 const urlParams = new URLSearchParams(window.location.search);
 const isAdmin = urlParams.get('forAdmin') === '1';
 
-// ===== Функция загрузки JSON с сервера =====
+// ✅ ДОБАВИЛ
+const fromIndex = urlParams.get('from') === 'index';
+
+function goToMenu() {
+    window.location.href = "index.html";
+}
+
+function toggleMenuBtn(show) {
+    document.getElementById("menuBtn").style.display = show ? "block" : "none";
+}
+
 async function loadWarehouse() {
     try {
-        const response = await fetch('./warehouse.json'); // путь к твоему JSON
+        const response = await fetch('./warehouse.json');
         if (!response.ok) throw new Error('Файл warehouse.json не найден');
         const data = await response.json();
-
-        localStorage.setItem(warehouseKey, JSON.stringify(data)); // сохраняем в localStorage
-        loadGrid(); // отобразить товары
+        localStorage.setItem(warehouseKey, JSON.stringify(data));
+        loadGrid();
     } catch (err) {
         console.error('Ошибка загрузки JSON:', err);
         const warehouseLS = localStorage.getItem(warehouseKey);
@@ -69,12 +81,14 @@ async function loadWarehouse() {
     }
 }
 
-// ===== Функции отображения =====
 function loadGrid() {
+    toggleMenuBtn(true);
+
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const poles = warehouse.filter(item => item.category === 'pole');
     grid.innerHTML = '';
     document.querySelector('h2').textContent = 'Опоры';
+
     poles.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = 'card';
@@ -85,11 +99,15 @@ function loadGrid() {
 }
 
 function showChildren(index) {
+    toggleMenuBtn(false);
+
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const parent = warehouse[index];
     if (!parent) return;
+
     document.querySelector('h2').textContent = `Длина ${parent.name}`;
     const children = parent.children || [];
+
     if (!children.length) { alert("Нет дочерних элементов"); return; }
 
     const html = `<div class="size-grid">
@@ -107,14 +125,16 @@ function showChildren(index) {
 }
 
 function showProductDetails(name, img, qty, parentIndex, childIndex) {
+    toggleMenuBtn(false);
+
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const child = warehouse[parentIndex].children[childIndex];
 
     document.querySelector('h2').textContent = `${child.name}`;
+
     let infoTableHTML = '<table>';
     if (child.info && child.info.trim()) {
-        const lines = child.info.split('\n');
-        lines.forEach(line => {
+        child.info.split('\n').forEach(line => {
             if (!line.trim()) return;
             const parts = line.split(':');
             if (parts.length >= 2) infoTableHTML += `<tr><td>${parts[0].trim()}</td><td>${parts.slice(1).join(':').trim()}</td></tr>`;
@@ -129,16 +149,38 @@ function showProductDetails(name, img, qty, parentIndex, childIndex) {
             <p><strong>Название:</strong> ${name}</p>
             <p><strong>В наличии:</strong> ${child.qty}</p>
             <p><strong>Информация:</strong></p>${infoTableHTML}
-            <button onclick="selectItem(${parentIndex}, ${childIndex})">Выбрать</button>
+            <button onclick="handleAction(${parentIndex}, ${childIndex})">
+                ${fromIndex ? "Оставить заявку" : "Выбрать"}
+            </button>
         </div>
     </div>
     <button class="back-btn" onclick="showChildren(${parentIndex})">Назад</button>`;
+}
+
+// ✅ ДОБАВИЛ
+function handleAction(parentIndex, childIndex) {
+    if (fromIndex) {
+        const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
+        const parent = warehouse[parentIndex];
+        const child = parent.children[childIndex];
+
+        localStorage.setItem("requestItem", JSON.stringify({
+            name: child.name,
+            price: child.price,
+            img: parent.img
+        }));
+
+        window.location.href = "submit_request.html";
+    } else {
+        selectItem(parentIndex, childIndex);
+    }
 }
 
 function selectItem(parentIndex, childIndex) {
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const parent = warehouse[parentIndex];
     const child = parent.children[childIndex];
+
     if (child.qty < 1) { alert("Нет в наличии"); return; }
 
     if (isAdmin) {
@@ -157,15 +199,10 @@ function selectItem(parentIndex, childIndex) {
     else selected.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
     localStorage.setItem("selectedItems", JSON.stringify(selected));
 
-    // ⚠️ Убираем уменьшение количества на складе
-    // child.qty -= 1;
-    // parent.qty = parent.children.reduce((sum, c) => sum + c.qty, 0);
-    // localStorage.setItem(warehouseKey, JSON.stringify(warehouse));
-
     alert(`Товар "${child.name}" добавлен в корзину!`);
     loadGrid();
 }
-// ===== Запуск при загрузке страницы =====
+
 loadWarehouse();
 </script>
 

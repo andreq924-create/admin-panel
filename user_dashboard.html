@@ -224,6 +224,25 @@
                 font-size: 12px;
             }
         }
+
+        /* Стиль для изображений товаров */
+        .items-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .item {
+            max-width: 120px;
+            text-align: center;
+        }
+
+        .item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -264,35 +283,17 @@
 </footer>
 
 <script>
-    // Пример данных о заявках
-    const exampleRequests = [
-        {
-            username: '111',
-            date: '2026-03-01',
-            type: 'repair',
-            problemDescription: 'Поломка светильника на улице, не работает.',
-            expectedCallTime: '2026-03-05T10:00:00',
-            status: 'В работе',
-            items: [{ name: 'Светильник', qty: 1 }]
-        },
-        {
-            username: '111',
-            date: '2026-03-02',
-            type: 'repair',
-            problemDescription: 'Повреждение кабеля в подземной сети, требуется восстановление.',
-            expectedCallTime: '2026-03-10T14:00:00',
-            status: 'Ожидает выполнения',
-            items: [{ name: 'Кабель', qty: 2 }]
-        }
-    ];
-
-    // Загрузка заявок
+    // Загрузка заявок из requests_all.json
     async function loadRequests() {
         try {
-            // Возвращаем наши примеры заявок
-            return exampleRequests;
+            const response = await fetch('requests_all.json');  // Путь к вашему JSON файлу
+            if (!response.ok) {
+                throw new Error('Не удалось загрузить данные');
+            }
+            const requests = await response.json();
+            return requests;
         } catch (error) {
-            console.error('Fetch error:', error);
+            console.error('Ошибка при загрузке данных:', error);
             alert('Ошибка при загрузке данных. Проверьте консоль для подробностей.');
             return [];
         }
@@ -310,24 +311,40 @@
             const requestCard = document.createElement('div');
             requestCard.classList.add('request-card');
 
+            // Формируем список товаров (items)
             let itemsText = '-';
-            if(request.type === 'repair' && request.problemDescription) {
-                itemsText = request.problemDescription;
-            } else if(request.items && request.items.length > 0) {
+            if (request.items && request.items.length > 0) {
                 itemsText = request.items.map(i => `${i.name} (${i.qty || 1} шт)`).join(', ');
             }
 
+            // Форматируем тип заявки
             let typeName = '';
-            if(request.type === 'both') typeName = 'Установка столбов и светильников';
-            else if(request.type === 'repair') typeName = 'Ремонт повреждения электрических сетей';
+            if (request.type === 'both') typeName = 'Установка столбов и светильников';
+            else if (request.type === 'repair') typeName = 'Ремонт повреждения электрических сетей';
             else typeName = request.type || '-';
+
+            // Форматируем дату
+            const createdAt = new Date(request.createdAt);
+            const expectedCallTime = new Date(request.expectedCallTime);
 
             requestCard.innerHTML = `
                 <h3>Тип заявки: ${typeName}</h3>
-                <p><strong>Дата:</strong> ${request.date || '-'}</p>
+                <p><strong>Дата создания:</strong> ${createdAt.toLocaleString()}</p>
+                <p><strong>Имя:</strong> ${request.firstname} ${request.lastname}</p>
+                <p><strong>Телефон:</strong> ${request.phone}</p>
+                <p><strong>Email:</strong> ${request.email}</p>
+                <p><strong>Адрес:</strong> ${request.address}</p>
                 <p><strong>Описание:</strong> ${itemsText}</p>
-                <p><strong>Дата завершения:</strong> ${request.expectedCallTime ? new Date(request.expectedCallTime).toLocaleString() : '-'}</p>
+                <p><strong>Дата завершения:</strong> ${expectedCallTime.toLocaleString()}</p>
                 <p><strong>Статус:</strong> ${request.status || 'Новая'}</p>
+                <div class="items-list">
+                    ${request.items.map(item => `
+                        <div class="item">
+                            <img src="${item.img}" alt="${item.name}" class="item-img">
+                            <p><strong>${item.name}</strong> (${item.qty} шт)</p>
+                        </div>
+                    `).join('')}
+                </div>
             `;
 
             container.appendChild(requestCard);
