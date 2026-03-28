@@ -238,7 +238,7 @@ function submitRequest(){
 
 async function saveRequestsAll(requestsData) {
   try {
-    const response = await fetch('/.netlify/functions/updateRequestsAll', {
+    const response = await fetch('/api/updateRequestsAll', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -247,6 +247,7 @@ async function saveRequestsAll(requestsData) {
     });
 
     const result = await response.json();
+
     if (!response.ok) {
       console.error('Ошибка сервера:', result.error || result);
       alert('Не удалось сохранить заявки: ' + (result.error || 'Неизвестная ошибка'));
@@ -255,9 +256,10 @@ async function saveRequestsAll(requestsData) {
 
     console.log('Заявки успешно обновлены на GitHub:', result);
     alert('Заявки успешно сохранены!');
+
   } catch (err) {
     console.error('Ошибка при соединении с сервером:', err);
-    alert('Ошибка при соединении с сервером. Проверьте интернет или Netlify Function.');
+    alert('Ошибка соединения с сервером');
   }
 }
 
