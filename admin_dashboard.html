@@ -1242,54 +1242,28 @@ async function loadRequestsFromFile() {
 
 async function saveWarehouseToGitHub(updatedData) {
     try {
-        const response = await fetch('/.netlify/functions/updateWarehouse', {
+        const response = await fetch('/api/updateWarehouse', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ warehouse: updatedData })
         });
 
-        let result;
-        try {
-            // пробуем распарсить JSON
-            result = await response.json();
-        } catch (err) {
-            // если сервер прислал текст вместо JSON
-            const text = await response.text();
-            console.error('Ответ сервера не в формате JSON:', text);
-            alert('Ошибка сервера при сохранении склада. Смотрите консоль.');
-            return;
-        }
+        const result = await response.json();
 
         if (!response.ok) {
             console.error('Ошибка сервера:', result.error || result);
-            alert('Не удалось сохранить склад: ' + (result.error || 'Неизвестная ошибка'));
+            alert('Не удалось сохранить склад');
             return;
         }
 
-        console.log('Склад успешно обновлён на GitHub:', result);
-        alert('Склад успешно сохранён!');
+        console.log('Склад обновлён:', result);
     } catch (err) {
-        console.error('Ошибка сети или запроса:', err);
-        alert('Ошибка при соединении с сервером. Проверьте интернет или Netlify Function.');
+        console.error('Ошибка:', err);
+        alert('Ошибка соединения с сервером');
     }
 }
 // Пример Node.js / Netlify Function
-exports.handler = async function(event, context) {
-  try {
-    const data = JSON.parse(event.body);
-    // ... обработка данных
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true })
-    };
-  } catch (err) {
-    console.error(err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message }) // <- возвращаем JSON, а не plain text
-    };
-  }
-};
+ 
 function downloadAllRequests() {
     const requests = JSON.parse(localStorage.getItem('requests')) || [];
 
@@ -1320,28 +1294,26 @@ function saveAllRequests() {
 }
 
 async function saveRequestsAll(requestsData) {
-  try {
-    const response = await fetch('/.netlify/functions/updateRequestsAll', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        requests: requestsData
-      })
-    });
+    try {
+        const response = await fetch('/api/updateRequestsAll', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requests: requestsData })
+        });
 
-    const result = await response.json();
-    if (!response.ok) {
-      console.error('Ошибка сервера:', result.error || result);
-      alert('Не удалось сохранить заявки: ' + (result.error || 'Неизвестная ошибка'));
-      return;
+        const result = await response.json();
+
+        if (!response.ok) {
+            console.error('Ошибка сервера:', result.error || result);
+            alert('Не удалось сохранить заявки');
+            return;
+        }
+
+        console.log('Заявки обновлены:', result);
+    } catch (err) {
+        console.error('Ошибка:', err);
+        alert('Ошибка соединения с сервером');
     }
-
-    console.log('Заявки успешно обновлены на GitHub:', result);
-    alert('Заявки успешно сохранены!');
-  } catch (err) {
-    console.error('Ошибка при соединении с сервером:', err);
-    alert('Ошибка при соединении с сервером. Проверьте интернет или Netlify Function.');
-  }
 }
 </script>
 </body>

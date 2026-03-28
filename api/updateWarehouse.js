@@ -1,23 +1,18 @@
-﻿// netlify/functions/updateWarehouse.js
-
-// ⚡ Твой GitHub токен должен быть в переменных окружения Netlify:
-// Key: GITHUB_TOKEN
-// Value: <твой_personal_access_token>
-
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const REPO = 'andreq924-create/admin-panel'; // username/repo
-const FILE_PATH = 'warehouse.json';
-const BRANCH = 'main';
-
-exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+﻿export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
+  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+  const REPO = 'andreq924-create/admin-panel';
+  const FILE_PATH = 'warehouse.json';
+  const BRANCH = 'main';
+
   try {
-    const { warehouse } = JSON.parse(event.body);
+    const { warehouse } = req.body;
+
     if (!warehouse) {
-      return { statusCode: 400, body: 'No warehouse data provided' };
+      return res.status(400).json({ error: 'No warehouse data provided' });
     }
 
     // 1️⃣ Получаем SHA текущего файла
@@ -26,7 +21,7 @@ exports.handler = async (event) => {
       {
         headers: {
           Authorization: `Bearer ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github+json',
+          Accept: 'application/vnd.github+json',
         },
       }
     );
@@ -39,18 +34,20 @@ exports.handler = async (event) => {
     const getData = await getResponse.json();
     const sha = getData.sha;
 
-    // 2️⃣ Обновляем файл на GitHub
+    // 2️⃣ Обновляем файл
     const putResponse = await fetch(
       `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
       {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github+json',
+          Accept: 'application/vnd.github+json',
         },
         body: JSON.stringify({
-          message: 'Обновление warehouse.json через Netlify Functions',
-          content: Buffer.from(JSON.stringify(warehouse, null, 2)).toString('base64'),
+          message: 'Обновление warehouse.json через Vercel API',
+          content: Buffer.from(
+            JSON.stringify(warehouse, null, 2)
+          ).toString('base64'),
           sha: sha,
           branch: BRANCH,
         }),
@@ -63,10 +60,11 @@ exports.handler = async (event) => {
     }
 
     const putData = await putResponse.json();
-    return { statusCode: 200, body: JSON.stringify(putData) };
+
+    return res.status(200).json(putData);
 
   } catch (err) {
     console.error(err);
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+    return res.status(500).json({ error: err.message });
   }
-};
+}
