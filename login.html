@@ -13,7 +13,6 @@
             color: #fff;
         }
 
-        /* HEADER */
         header {
             background-color: #1e2a38;
             padding: 15px 30px;
@@ -37,14 +36,12 @@
         nav a {
             color: #fff;
             text-decoration: none;
-            transition: 0.2s;
         }
 
         nav a:hover {
             color: #FFD700;
         }
 
-        /* MAIN */
         main {
             display: flex;
             justify-content: center;
@@ -52,7 +49,6 @@
             height: calc(100vh - 140px);
         }
 
-        /* FORM */
         form {
             background: #fff;
             color: #000;
@@ -65,51 +61,41 @@
             gap: 12px;
         }
 
-        form label {
-            font-size: 14px;
-        }
-
         form input {
             padding: 10px;
             border-radius: 6px;
             border: 1px solid #ccc;
-            outline: none;
-            transition: 0.2s;
         }
 
         form input:focus {
             border-color: #FFD700;
         }
 
-        /* BUTTON */
         form button {
             margin-top: 10px;
             padding: 12px;
             border: none;
             border-radius: 6px;
             background-color: #FFD700;
-            color: #000;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
         }
 
         form button:hover {
             background-color: #FFC300;
         }
 
-        /* ERROR */
         #error {
             text-align: center;
             margin-top: 10px;
+            color: red;
+            display: none;
         }
 
-        /* FOOTER */
         footer {
             background: #000;
             text-align: center;
             padding: 15px;
-            font-size: 14px;
         }
     </style>
 
@@ -129,18 +115,12 @@
 <main>
     <div>
         <form id="loginForm">
-            <label for="username">Имя пользователя:</label>
-            <input type="text" id="username" name="username" required>
-
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password" required>
-
+            <input type="text" id="username" placeholder="Имя пользователя" required>
+            <input type="password" id="password" placeholder="Пароль" required>
             <button type="submit">Войти</button>
         </form>
 
-        <div id="error" style="color: red; display: none;">
-            Неверный логин или пароль!
-        </div>
+        <div id="error">Неверный логин или пароль!</div>
     </div>
 </main>
 
@@ -158,41 +138,44 @@ loginForm.addEventListener('submit', async function(event) {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    // Проверка для дефолтного пользователя
+    // дефолт
     if (username === '111' && password === '111') {
         sessionStorage.setItem('username', username);
-        window.location.href = "user_dashboard.html"; // Перенаправление на страницу пользователя
+        window.location.href = "user_dashboard.html";
         return;
     }
 
-    // Проверка для администратора
+    // админ
     if (username === 'Admin' && password === 'Admin') {
         sessionStorage.setItem('username', username);
-        window.location.href = "admin_dashboard.html"; // Перенаправление на страницу администратора
+        window.location.href = "admin_dashboard.html";
         return;
     }
 
     try {
-        // Загружаем данные пользователей из файла users.json
+        // 👉 читаем users.json
         const response = await fetch('users.json');
+
         if (!response.ok) {
-            throw new Error('Не удалось загрузить данные пользователей');
+            throw new Error('Не удалось загрузить users.json');
         }
 
         const users = await response.json();
 
-        // Проверяем, существует ли такой пользователь и совпадает ли пароль
-        const user = users.find(u => u.username === username && u.password === password);
+        const user = users.find(u =>
+            u.username === username && u.password === password
+        );
 
         if (user) {
             sessionStorage.setItem('username', user.username);
-            window.location.href = "user_dashboard.html"; // Перенаправление на страницу пользователя
+            window.location.href = "user_dashboard.html";
         } else {
-            errorMessage.style.display = 'block';  // Показываем сообщение об ошибке
+            errorMessage.style.display = 'block';
         }
+
     } catch (error) {
-        console.error('Ошибка при загрузке пользователей:', error);
-        alert('Ошибка при загрузке данных пользователей. Попробуйте позже.');
+        console.error(error);
+        alert('Ошибка загрузки пользователей');
     }
 });
 </script>
