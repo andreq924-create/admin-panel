@@ -42,8 +42,10 @@
         "img": "images/oporaНФГ.png"
       }
     ],
-    "status": "Новая",
+    "status": "В процессе",
     "createdAt": "2026-03-28T07:10:19.180Z",
-    "expectedCallTime": "2026-03-28T07:15:19.180Z"
+    "expectedCallTime": "2026-03-28T07:15:19.180Z",
+    "callDate": "",
+    "completionDate": ""
   }
 ]
