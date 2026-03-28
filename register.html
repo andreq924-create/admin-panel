@@ -12,7 +12,6 @@
             color: #fff;
         }
 
-        /* HEADER */
         header {
             background-color: #1e2a38;
             padding: 15px 30px;
@@ -36,14 +35,12 @@
         nav a {
             color: #fff;
             text-decoration: none;
-            transition: 0.2s;
         }
 
         nav a:hover {
             color: #FFD700;
         }
 
-        /* MAIN */
         main {
             display: flex;
             justify-content: center;
@@ -51,7 +48,6 @@
             height: calc(100vh - 140px);
         }
 
-        /* FORM */
         form {
             background: #fff;
             color: #000;
@@ -64,40 +60,31 @@
             gap: 12px;
         }
 
-        form label {
-            font-size: 14px;
-        }
-
         form input {
             padding: 10px;
             border-radius: 6px;
             border: 1px solid #ccc;
             outline: none;
-            transition: 0.2s;
         }
 
         form input:focus {
             border-color: #FFD700;
         }
 
-        /* BUTTON */
         form button {
             margin-top: 10px;
             padding: 12px;
             border: none;
             border-radius: 6px;
             background-color: #FFD700;
-            color: #000;
-            font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
+            font-weight: bold;
         }
 
         form button:hover {
             background-color: #FFC300;
         }
 
-        /* FOOTER */
         footer {
             background: #000;
             text-align: center;
@@ -119,17 +106,15 @@
 </header>
 
 <main>
-    <div>
-        <form id="registerForm">
-            <label for="regUsername">Имя пользователя:</label>
-            <input type="text" id="regUsername" required>
+    <form id="registerForm">
+        <label>Имя пользователя:</label>
+        <input type="text" id="regUsername" required>
 
-            <label for="regPassword">Пароль:</label>
-            <input type="password" id="regPassword" required>
+        <label>Пароль:</label>
+        <input type="password" id="regPassword" required>
 
-            <button type="submit">Зарегистрироваться</button>
-        </form>
-    </div>
+        <button type="submit">Зарегистрироваться</button>
+    </form>
 </main>
 
 <footer>
@@ -137,48 +122,53 @@
 </footer>
 
 <script>
-    const registerForm = document.getElementById('registerForm');
+const registerForm = document.getElementById('registerForm');
 
-    registerForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
+registerForm.addEventListener('submit', async function(event) {
+    event.preventDefault();
 
-        const regUsername = document.getElementById('regUsername').value;
-        const regPassword = document.getElementById('regPassword').value;
+    const regUsername = document.getElementById('regUsername').value;
+    const regPassword = document.getElementById('regPassword').value;
 
-        const newUser = {
-            username: regUsername,
-            password: regPassword
-        };
+    const newUser = {
+        username: regUsername,
+        password: regPassword
+    };
 
-        try {
-            const response = await fetch('/api/updateUsers', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newUser)
-            });
+    try {
+        // Получаем текущих пользователей
+        let users = JSON.parse(localStorage.getItem('users')) || [];
 
-            const result = await response.json();
+        // Добавляем нового
+        users.push(newUser);
 
-            if (!response.ok) {
-                alert('Ошибка: ' + (result.error || 'Неизвестная ошибка'));
-                return;
-            }
+        // Отправляем ВСЁ на сервер
+        const response = await fetch('/api/updateUsers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ users: users })
+        });
 
-            // (опционально) локальное сохранение
-            let users = JSON.parse(localStorage.getItem('users')) || [];
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
+        const result = await response.json();
 
-            alert('Регистрация успешна!');
-            window.location.href = "login.html";
-
-        } catch (err) {
-            console.error(err);
-            alert('Ошибка соединения с сервером');
+        if (!response.ok) {
+            alert('Ошибка: ' + (result.error || 'Неизвестная ошибка'));
+            return;
         }
-    });
+
+        // Сохраняем локально
+        localStorage.setItem('users', JSON.stringify(users));
+
+        alert('Регистрация успешна!');
+        window.location.href = "login.html";
+
+    } catch (err) {
+        console.error(err);
+        alert('Ошибка соединения с сервером');
+    }
+});
 </script>
 
 </body>
