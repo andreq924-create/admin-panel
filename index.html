@@ -28,7 +28,7 @@ html, body {
 }
 
 .logo { 
-    width: 35px; 
+    width: 50px; 
     margin-right: 10px; 
 }
 
@@ -46,6 +46,7 @@ html, body {
     text-decoration: none; 
     padding: 5px 10px; 
     transition: 0.3s; 
+	  font-weight: bold;
 }
 
 .nav-menu a:hover { 
@@ -61,27 +62,22 @@ html, body {
     background-color: #1e2a38;
     z-index: 1000;
     transition: all 0.3s ease;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: center;
-    box-sizing: border-box;
-    will-change: transform; /* Повышаем производительность при скроллинге */
+    padding: 25px 30px; /* БЫЛО 15px → стало больше */
 }
-
 
 .header-inner {
-    max-width: 1200px;
-    width: 100%;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
+    justify-content: space-between;  /* Располагаем элементы по краям */
+    align-items: center;             /* Вертикальное выравнивание */
+    width: 100%;
     box-sizing: border-box;
+	 
 }
-
- #mainHeader.scrolled {
-        background-color: rgba(30, 42, 56, 0.8); /* Цвет фона хедера, чтобы он был всегда непрозрачным */
-    }
+ 
+#mainHeader.scrolled {
+    background-color: rgba(30, 42, 56, 0.9);
+    padding: 10px 30px; /* МЕНЬШЕ при скролле */
+}
 
 /* Пользователь */
 #userInfo { 
@@ -97,12 +93,15 @@ html, body {
     height: 30px; 
     border-radius: 50%; 
 }
-
+ 
 /* HERO */
 .hero { 
+padding-top: 90px;
     height: 100vh; 
+
     background: url('sait1/main-photo.jpg') center/cover no-repeat; 
     display: flex; 
+	background-position: center 10%; /* смещает изображение вниз */
     align-items: center; 
     padding-left: 60px; 
     color: white; 
@@ -145,65 +144,174 @@ html, body {
     justify-content: center;
 }
 
-.hero-buttons button { 
-    padding: 10px 15px; 
-    border: none; 
-    border-radius: 6px; 
-    cursor: pointer; 
-    background-color: #FFD700; 
-    color: #000; 
-    font-size: 14px; 
-    transition: 0.3s; 
-    flex: 1 1 30%;
-    margin-bottom: 10px;
+.hero-buttons button {
+    padding: 18px 25px;   /* больше кнопка */
+    border: none;
+     border-radius: 10px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #FFD700, #FFC300);
+    color: #1e2a38;
+    font-size: 14px;
+    font-weight: bold;
+    transition: 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+	    font-weight: bold; /* Сделать текст жирным */
+		    font-size: 16px; /* Можно подкорректировать размер шрифта */
+
 }
 
-.hero-buttons button:hover { 
-    background-color: #FFC300; 
+.hero-buttons button:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+    background: linear-gradient(135deg, #FFC300, #FFB000);
 }
 
 /* Блоки установок и кейсов */
 .install-section, .cases-section { 
     padding: 100px 80px; 
     position: relative; 
-    background-color: #FFD700; 
+    background: linear-gradient(45deg, #FFD700, #FFCC00, #FFB300); /* Градиент от желтого к более тёмным оттенкам */
 }
-
 .install-buttons, .cases-buttons { 
     display: flex; 
     gap: 20px; 
     justify-content: center; 
     flex-wrap: wrap;
 }
-
-.install-buttons button, .cases-buttons button { 
-    position: relative; 
-    flex: 1 1 30%; 
-    height: 400px; 
-    border: none; 
-    border-radius: 12px; 
-    cursor: pointer; 
-    background-size: cover; 
-    background-position: center; 
-    overflow: hidden; 
-    color: #fff; 
-    transition: 0.3s; 
+/* Кнопки в секции "Что мы устанавливаем" */
+/* Кнопки "Что мы устанавливаем" */
+/* Кнопки "Что мы устанавливаем" */
+.install-buttons button {
+    position: relative;
+    flex: 1 1 30%;
+    height: 400px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    color: #fff;
+    transition: box-shadow 0.3s ease, transform 0.3s ease; /* Убираем масштабирование и оставляем только плавные переходы для обводки и тени */
     margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1; /* Убедимся, что кнопки выше остальных элементов */
 }
 
-.install-buttons button:hover, .cases-buttons button:hover { 
-    filter: brightness(1.1); 
+/* Эффект при наведении */
+.install-buttons button:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    border: 3px solid #FFD700; /* Желтая обводка */
+}
+/* Текст на кнопке */
+.install-buttons button p {
+    transition: color 0.3s ease; /* Плавное изменение цвета текста */
 }
 
-.install-buttons span, .cases-buttons span { 
-    position: absolute; 
-    bottom: 10px; 
-    right: 10px; 
-    font-size: 26px; 
-    font-weight: bold; 
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); 
+/* Цвет текста при наведении */
+.install-buttons button:hover p {
+    color: #FFD700; /* Желтый цвет текста */
 }
 
+ 
+
+/* Начальное состояние кнопок */
+.install-buttons button.poles {
+    transform: translateX(-200px);
+    opacity: 0;
+}
+
+.install-buttons button.lights {
+    transform: translateX(200px);
+    opacity: 0;
+}
+
+/* Когда кнопка становится видимой, запускаем анимацию */
+.install-buttons button.show {
+    opacity: 1;
+    animation: slideIn 2s ease forwards;
+}
+
+/* Анимация для кнопки "Опоры" */
+@keyframes slideInLeftToRight {
+    0% {
+        opacity: 0;
+        transform: translateX(-200px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Анимация для кнопки "Светильники" */
+@keyframes slideInRightToLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(200px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Применяем анимацию в зависимости от кнопки */
+.install-buttons button.poles.show {
+    animation: slideInLeftToRight 1s ease forwards;
+}
+
+.install-buttons button.lights.show {
+    animation: slideInRightToLeft 1s ease forwards;
+}
+/* Заголовок на кнопках */
+.install-buttons span {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    transition: 0.3s;
+}
+/* Стили для кнопок в секции "Кейсы" */
+.cases-buttons button {
+    position: relative;
+    width: 350px; /* Увеличиваем ширину кнопки */
+    height: 400px; /* Увеличиваем высоту кнопки */
+    background-size: cover; /* Картинка будет растягиваться по кнопке */
+    background-position: center; /* Центрируем картинку */
+    border: none;
+    border-radius: 15px; /* Увеличиваем скругление углов */
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Плавные эффекты */
+    margin-bottom: 30px; /* Увеличиваем отступ между кнопками */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4); /* Тень */
+}
+
+
+.cases-buttons button:hover {
+    transform: scale(1.05); /* Плавное увеличение кнопки при наведении */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); /* Тень при наведении */
+}
+
+
+/* Текст на кнопке */
+.cases-buttons span {
+    position: absolute;
+    bottom: 15px; /* Сдвигаем текст немного ниже */
+    left: 15px; /* Сдвигаем текст влево */
+    font-size: 28px; /* Увеличиваем размер шрифта */
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8); /* Увеличиваем эффект тени */
+    transition: 0.3s;
+}
+
+.cases-buttons button:hover span {
+    color: #FFD700; /* Цвет текста при наведении */
+    text-shadow: 1px 1px 7px rgba(255, 215, 0, 0.8); /* Яркая тень при наведении */
+}
 .install-section h2, .cases-section h2 { 
     font-size: 60px; 
     margin-top: -50px; 
@@ -225,7 +333,34 @@ html, body {
     margin-bottom: 50px; 
     color: #FFD700; 
 }
+.video-text {
+    text-align: center;
+ 
+}
 
+.video-text h2 {
+    font-size: 36px; /* заголовок */
+}
+
+.video-text p {
+    font-size: 20px; /* обычный текст */
+}
+/* Увеличиваем кнопку при наведении */
+.install-buttons button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    border: 3px solid #FFD700; /* Добавляем желтую обводку */
+    color: #FFD700; /* Меняем цвет текста на желтый */
+}
+/* Для кнопок "Опоры" и "Светильники" */
+.install-buttons button p {
+    transition: color 0.3s ease; /* Плавное изменение цвета текста */
+}
+
+/* Стилизация текста на кнопке при наведении */
+.install-buttons button:hover p {
+    color: #FFD700; /* Текст становится желтым */
+}
 .why-grid { 
     display: grid; 
     grid-template-columns: repeat(3, 1fr); 
@@ -234,11 +369,40 @@ html, body {
     align-items: start; 
 }
 
-.why-item img { 
-    width: 100px; 
-    margin-bottom: 20px; 
+.why-item {
+    opacity: 0; /* Начальная прозрачность */
+    transform: translateY(-20px); /* Сдвигаем элементы вверх */
+    transition: opacity 0.3s ease, transform 0.3s ease; /* Плавная анимация */
 }
 
+/* Когда элемент становится видимым, добавляем анимацию */
+.why-item.animate {
+    opacity: 1; /* Убираем прозрачность */
+    transform: translateY(0); /* Сдвигаем в исходное положение */
+}
+@keyframes fadeInFromTop {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.why-item:nth-child(1).animate { animation-delay: 0.2s; }
+.why-item:nth-child(2).animate { animation-delay: 0.4s; }
+.why-item:nth-child(3).animate { animation-delay: 0.6s; }
+.why-item:nth-child(4).animate { animation-delay: 0.8s; }
+.why-item:nth-child(5).animate { animation-delay: 1s; }
+.why-item:nth-child(6).animate { animation-delay: 1.2s; }
+/* Стили для изображений (иконок) */
+.why-item img {
+    width: 100px; /* Фиксированная ширина */
+    height: 100px; /* Фиксированная высота */
+    object-fit: contain; /* Сохраняем пропорции изображения */
+    margin-bottom: 10px; /* Отступ снизу для иконки */
+}
 .why-title { 
     font-weight: bold; 
     font-size: 16px; 
@@ -271,6 +435,69 @@ html, body {
     padding: 20px; 
     min-width: 250px; 
     font-size: 18px; 
+}
+/* Анимации для кнопок */
+@keyframes slideInTopToBottom {
+    0% {
+        opacity: 0;
+        transform: translateY(-200px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInBottomToTop {
+    0% {
+        opacity: 0;
+        transform: translateY(200px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Начальное состояние кнопок */
+.cases-buttons button.first,
+.cases-buttons button.second,
+.cases-buttons button.third {
+    opacity: 0; /* Начальная прозрачность */
+    transform: translateY(0); /* Начальная позиция */
+    transition: transform 0.3s ease, opacity 0.3s ease; /* Плавная анимация при наведении */
+}
+
+/* Анимации для кнопок при скролле */
+.cases-buttons button.first {
+    transform: translateY(0px); /* Начальная позиция для анимации */
+}
+
+.cases-buttons button.second {
+    transform: translateY(0px); /* Начальная позиция для анимации */
+}
+
+.cases-buttons button.third {
+    transform: translateY(0px); /* Начальная позиция для анимации */
+}
+
+/* Когда кнопка становится видимой, запускаем анимацию */
+.cases-buttons button.first.show {
+    animation: slideInTopToBottom 1s ease forwards;
+}
+
+.cases-buttons button.second.show {
+    animation: slideInBottomToTop 1s ease forwards;
+}
+
+.cases-buttons button.third.show {
+    animation: slideInTopToBottom 1s ease forwards;
+}
+
+/* Анимация при наведении */
+.cases-buttons button:hover {
+    transform: scale(1.1); /* Увеличение при наведении */
+    opacity: 1; /* Сделаем кнопку видимой при наведении */
 }
 
 .video-text-section iframe { 
@@ -387,15 +614,15 @@ footer .footer-container {
     display: none;
     cursor: pointer;
     flex-direction: column;
-    gap: 5px;
-}
+         margin-top: 1px;  /* Приподнимаем полоску на 5px (или больше по необходимости) */
+
+ }
 
 .menu-bar {
-    width: 30px;
-    height: 4px;
+     height: 3px;
     background-color: #fff;
-    border-radius: 5px;
-}
+	   margin-left: -50px;
+ }
 
 .mobile-menu {
     display: none;
@@ -432,9 +659,7 @@ footer a:hover {
     color: #FFC300;
 }
 
-/* Мобильные адаптации */
-/* Мобильные адаптации */
-/* Мобильные адаптации */
+ 
 /* Мобильные адаптации */
 @media (max-width: 768px) {
     .hero {
@@ -442,7 +667,7 @@ footer a:hover {
         padding-top: 50px; /* Уменьшаем отступ сверху */
         text-align: left;  /* Текст выравнивается по левому краю */
     }
-
+ 
     .hero-content {
         max-width: 100%;
         padding-left: 2; /* Убираем отступ слева */
@@ -470,10 +695,11 @@ footer a:hover {
     }
 
     .hero-buttons button {
-        padding: 5px 8px; /* Уменьшаем размер кнопок */
+        padding: 18px 8px; /* Уменьшаем размер кнопок */
         font-size: 10px; /* Уменьшаем размер шрифта кнопок */
         width: 100%; /* Кнопки занимают всю ширину */
         margin-bottom: 5px; /* Уменьшаем отступ между кнопками */
+
     }
 
     /* Уменьшаем кнопки в секциях */
@@ -558,12 +784,12 @@ footer a:hover {
     }
 
     /* Блок правой части хедера (контакты и кнопки) */
-    .header-inner > div {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
+.header-inner > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-start;  /* Изменяем на start, чтобы элементы шли от левого края */
+ }
     /* Информация о пользователе */
     #userInfo {
         font-size: 14px; /* Уменьшаем размер шрифта */
@@ -591,13 +817,13 @@ footer a:hover {
 .mobile-menu.show {
     display: block; /* Показать меню */
 }
-
+ 
 
 .logo {
     width: 25px;
-    position: absolute;  /* Закрепляем логотип */
-    left: 10px;  /* Сдвигаем логотип вправо */
-    top: 15px;  /* Для вертикального выравнивания */
+    position: absolute;
+    left: 10px;
+    top: 10px; /* было 15px — уменьшаем, чтобы поднять */
 }
 
     /* Уменьшаем размер шрифта для ссылок меню */
@@ -651,7 +877,7 @@ footer a:hover {
         width: 100% !important;  /* Видео занимает всю ширину экрана */
         height: 200px !important; /* Уменьшаем высоту */
         max-width: 100% !important; /* Ограничиваем максимальную ширину */
-        margin-left: -50px; /* Сдвигаем видео влево */
+        margin-left: -40px; /* Сдвигаем видео влево */
     }
 
     .video-text-section {
@@ -662,8 +888,11 @@ footer a:hover {
     }
 
 	   .video-text-section .video-text {
-        margin-left: -50px;
+        margin-left: -80px;
     }
+
+ 
+
 }
 </style>
 </head>
@@ -685,8 +914,8 @@ footer a:hover {
     </div>
 
     <!-- Правый блок -->
-    <div style="display: flex; align-items: center; gap: 20px; font-size: 18px;">
-      <div style="font-weight: bold; color: #fff;">+7 919 519 15 28</div>
+	<div style="display: flex; align-items: center; gap: 20px; font-size: 18px; margin-left: auto; transform: translateX(-65px);">
+      <div style="font-weight: bold; color: #fff; margin-top: 4px;">+7 919 519 15 28</div>
 
       <div id="loginLink"><a href="login.html">Войти</a></div>
       <div id="registerLink"><a href="register.html">Регистрация</a></div>
@@ -721,19 +950,17 @@ footer a:hover {
 <section class="hero">
     <div class="hero-content">
         <h2>МКУ Кировсвет</h2>
-        <h3>профессиональный свет</h3>
+        <h3><span style="color: #FFD700;">профессиональный</span> свет</h3>
         <ul>
             <li>Металлические опоры освещения СТВ, ОГК и другие</li>
-            <li>Светодиодные LED светильники на любой бюджет</li>
-            <li>Отгрузка со склада сразу же в день оплаты</li>
-            <li>Доставка в любую точку Кирова по честной цене</li>
-            <li>Изготовим по вашему техническому заданию с заключением лаборатории</li>
+<li>Светодиодные LED светильники на <span style="background-color: #FFD700; color: #000000; padding: 2px 5px; border-radius: 4px; font-weight: bold;">любой бюджет</span></li>            <li>Отгрузка со склада сразу же в день оплаты</li>
+<li>Доставка в <span style="background-color: #FFD700; color: #000000; padding: 2px 5px; border-radius: 4px; font-weight: bold;">любую точку Кирова</span> по честной цене</li>            <li>Изготовим по вашему техническому заданию с заключением лаборатории</li>
         </ul>
-        <div class="hero-buttons">
-            <button onclick="window.location.href='poles.html?from=index'">Опоры освещения</button>
-			<button onclick="window.location.href='light.html?from=index'">LED светильники</button>
-            <button onclick="handleRequestClick(event)">Ремонт повреждений электрических сетей</button>
-        </div>
+   <div class="hero-buttons">
+    <button onclick="window.location.href='poles.html?from=index'">🏗️ Опоры освещения</button>
+    <button onclick="window.location.href='light.html?from=index'">💡 LED светильники</button>
+    <button onclick="handleRequestClick(event)">⚡ Ремонт электрических сетей</button>
+</div>
     </div>
 </section>
 
@@ -754,22 +981,29 @@ footer a:hover {
 <section class="why-section">
     <h2>Почему мы?</h2>
     <div class="why-grid">
-        <div class="why-item"><img src="sait1/icon1.png"><p class="why-title">Научный подход</p><p class="why-desc">У нас 9 патентов и инженеры PhD и MTech</p></div>
-        <div class="why-item"><img src="sait1/icon2.png"><p class="why-title">Мы стараемся!</p><p class="why-desc">Мы пока не №1 на рынке, поэтому очень стараемся</p></div>
-        <div class="why-item"><img src="sait1/icon3.png"><p class="why-title">5 лет гарантии!</p><p class="why-desc">Ремонтируем или меняем сбойный светильник</p></div>
-        <div class="why-item"><img src="sait1/icon4.png"><p class="why-title">По честной цене!</p><p class="why-desc">Наши цены обоснованы</p></div>
-        <div class="why-item"><img src="sait1/icon5.png"><p class="why-title">Мы надежные</p><p class="why-desc">Нас проверили Хлынов банк</p></div>
-        <div class="why-item"><img src="sait1/icon6.png"><p class="why-title">На любой бюджет!</p><p class="why-desc">Можно найти решение под любой бюджет</p></div>
+        <div class="why-item"><img src="sait1/icon1.png" alt="Scientific Approach Icon"><p class="why-title">Научный подход</p><p class="why-desc">У нас 9 патентов и инженеры PhD и MTech</p></div>
+        <div class="why-item"><img src="sait1/icon2.png" alt="We Try Hard Icon"><p class="why-title">Мы стараемся!</p><p class="why-desc">Мы пока не №1 на рынке, поэтому очень стараемся</p></div>
+        <div class="why-item"><img src="sait1/icon3.png" alt="5 Years Warranty Icon"><p class="why-title">5 лет гарантии!</p><p class="why-desc">Ремонтируем или меняем сбойный светильник</p></div>
+        <div class="why-item"><img src="sait1/icon4.png" alt="Fair Price Icon"><p class="why-title">По честной цене!</p><p class="why-desc">Наши цены обоснованы</p></div>
+        <div class="why-item"><img src="sait1/icon5.png" alt="Reliable Icon"><p class="why-title">Мы надежные</p><p class="why-desc">Нас проверили Хлынов банк</p></div>
+        <div class="why-item"><img src="sait1/icon6.png" alt="Any Budget Icon"><p class="why-title">На любой бюджет!</p><p class="why-desc">Можно найти решение под любой бюджет</p></div>
     </div>
 </section>
 
 <!-- Кейсы -->
+<!-- Кейсы -->
 <section class="cases-section" id="casesSection">
     <h2>Кейсы</h2>
     <div class="cases-buttons">
-        <button style="background-image: url('sait1/case1.jpg');" onclick="location.href='blog.html?category=streets'"><span>Улица</span></button>
-        <button style="background-image: url('sait1/case2.jpg');" onclick="location.href='blog.html?category=parks'"><span>Парки</span></button>
-        <button style="background-image: url('sait1/case3.jpg');" onclick="location.href='blog.html?category=factories'"><span>Цех</span></button>
+        <button style="background-image: url('sait1/case1.jpg');" onclick="location.href='blog.html?category=streets'">
+            <span>Улица</span>
+        </button>
+        <button style="background-image: url('sait1/case2.jpg');" onclick="location.href='blog.html?category=parks'">
+            <span>Парки</span>
+        </button>
+        <button style="background-image: url('sait1/case3.jpg');" onclick="location.href='blog.html?category=factories'">
+            <span>Цех</span>
+        </button>
     </div>
 </section>
 
@@ -794,7 +1028,95 @@ footer a:hover {
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const installButtons = document.querySelectorAll('.install-buttons button');
 
+    // Функция для отслеживания видимости элементов
+    const handleIntersection = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('show'); // Добавляем класс "show" для анимации
+                observer.unobserve(entry.target); // Останавливаем наблюдение после того, как элемент стал видим
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, {
+        threshold: 0.5 // Элемент будет виден, когда его 50% будет видно на экране
+    });
+
+    // Наблюдаем за каждой кнопкой
+    installButtons.forEach(button => {
+        // Если кнопка "Опоры" (слева)
+        if (button.style.backgroundImage.includes("photo1")) {
+            button.classList.add('poles'); // Добавляем класс для анимации "Опоры"
+        }
+
+        // Если кнопка "Светильники" (справа)
+        if (button.style.backgroundImage.includes("photo2")) {
+            button.classList.add('lights'); // Добавляем класс для анимации "Светильники"
+        }
+
+        observer.observe(button); // Начинаем наблюдение за кнопкой
+    });
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const caseButtons = document.querySelectorAll('.cases-buttons button');
+
+    // Функция для отслеживания видимости элементов
+    const handleIntersection = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('show'); // Добавляем класс "show" для анимации
+                observer.unobserve(entry.target); // Прекращаем наблюдение за этим элементом
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, {
+        threshold: 0.5 // Элемент будет виден, когда его 50% будет видно на экране
+    });
+
+    // Добавляем классы для первой, второй и третьей кнопки
+    caseButtons.forEach((button, index) => {
+        if (index === 0) {
+            button.classList.add('first'); // Первая кнопка
+        } else if (index === 1) {
+            button.classList.add('second'); // Вторая кнопка
+        } else if (index === 2) {
+            button.classList.add('third'); // Третья кнопка
+        }
+
+        observer.observe(button); // Начинаем наблюдение за кнопкой
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Получаем все элементы с классом .why-item
+    const whyItems = document.querySelectorAll('.why-item');
+
+    // Функция для отслеживания видимости элементов
+    const handleIntersection = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate'); // Добавляем класс "animate" для анимации
+                observer.unobserve(entry.target); // Прекращаем наблюдение за этим элементом
+            }
+        });
+    };
+
+    // Настройки IntersectionObserver
+    const observer = new IntersectionObserver(handleIntersection, {
+        threshold: 0.5 // Элемент будет видим, когда 50% его видимости появится на экране
+    });
+
+    // Наблюдаем за каждым элементом .why-item
+    whyItems.forEach(item => {
+        observer.observe(item); // Начинаем наблюдение за каждым элементом
+    });
+});
+</script>
 <script>
 // Отображение пользователя
 if(sessionStorage.getItem('username')){
@@ -881,4 +1203,4 @@ window.onclick = function(event){
 </footer>
 
 </body>
-</html>  
+</html>    

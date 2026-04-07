@@ -130,6 +130,12 @@ registerForm.addEventListener('submit', async function(event) {
     const regUsername = document.getElementById('regUsername').value;
     const regPassword = document.getElementById('regPassword').value;
 
+    // Проверка на пустые значения
+    if (!regUsername || !regPassword) {
+        alert('Пожалуйста, заполните все поля!');
+        return;
+    }
+
     const newUser = {
         username: regUsername,
         password: regPassword
@@ -139,7 +145,15 @@ registerForm.addEventListener('submit', async function(event) {
         // Получаем текущих пользователей
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        // Добавляем нового
+        // Проверка, существует ли уже такой пользователь
+        const existingUser = users.find(user => user.username === regUsername);
+
+        if (existingUser) {
+            alert('Пользователь с таким именем уже зарегистрирован.');
+            return;
+        }
+
+        // Добавляем нового пользователя
         users.push(newUser);
 
         // Отправляем ВСЁ на сервер
