@@ -894,6 +894,31 @@ footer a:hover {
  
 
 }
+.nav-menu a {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-menu a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 1px;
+    width: 80%;
+    height: 1px;
+    background-color: white;
+
+    transform: translateX(-50%) scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s ease;
+}
+
+.nav-menu a:hover::after {
+    transform: translateX(-50%) scaleX(1);
+}
+html {
+    scroll-behavior: smooth;
+}
 </style>
 </head>
 <body>
@@ -902,7 +927,9 @@ footer a:hover {
   <div class="header-inner">
     <!-- Левый блок: логотип + меню -->
     <div style="display: flex; align-items: center; gap: 30px;">
-      <img src="sait1/logo.png" alt="Логотип" class="logo">
+      <a href="#home">
+    <img src="sait1/logo.png" alt="Логотип" class="logo">
+</a>
       <nav>
         <ul class="nav-menu">
           <li><a href="#installSection">Каталог</a></li>
@@ -947,7 +974,7 @@ footer a:hover {
 
 <main>
 <!-- HERO -->
-<section class="hero">
+<section class="hero" id="home">
     <div class="hero-content">
         <h2>МКУ Кировсвет</h2>
         <h3><span style="color: #FFD700;">профессиональный</span> свет</h3>

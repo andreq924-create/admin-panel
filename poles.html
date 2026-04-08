@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Опоры - Тёмная тема</title>
+
 <style>
-/* === Стили остаются твоими === */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -13,34 +13,307 @@ body {
     background: linear-gradient(135deg, #1c1c1c, #2a2a2a);
     color: #eee;
     box-sizing: border-box;
+    position: relative;
 }
-h2 { text-align: center; margin-bottom: 20px; font-size: 2.5rem; color: #FFD700; }
-.grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
-.grid .card, .size-grid .card { flex: 0 0 350px; }
-.size-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; padding: 20px 0; }
-.card { background-color: #2f2f2f; border: 1px solid #444; border-radius: 12px; overflow: hidden;
-       text-align: left; cursor: pointer; position: relative; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
-       display: flex; flex-direction: column; gap: 15px; }
-.card:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.5); border-color: #FFD700; }
-.card img { width: 100%; height: 280px; object-fit: contain; border-bottom: 1px solid #444; background-color: #1c1c1c; }
-.card h3 { margin: 12px; font-size: 1.3rem; color: #FFD700; }
-.qty-badge { position: absolute; top: 10px; right: 10px; background: #FFD700; color: #000;
-             padding: 6px 12px; border-radius: 4px; font-size: 16px; font-weight: bold; min-width: 24px; text-align: center; }
-button { margin-top: 20px; padding: 12px 25px; background-color: #FFD700; color: #000; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; transition: background 0.3s; }
-button:hover { background-color: #FFC300; }
-button.back-btn, button.clear-cart { position: fixed; top: 20px; padding: 10px 20px; border-radius: 6px; font-size: 16px; cursor: pointer; color: #fff; font-weight: bold; }
-button.back-btn { left: 20px; background-color: #28a745; } button.back-btn:hover { background-color: #218838; }
-button.clear-cart { right: 20px; background-color: #dc3545; } button.clear-cart:hover { background-color: #c82333; }
-.details-container { display: flex; flex-direction: row; gap: 40px; margin-top: 20px; flex-wrap: nowrap; align-items: flex-start; }
-.details-container .image { width: 550px; flex: 0 0 auto; text-align: left; }
-.details-container .image img { width: 100%; height: 400px; object-fit: contain; display: block; border-radius: 12px; border: 1px solid #444; }
-.details-container .info { flex: 1 1 auto; max-width: 600px; padding: 20px 15px; background-color: #2f2f2f; border: 1px solid #444; border-radius: 12px;
-                          white-space: normal; overflow-wrap: break-word; word-break: break-word; }
-.details-container table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
-.details-container td:first-child { width: 180px; font-weight: bold; color: #FFD700; text-align: left; }
-@media (max-width: 800px) { .details-container { flex-direction: column; } .details-container .info, .details-container .image { width: 100%; } .grid { flex-direction: column; } .size-grid { flex-direction: column; align-items: center; } }
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+    color: #FFD700;
+}
+
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+}
+
+.grid .card, .size-grid .card {
+    flex: 0 0 350px;
+}
+
+.size-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+    padding: 20px 0;
+}
+
+.card {
+    background-color: #2f2f2f;
+    border: 1px solid #444;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    border-color: #FFD700;
+}
+
+.card img {
+    width: 100%;
+    height: 280px;
+    object-fit: contain;
+    border-bottom: 1px solid #444;
+    background-color: #1c1c1c;
+}
+
+.card h3 {
+    margin: 12px;
+    font-size: 1.3rem;
+    color: #FFD700;
+}
+
+.qty-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #FFD700;
+    color: #000;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* кнопки */
+button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    background-color: #FFD700;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #FFC300;
+}
+
+button.back-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+button.back-btn:hover {
+    background-color: #218838;
+}
+
+/* ===== ДЕТАЛИ (как в "Освещение") ===== */
+
+.details-container {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    margin-top: 20px;
+    align-items: flex-start;
+
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+
+.details-container .image {
+    width: 550px;
+    flex: 0 0 550px;
+}
+
+.details-container .image img {
+    width: 100%;
+    height: 400px;
+    object-fit: contain;
+    display: block;
+    border-radius: 12px;
+    border: 1px solid #444;
+}
+
+.details-container .info {
+    width: 600px;
+    flex: 0 0 600px;
+
+    padding: 20px 15px;
+    background-color: #2f2f2f;
+    border: 1px solid #444;
+    border-radius: 12px;
+}
+
+.details-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.details-container td:first-child {
+    width: 180px;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+/* 📱 адаптация */
+@media (max-width: 800px) {
+
+    .grid {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .grid .card {
+        width: 95%;
+        max-width: 500px;
+    }
+
+    .details-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .details-container .image,
+    .details-container .info {
+        width: 100%;
+        flex: none;
+    }
+
+    .details-container .image img {
+        height: auto;
+        max-height: 300px;
+    }
+
+
+}
+/* ===== МОДАЛКА ===== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(12px);
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+
+.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: rgba(47,47,47,0.9);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    backdrop-filter: blur(10px);
+
+    padding: 30px 25px;
+    border-radius: 16px;
+    text-align: center;
+    color: #eee;
+
+    width: 340px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+
+    animation: scaleIn 0.3s ease;
+}
+
+.modal-content h3 {
+    color: #FFD700;
+    margin-bottom: 10px;
+    font-size: 26px;
+}
+
+.modal-content p {
+    font-size: 18px;
+    color: #ccc;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+    transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.modal-buttons button:hover {
+    transform: scale(1.05);
+}
+
+.modal-buttons button:first-child {
+    background: #444;
+    color: #fff;
+}
+
+.modal-buttons button:last-child {
+    background: #FFD700;
+    color: #000;
+}
+
+.close-btn {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #aaa;
+    transition: 0.3s;
+}
+
+.close-btn:hover {
+    color: #fff;
+    transform: rotate(90deg);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
 </style>
 </head>
+
 <body>
 
 <h2>Опоры</h2>
@@ -49,13 +322,24 @@ button.clear-cart { right: 20px; background-color: #dc3545; } button.clear-cart:
 
 <div class="grid" id="grid"></div>
 
+<!-- МОДАЛКА -->
+<div id="authModal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAuthModal()">✖</span>
+        <h3>Требуется авторизация</h3>
+        <p>Чтобы оставить заявку, нужно войти или зарегистрироваться</p>
+
+        <div class="modal-buttons">
+            <button onclick="goToRegister()">Регистрация</button>
+            <button onclick="goToLogin()">Вход</button>
+        </div>
+    </div>
+</div>
+
 <script>
 const warehouseKey = 'warehouse';
 const grid = document.getElementById("grid");
 const urlParams = new URLSearchParams(window.location.search);
-const isAdmin = urlParams.get('forAdmin') === '1';
-
-// ✅ ДОБАВИЛ
 const fromIndex = urlParams.get('from') === 'index';
 
 function goToMenu() {
@@ -66,15 +350,32 @@ function toggleMenuBtn(show) {
     document.getElementById("menuBtn").style.display = show ? "block" : "none";
 }
 
+function isUserLoggedIn() {
+    return sessionStorage.getItem("username") !== null;
+}
+
+function openAuthModal() {
+    document.getElementById("authModal").classList.remove("hidden");
+}
+
+function closeAuthModal() {
+    document.getElementById("authModal").classList.add("hidden");
+}
+
+function goToLogin() {
+    window.location.href = "login.html";
+}
+
+function goToRegister() {
+    window.location.href = "register.html";
+}
 async function loadWarehouse() {
     try {
         const response = await fetch('./warehouse.json');
-        if (!response.ok) throw new Error('Файл warehouse.json не найден');
         const data = await response.json();
         localStorage.setItem(warehouseKey, JSON.stringify(data));
         loadGrid();
-    } catch (err) {
-        console.error('Ошибка загрузки JSON:', err);
+    } catch {
         const warehouseLS = localStorage.getItem(warehouseKey);
         if (warehouseLS) loadGrid();
         else alert("Данные недоступны!");
@@ -86,13 +387,14 @@ function loadGrid() {
 
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const poles = warehouse.filter(item => item.category === 'pole');
+
     grid.innerHTML = '';
     document.querySelector('h2').textContent = 'Опоры';
 
     poles.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = 'card';
-        card.innerHTML = `<img src="${item.img}" alt="${item.name}"><h3>${item.name}</h3>`;
+        card.innerHTML = `<img src="${item.img}"><h3>${item.name}</h3>`;
         card.onclick = () => showChildren(index);
         grid.appendChild(card);
     });
@@ -103,104 +405,121 @@ function showChildren(index) {
 
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const parent = warehouse[index];
-    if (!parent) return;
-
-    document.querySelector('h2').textContent = `Длина ${parent.name}`;
     const children = parent.children || [];
 
-    if (!children.length) { alert("Нет дочерних элементов"); return; }
+    document.querySelector('h2').textContent = `Длина ${parent.name}`;
 
-    const html = `<div class="size-grid">
-        ${children.map((c, childIndex) => {
-            const childImg = c.img || parent.img;
-            return `<div class="card" onclick="showProductDetails('${c.name}', '${childImg}', ${c.qty}, ${index}, ${childIndex})">
-                <img src="${childImg}">
-                <h3>${c.name}</h3>
-                <span class="qty-badge">${c.qty}</span>
-            </div>`;
-        }).join('')}
-    </div>
-    <button class="back-btn" onclick="loadGrid()">Назад</button>`;
-    grid.innerHTML = html;
-}
-
-function showProductDetails(name, img, qty, parentIndex, childIndex) {
-    toggleMenuBtn(false);
-
-    const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-    const child = warehouse[parentIndex].children[childIndex];
-
-    document.querySelector('h2').textContent = `${child.name}`;
-
-    let infoTableHTML = '<table>';
-    if (child.info && child.info.trim()) {
-        child.info.split('\n').forEach(line => {
-            if (!line.trim()) return;
-            const parts = line.split(':');
-            if (parts.length >= 2) infoTableHTML += `<tr><td>${parts[0].trim()}</td><td>${parts.slice(1).join(':').trim()}</td></tr>`;
-            else infoTableHTML += `<tr><td colspan="2">${line.trim()}</td></tr>`;
-        });
-    } else infoTableHTML += '<tr><td colspan="2">Информация отсутствует</td></tr>';
-    infoTableHTML += '</table>';
-
-    grid.innerHTML = `<div class="details-container">
-        <div class="image"><img src="${img}" alt="${name}"></div>
-        <div class="info">
-            <p><strong>Название:</strong> ${name}</p>
-            <p><strong>В наличии:</strong> ${child.qty}</p>
-            <p><strong>Информация:</strong></p>${infoTableHTML}
-            <button onclick="handleAction(${parentIndex}, ${childIndex})">
-                ${fromIndex ? "Оставить заявку" : "Выбрать"}
-            </button>
+    grid.innerHTML = `
+        <div class="size-grid">
+            ${children.map((c, childIndex) => {
+                const img = c.img || parent.img;
+                return `
+                <div class="card" onclick="showProductDetails(${index}, ${childIndex})">
+                    <img src="${img}">
+                    <h3>${c.name}</h3>
+                    <span class="qty-badge">${c.qty}</span>
+                </div>`;
+            }).join('')}
         </div>
-    </div>
-    <button class="back-btn" onclick="showChildren(${parentIndex})">Назад</button>`;
+        <button class="back-btn" onclick="loadGrid()">Назад</button>
+    `;
 }
-
-// ✅ ДОБАВИЛ
 function handleAction(parentIndex, childIndex) {
-    if (fromIndex) {
-        const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-        const parent = warehouse[parentIndex];
-        const child = parent.children[childIndex];
 
-        localStorage.setItem("requestItem", JSON.stringify({
-            name: child.name,
-            price: child.price,
-            img: parent.img
-        }));
-
-        window.location.href = "submit_request.html";
-    } else {
-        selectItem(parentIndex, childIndex);
-    }
-}
-
-function selectItem(parentIndex, childIndex) {
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const parent = warehouse[parentIndex];
     const child = parent.children[childIndex];
 
-    if (child.qty < 1) { alert("Нет в наличии"); return; }
+    if (fromIndex) {
 
-    if (isAdmin) {
-        let request = JSON.parse(localStorage.getItem("currentAdminRequest")) || { items: [] };
-        let exist = request.items.find(i => i.name === child.name);
-        if (exist) exist.qty += 1;
-        else request.items.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
-        localStorage.setItem("currentAdminRequest", JSON.stringify(request));
-        alert(`Товар "${child.name}" добавлен в заявку!`);
-        return;
+        if (!isUserLoggedIn()) {
+            openAuthModal();
+            return;
+        }
+
+        localStorage.setItem("requestItem", JSON.stringify({
+            name: child.name,
+            price: child.price,
+            img: child.img || parent.img
+        }));
+
+        window.location.href = "submit_request.html";
+
+    } else {
+
+        if (child.qty < 1) {
+            alert("Нет в наличии");
+            return;
+        }
+
+        let selected = JSON.parse(localStorage.getItem("selectedItems")) || [];
+
+        let exist = selected.find(i => i.name === child.name);
+
+        if (exist) {
+            exist.qty += 1;
+        } else {
+            selected.push({
+                name: child.name,
+                price: child.price,
+                qty: 1,
+                img: parent.img
+            });
+        }
+
+        localStorage.setItem("selectedItems", JSON.stringify(selected));
+
+        
+
+        // ✅ ДОБАВЬ ЭТО:
+        window.close();
+    }
+}
+function showProductDetails(parentIndex, childIndex) {
+    toggleMenuBtn(false);
+
+    const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
+    const child = warehouse[parentIndex].children[childIndex];
+    const parent = warehouse[parentIndex];
+
+    let infoTableHTML = '<table>';
+
+    if (child.info) {
+        child.info.split('\n').forEach(line => {
+            if (!line.trim()) return;
+            const parts = line.split(':');
+            if (parts.length >= 2) {
+                infoTableHTML += `<tr><td>${parts[0]}</td><td>${parts.slice(1).join(':')}</td></tr>`;
+            } else {
+                infoTableHTML += `<tr><td colspan="2">${line}</td></tr>`;
+            }
+        });
+    } else {
+        infoTableHTML += '<tr><td colspan="2">Информация отсутствует</td></tr>';
     }
 
-    let selected = JSON.parse(localStorage.getItem("selectedItems")) || [];
-    let exist = selected.find(i => i.name === child.name);
-    if (exist) exist.qty += 1;
-    else selected.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
-    localStorage.setItem("selectedItems", JSON.stringify(selected));
+    infoTableHTML += '</table>';
 
-    alert(`Товар "${child.name}" добавлен в корзину!`);
-    loadGrid();
+    grid.innerHTML = `
+    <div class="details-container">
+        <div class="image">
+            <img src="${child.img || parent.img}">
+        </div>
+
+        <div class="info">
+            <p><strong>Название:</strong> ${child.name}</p>
+            <p><strong>В наличии:</strong> ${child.qty}</p>
+            <p><strong>Информация:</strong></p>
+            ${infoTableHTML}
+
+        <button onclick="handleAction(${parentIndex}, ${childIndex})">
+    ${fromIndex ? "Оставить заявку" : "Выбрать"}
+</button>
+        </div>
+    </div>
+
+    <button class="back-btn" onclick="showChildren(${parentIndex})">Назад</button>
+    `;
 }
 
 loadWarehouse();

@@ -1,101 +1,182 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Подача заявки</title>
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #1e2a38, #2f3f52);
-    color: #fff;
-    margin: 0;
-    padding: 40px;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подача заявки</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e2a38, #2f3f52);
+            color: #fff;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            position: relative;
+            max-width: 700px;
+            width: 100%;
+            background: #24344f;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .closeBtn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 50px;
+            height: 50px;
+            font-size: 32px;
+            font-weight: bold;
+            background-color: #FFD700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #1e2a38;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            user-select: none;
+            transition: 0.2s;
+        }
+        .closeBtn:hover { background-color: #FFC300; }
+
+        h2, h3 { margin-top: 0; color: #FFD700; }
+        label { display: block; margin-top: 15px; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #555;
+            background: #1e2a38;
+            color: #fff;
+            outline: none;
+        }
+        input::placeholder, textarea::placeholder { color: #aaa; }
+
+        button {
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .openBtn { background-color: #2196F3; color: #fff; display: none; }
+        .openBtn:hover { background-color: #1976D2; }
+
+        .submitBtn { background-color: #4CAF50; color: #fff; }
+        .submitBtn:hover { background-color: #388E3C; }
+
+        .selectedItem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            border: 1px solid #555;
+            padding: 10px;
+            border-radius: 10px;
+            background: #1e2a38;
+        }
+        .left { display: flex; align-items: center; gap: 10px; }
+        .left img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #555; }
+     .controls {
     display: flex;
-    justify-content: center;
-    min-height: 100vh;
+    align-items: center;
+    gap: 10px;
 }
-.container {
-    position: relative;
-    max-width: 700px;
-    width: 100%;
-    background: #24344f;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-.closeBtn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 50px;
-    height: 50px;
-    font-size: 32px;
-    font-weight: bold;
-    background-color: #FFD700;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    color: #1e2a38;
+
+/* квадратные кнопки + и - */
+.controls button {
+    width: 32px;
+    height: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100;
-    user-select: none;
+    border-radius: 6px;
+    border: none;
+    background: #444;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
     transition: 0.2s;
 }
-.closeBtn:hover { background-color: #FFC300; }
 
-h2, h3 { margin-top: 0; color: #FFD700; }
-label { display: block; margin-top: 15px; }
-
-input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 6px;
-    border: 1px solid #555;
-    background: #1e2a38;
-    color: #fff;
-    outline: none;
+.controls button:hover {
+    background: #666;
 }
-input::placeholder, textarea::placeholder { color: #aaa; }
 
-button {
-    padding: 12px;
-    width: 100%;
-    cursor: pointer;
-    border: none;
+/* число по центру */
+.controls span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 32px;
+    height: 32px;
+    font-weight: bold;
+    font-size: 16px;
+}
+.qty-value {
+    margin-top: 7px; /* подстрой значение */
+}
+/* кнопка удаления (мусорка) */
+.delete {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f44336;
+    color: #fff;
     border-radius: 6px;
     font-size: 16px;
-    margin-top: 10px;
-    transition: 0.3s;
+    padding: 0;
 }
-
-.openBtn { background-color: #2196F3; color: #fff; display: none; }
-.openBtn:hover { background-color: #1976D2; }
-
-.submitBtn { background-color: #4CAF50; color: #fff; }
-.submitBtn:hover { background-color: #388E3C; }
-
-.selectedItem {
+.qty-block {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    margin-top: 10px;
-    border: 1px solid #555;
-    padding: 10px;
-    border-radius: 10px;
-    background: #1e2a38;
+    min-width: 50px;
 }
-.left { display: flex; align-items: center; gap: 10px; }
-.left img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #555; }
-.controls { display: flex; align-items: center; gap: 10px; }
-.controls button { width: 30px; height: 30px; cursor: pointer; border-radius: 4px; border: none; background: #444; color: #fff; font-weight: bold; transition: 0.2s; }
-.controls button:hover { background: #666; }
-.delete { background: #f44336; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; transition: 0.2s; }
-.delete:hover { background: #d32f2f; }
-</style>
+
+.qty-label {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.qty-value {
+    font-size: 16px;
+    font-weight: bold;
+ 
+
+}
+
+
+.delete:hover {
+    background: #d32f2f;
+}
+
+        .error-message {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .error-border {
+            border-color: #f44336 !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -104,10 +185,19 @@ button {
     <h2>Заявка</h2>
 
     <label>Фамилия</label><input type="text" id="lastname">
+    <div id="lastname-error" class="error-message" style="display: none;"></div>
+
     <label>Имя</label><input type="text" id="firstname">
-    <label>Телефон</label><input type="text" id="phone">
+    <div id="firstname-error" class="error-message" style="display: none;"></div>
+
+    <label>Телефон</label><input type="text" id="phone" placeholder="+7(XXX)XXX-XX-XX">
+    <div id="phone-error" class="error-message" style="display: none;"></div>
+
     <label>E-mail</label><input type="email" id="email" placeholder="example@mail.com">
+    <div id="email-error" class="error-message" style="display: none;"></div>
+
     <label>Адрес</label><input type="text" id="address">
+    <div id="address-error" class="error-message" style="display: none;"></div>
 
     <label>Тип работы</label>
     <select id="workType" onchange="toggleInputs()">
@@ -132,143 +222,243 @@ button {
     <button class="submitBtn" onclick="submitRequest()">Оставить заявку</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.6/dist/inputmask.min.js"></script>
+
 <script>
-const username = sessionStorage.getItem('username');
-if (!username) { alert('Вы не вошли в систему.'); window.location.href='login.html'; }
+    const username = sessionStorage.getItem('username');
+    if (!username) { alert('Вы не вошли в систему.'); window.location.href='login.html'; }
+	localStorage.removeItem("selectedItems");
+    function goHome() { window.location.href='index.html'; }
+    function openPage(page) { window.open(page, "_blank"); }
 
-function goHome() { window.location.href='index.html'; }
-function openPage(page) { window.open(page, "_blank"); }
+    // Переключение кнопок и текстового поля
+    function toggleInputs() {
+        const type = document.getElementById('workType').value;
+        const polesBtn = document.getElementById('polesBtn');
+        const lightBtn = document.getElementById('lightBtn');
+        const problemDiv = document.getElementById('problemDiv');
+        const result = document.getElementById('result'); 
 
-// Переключение кнопок и текстового поля
-function toggleInputs() {
-    const type = document.getElementById('workType').value;
-    const polesBtn = document.getElementById('polesBtn');
-    const lightBtn = document.getElementById('lightBtn');
-    const problemDiv = document.getElementById('problemDiv');
-
-    if (type === 'both') {
-        polesBtn.style.display = 'block';
-        lightBtn.style.display = 'block';
-        problemDiv.style.display = 'none';
-    } else if (type === 'repair') {
-        polesBtn.style.display = 'none';
-        lightBtn.style.display = 'none';
-        problemDiv.style.display = 'block';
-    } else {
-        polesBtn.style.display = 'none';
-        lightBtn.style.display = 'none';
-        problemDiv.style.display = 'none';
-    }
-}
-
-// Работа с выбранными предметами
-function getData(){ return JSON.parse(localStorage.getItem("selectedItems"))||[]; }
-function saveData(data){ localStorage.setItem("selectedItems", JSON.stringify(data)); render(); }
-
-function render(){
-    const data=getData();
-    const result=document.getElementById("result");
-    result.innerHTML="";
-    data.forEach((item,index)=>{
-        item.qty=Number(item.qty)||1;
-        const div=document.createElement("div");
-        div.className="selectedItem";
-        div.innerHTML=`
-        <div class="left">
-            <img src="${decodeURIComponent(item.img)}">
-            <div>${item.name}</div>
-        </div>
-        <div class="controls">
-            <button onclick="minus(${index})">-</button>
-            <span>${item.qty}</span>
-            <button onclick="plus(${index})">+</button>
-            <button class="delete" onclick="removeItem(${index})">🗑</button>
-        </div>`;
-        result.appendChild(div);
-    });
-}
-function plus(i){ let data=getData(); data[i].qty++; saveData(data);}
-function minus(i){ let data=getData(); if(data[i].qty>1)data[i].qty--; saveData(data);}
-function removeItem(i){ let data=getData(); data.splice(i,1); saveData(data);}
-window.addEventListener("focus",()=>{ render(); });
-
-// Отправка заявки
-function submitRequest(){
-    const lastname=document.getElementById("lastname").value.trim();
-    const firstname=document.getElementById("firstname").value.trim();
-    const phone=document.getElementById("phone").value.trim();
-    const email=document.getElementById("email").value.trim();
-    const address=document.getElementById("address").value.trim();
-    const workType=document.getElementById("workType").value;
-    const items=getData();
-
-    if(!lastname||!firstname||!phone||!email||!address||!workType){
-        alert("Заполните все поля!");
-        return;
-    }
-
-    let problemDescription = "";
-    if(workType === "repair") {
-        problemDescription = document.getElementById("problemDescription").value.trim();
-        if(!problemDescription){
-            alert("Опишите проблему!");
-            return;
+        if (type === 'both') {
+            polesBtn.style.display = 'block';
+            lightBtn.style.display = 'block';
+            problemDiv.style.display = 'none';
+            result.innerHTML = '<p>Вы выбрали установку столбов и светильников.</p>';
+        } else if (type === 'repair') {
+            polesBtn.style.display = 'none';
+            lightBtn.style.display = 'none';
+            problemDiv.style.display = 'block';
+            result.innerHTML = '<p>Вы выбрали ремонт повреждения электрических сетей. Пожалуйста, опишите проблему.</p>';
+        } else {
+            polesBtn.style.display = 'none';
+            lightBtn.style.display = 'none';
+            problemDiv.style.display = 'none';
+            result.innerHTML = ''; 
         }
     }
 
-    const request={
-        username, date:new Date().toLocaleString(),
-        lastname, firstname, phone, email, address,
-        type:workType, items, status:"Новая",
-        problemDescription: problemDescription || undefined,
-        createdAt:new Date().toISOString(),
-        expectedCallTime:new Date(Date.now()+5*60*1000).toISOString()
-    };
-
-    const storedRequests=JSON.parse(localStorage.getItem("requests"))||[];
-    storedRequests.push(request);
-    localStorage.setItem("requests", JSON.stringify(storedRequests));
-    localStorage.removeItem("selectedItems");
-
-    const summary=encodeURIComponent(JSON.stringify(request));
-    window.location.href=`confirmation.html?data=${summary}`;
-
-	saveAllRequests();
-}
-
-async function saveRequestsAll(requestsData) {
-  try {
-    const response = await fetch('/api/updateRequestsAll', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        requests: requestsData
-      })
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.error('Ошибка сервера:', result.error || result);
-      alert('Не удалось сохранить заявки: ' + (result.error || 'Неизвестная ошибка'));
-      return;
+    // Валидация имени и фамилии (только буквы)
+    function validateName(name) {
+        const regex = /^[a-zA-Zа-яА-ЯёЁ]+$/;
+        return regex.test(name);
     }
 
-    console.log('Заявки успешно обновлены на GitHub:', result);
-    alert('Заявки успешно сохранены!');
+    // Валидация телефона
+    const phoneInput = document.getElementById("phone");
+    const phoneMask = new Inputmask("+7(999)999-99-99");
+    phoneMask.mask(phoneInput);
 
-  } catch (err) {
-    console.error('Ошибка при соединении с сервером:', err);
-    alert('Ошибка соединения с сервером');
-  }
+    // Валидация и отображение ошибок
+    function showError(inputId, message) {
+        const input = document.getElementById(inputId);
+        const errorElement = document.getElementById(inputId + '-error');
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+        input.classList.add('error-border');
+    }
+
+    function hideError(inputId) {
+        const input = document.getElementById(inputId);
+        const errorElement = document.getElementById(inputId + '-error');
+        errorElement.style.display = 'none';
+        input.classList.remove('error-border');
+    }
+
+    // Валидация всех полей при вводе
+    document.getElementById("lastname").addEventListener("input", function() {
+        const lastname = this.value.trim();
+        if (!lastname || !validateName(lastname)) {
+            showError("lastname", "Фамилия должна содержать только буквы.");
+        } else {
+            hideError("lastname");
+        }
+    });
+
+    document.getElementById("firstname").addEventListener("input", function() {
+        const firstname = this.value.trim();
+        if (!firstname || !validateName(firstname)) {
+            showError("firstname", "Имя должно содержать только буквы.");
+        } else {
+            hideError("firstname");
+        }
+    });
+
+    document.getElementById("phone").addEventListener("input", function() {
+        const phone = this.value.trim();
+        const phonePattern = /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/;
+        if (!phone || !phonePattern.test(phone)) {
+            showError("phone", "Неверный формат телефона! Введите номер в формате: +7(XXX)XXX-XX-XX");
+        } else {
+            hideError("phone");
+        }
+    });
+
+    document.getElementById("email").addEventListener("input", function() {
+        const email = this.value.trim();
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!email || !emailPattern.test(email)) {
+            showError("email", "Введите правильный E-mail.");
+        } else {
+            hideError("email");
+        }
+    });
+
+    document.getElementById("address").addEventListener("input", function() {
+        const address = this.value.trim();
+        if (!address) {
+            showError("address", "Адрес не может быть пустым.");
+        } else {
+            hideError("address");
+        }
+    });
+
+    // Работа с выбранными товарами
+    function getData() {
+        return JSON.parse(localStorage.getItem("selectedItems")) || [];
+    }
+
+    function render() {
+        const data = getData();
+        const result = document.getElementById("result");
+        result.innerHTML = "";  // Очистка старых товаров
+
+        if (data.length === 0) {
+            result.innerHTML = "<p>Вы не выбрали товары.</p>";
+            return;
+        }
+
+        data.forEach((item, index) => {
+            item.qty = Number(item.qty) || 1;
+            const div = document.createElement("div");
+            div.className = "selectedItem";
+            div.innerHTML = `
+                <div class="left">
+                    <img src="${decodeURIComponent(item.img)}">
+                    <div>${item.name}</div>
+                </div>
+          <div class="controls">
+    <button onclick="minus(${index})">-</button>
+
+    <div class="qty-block">
+         
+        <span class="qty-value">${item.qty}</span>
+    </div>
+
+    <button onclick="plus(${index})">+</button>
+    <button class="delete" onclick="removeItem(${index})">×</button>
+</div>
+            `;
+            result.appendChild(div);
+        });
+    }
+
+    function plus(i) {
+        let data = getData();
+        data[i].qty++;
+        localStorage.setItem("selectedItems", JSON.stringify(data));
+        render();
+    }
+
+    function minus(i) {
+        let data = getData();
+        if (data[i].qty > 1) {
+            data[i].qty--;
+        }
+        localStorage.setItem("selectedItems", JSON.stringify(data));
+        render();
+    }
+
+    function removeItem(i) {
+        let data = getData();
+        data.splice(i, 1);
+        localStorage.setItem("selectedItems", JSON.stringify(data));
+        render();
+    }
+
+    window.addEventListener("focus", render);  // Перерисовать, когда окно получает фокус
+
+    render();  // Инициализация рендеринга при загрузке страницы
+	function validatePhone(phone) {
+    const phonePattern = /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/;
+    return phonePattern.test(phone);
 }
+    // Отправка заявки
+    function submitRequest() {
+	const items = JSON.parse(localStorage.getItem("selectedItems")) || [];
+        const lastname = document.getElementById("lastname").value.trim();
+        const firstname = document.getElementById("firstname").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const address = document.getElementById("address").value.trim();
+        const workType = document.getElementById("workType").value;
 
-function saveAllRequests() {
-  const requests = JSON.parse(localStorage.getItem('requests')) || [];
-  saveRequestsAll(requests); // Отправляем все заявки на сервер
-}
+        let formValid = true;
 
+        // Проверяем все поля на наличие ошибок
+        if (!lastname || !validateName(lastname)) {
+            showError("lastname", "Фамилия должна содержать только буквы.");
+            formValid = false;
+        }
+        if (!firstname || !validateName(firstname)) {
+            showError("firstname", "Имя должно содержать только буквы.");
+            formValid = false;
+        }
+       const phonePattern = /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/;
 
+if (!phone || !phonePattern.test(phone)) {
+            showError("phone", "Неверный формат телефона! Введите номер в формате: +7(XXX)XXX-XX-XX");
+            formValid = false;
+        }
+        if (!email || !/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(email)) {
+            showError("email", "Введите правильный E-mail.");
+            formValid = false;
+        }
+        if (!address) {
+            showError("address", "Адрес не может быть пустым.");
+            formValid = false;
+        }
+
+        if (!formValid) {
+            alert("Пожалуйста, исправьте ошибки перед отправкой.");
+            return;
+        }
+
+        const request = {
+            username, date: new Date().toLocaleString(),
+            lastname, firstname, phone, email, address,
+            type: workType, items, status: "Новая",
+            createdAt: new Date().toISOString(),
+			 
+            expectedCallTime: new Date(Date.now() + 5 * 60 * 1000).toISOString()
+        };
+
+        const storedRequests = JSON.parse(localStorage.getItem("requests")) || [];
+        storedRequests.push(request);
+        localStorage.setItem("requests", JSON.stringify(storedRequests));
+
+        const summary = encodeURIComponent(JSON.stringify(request));
+        window.location.href = `confirmation.html?data=${summary}`;
+    }
 </script>
 
 </body>

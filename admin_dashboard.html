@@ -149,12 +149,10 @@ img.preview {
 
 
 .header {
-  position: fixed;
-  top: 10px;
-  right: 10px;
   display: flex;
+  justify-content: flex-end;
   gap: 10px;
-  z-index: 100;
+  margin-bottom: 15px;
 }
 
 .menu-button, .logout-button {
@@ -170,7 +168,23 @@ img.preview {
 .menu-button:hover, .logout-button:hover {
   background-color: #2980b9;
 }
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
 
+.header {
+  margin-top: 10px; /* регулируй значение */
+
+  display: flex;
+  gap: 10px;
+}
+
+.top-bar h2 {
+  margin: 0;
+}
 .content {
   margin-top: 50px;
   padding: 20px;
@@ -178,13 +192,15 @@ img.preview {
 </style>
 </head>
 <body>
-<div class="container">
+<div class="top-bar">
+  <h2>Админ панель</h2>
 
-<h2>Админ панель</h2>
-<div class="header">
-  <button class="menu-button" onclick="goToMainMenu()">Главное меню</button>
-  <button class="logout-button" onclick="logout()">Выйти</button>
+  <div class="header">
+    <button class="menu-button" onclick="goToMainMenu()">Главное меню</button>
+    <button class="logout-button" onclick="logout()">Выйти</button>
+  </div>
 </div>
+ 
 <div class="tabs">
   <button id="requestsTab" class="active" onclick="showMainTab('requests')">Заявки</button>
   <button id="warehouseTab" onclick="showMainTab('warehouse')">Склад</button>
