@@ -452,11 +452,7 @@ const workTypeNames = {
     repair: "Ремонт повреждения электрических сетей"
 };
 
-// Функция рендеринга заявок
-// Функция рендеринга заявок
-// Функция рендеринга заявок
-// Функция рендеринга заявок
-// Функция рендеринга заявок
+ 
 // Функция рендеринга заявок
 function renderRequests(requests, tableId) {
   const tbody = document.getElementById(tableId).querySelector('tbody');
@@ -1104,13 +1100,17 @@ async function downloadStyledReportExcel() {
         ['Общее количество деталей', totalDetails],
         ['Среднее количество деталей на заказ', (totalDetails / completed.length).toFixed(2)],
     ];
-
     statRows.forEach(r => worksheet.addRow(r));
     worksheet.addRow([]);
 
     // --------------------
     // 2️⃣ Таблица заказов
     // --------------------
+    const workTypeNames = {
+        both: "Установка столбов и освещения",
+        repair: "Ремонт повреждения электрических сетей"
+    };
+
     const orderStartRow = worksheet.lastRow.number + 1;
     worksheet.addRow(['ФИО', 'Телефон', 'Тип работы', 'Выбранные предметы', 'Дата завершения']);
     const headerRow = worksheet.lastRow;
@@ -1133,16 +1133,27 @@ async function downloadStyledReportExcel() {
         const itemsStr = r.items && r.items.length > 0
             ? r.items.map(i => `${i.name} (x${i.qty || 1})`).join(", ")
             : '-';
-        worksheet.addRow([
+
+        const displayType = workTypeNames[(r.type || '').trim().toLowerCase()] || r.type;
+
+        const row = worksheet.addRow([
             r.lastname + " " + r.firstname,
             r.phone,
-            r.type,
+            displayType,
             itemsStr,
             r.completionDate || ''
         ]);
+
+        row.eachCell(cell => {
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
     });
 
-    // Автофильтр
     worksheet.autoFilter = {
         from: `A${orderStartRow}`,
         to: `E${worksheet.lastRow.number}`
@@ -1191,7 +1202,8 @@ async function downloadStyledReportExcel() {
     // --------------------
     const typeCount = {};
     completed.forEach(r => {
-        typeCount[r.type] = (typeCount[r.type] || 0) + 1;
+        const normalizedType = (r.type || '').trim().toLowerCase();
+        typeCount[normalizedType] = (typeCount[normalizedType] || 0) + 1;
     });
 
     worksheet.addRow([]);
@@ -1213,7 +1225,8 @@ async function downloadStyledReportExcel() {
     });
 
     Object.entries(typeCount).forEach(([type, qty]) => {
-        const row = worksheet.addRow([type, qty]);
+        const displayName = workTypeNames[type.trim().toLowerCase()] || type;
+        const row = worksheet.addRow([displayName, qty]);
         row.eachCell(cell => {
             cell.border = {
                 top: { style: 'thin' },
@@ -1293,22 +1306,6 @@ async function downloadStyledReportExcel() {
     const buf = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     saveAs(blob, "styled_completed_requests_report.xlsx");
-}
-// ==== Попап товара ====
-function openProductPopup(){ 
-  editIndex = null; 
-  productName.value=''; 
-  productCategory.value='light'; 
-  productFile.value=''; 
-  
-  
-  productChildren=[]; 
-  renderProductChildren(); 
-
-  // Скрываем блок дочерних объектов при добавлении нового товара
-  document.getElementById('productChildrenContainer').style.display = 'none';
-
-  document.getElementById('productPopup').style.display='flex'; 
 }
 function closeProductPopup(){ document.getElementById('productPopup').style.display='none'; }
 function editProduct(i){ 
