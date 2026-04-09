@@ -136,8 +136,10 @@
         "img": "images/OporaOTF.png"
       }
     ],
-    "status": "Новая",
+    "status": "В процессе",
     "createdAt": "2026-04-09T08:18:25.597Z",
-    "expectedCallTime": "2026-04-09T08:23:25.597Z"
+    "expectedCallTime": "2026-04-09T08:23:25.597Z",
+    "callDate": "2026-04-24",
+    "completionDate": "2026-05-14"
   }
 ]
