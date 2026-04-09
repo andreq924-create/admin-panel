@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
 <meta charset="UTF-8">
 <title>Панель администратора</title>
 <style>
@@ -249,7 +252,7 @@ img.preview {
 <button id="completedRequestsBtn" onclick="showTable('completed', this)">Выполненные (<span id="completedRequestsCount">0</span>)</button>
   </div>
   <button onclick="downloadAllRequests()">💾 Скачать все заявки</button>
-
+<button onclick="downloadStyledReportExcel()">Скачать отчет Excel</button>
 
   <table id="newRequestsTable" class="requestsTable">
   <thead><tr><th>ФИО</th><th>Телефон</th><th>Тип работы</th><th>Выбранные предметы</th><th>Действия</th></tr></thead>
@@ -1064,6 +1067,232 @@ function deleteRequest() {
     loadRequests();
 		saveAllRequests();
 
+}
+async function downloadStyledReportExcel() {
+    const requests = JSON.parse(localStorage.getItem('requests')) || [];
+    const completed = requests.filter(r => r.status === 'Завершена');
+
+    if (completed.length === 0) {
+        alert("Нет выполненных заявок для отчета");
+        return;
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Отчет');
+
+    // --------------------
+    // 1️⃣ Общая статистика
+    // --------------------
+    const uniqueClients = new Set(completed.map(r => r.lastname + r.firstname)).size;
+    const detailsCount = {};
+    let totalDetails = 0;
+
+    completed.forEach(r => {
+        if (r.items && r.items.length > 0) {
+            r.items.forEach(i => {
+                const qty = i.qty || 1;
+                totalDetails += qty;
+                detailsCount[i.name] = (detailsCount[i.name] || 0) + qty;
+            });
+        }
+    });
+
+    worksheet.addRow(['Статистика']);
+    const statRows = [
+        ['Общее количество заказов', completed.length],
+        ['Уникальные клиенты', uniqueClients],
+        ['Общее количество деталей', totalDetails],
+        ['Среднее количество деталей на заказ', (totalDetails / completed.length).toFixed(2)],
+    ];
+
+    statRows.forEach(r => worksheet.addRow(r));
+    worksheet.addRow([]);
+
+    // --------------------
+    // 2️⃣ Таблица заказов
+    // --------------------
+    const orderStartRow = worksheet.lastRow.number + 1;
+    worksheet.addRow(['ФИО', 'Телефон', 'Тип работы', 'Выбранные предметы', 'Дата завершения']);
+    const headerRow = worksheet.lastRow;
+
+    // Оформление заголовка
+    headerRow.eachCell(cell => {
+        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF007BFF' } };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+        };
+    });
+
+    // Данные заказов
+    completed.forEach(r => {
+        const itemsStr = r.items && r.items.length > 0
+            ? r.items.map(i => `${i.name} (x${i.qty || 1})`).join(", ")
+            : '-';
+        worksheet.addRow([
+            r.lastname + " " + r.firstname,
+            r.phone,
+            r.type,
+            itemsStr,
+            r.completionDate || ''
+        ]);
+    });
+
+    // Автофильтр
+    worksheet.autoFilter = {
+        from: `A${orderStartRow}`,
+        to: `E${worksheet.lastRow.number}`
+    };
+
+    // --------------------
+    // 3️⃣ Сводка по деталям
+    // --------------------
+    worksheet.addRow([]);
+    const detailStartRow = worksheet.lastRow.number + 1;
+    worksheet.addRow(['Сводка по деталям']);
+    worksheet.addRow(['Деталь', 'Количество']);
+    const detailHeader = worksheet.lastRow;
+
+    detailHeader.eachCell(cell => {
+        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF28A745' } };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+        };
+    });
+
+    Object.entries(detailsCount).forEach(([name, qty]) => {
+        const row = worksheet.addRow([name, qty]);
+        row.eachCell(cell => {
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+    });
+
+    worksheet.autoFilter = {
+        from: `A${detailStartRow + 1}`,
+        to: `B${worksheet.lastRow.number}`
+    };
+
+    // --------------------
+    // 4️⃣ Сводка по типам работы
+    // --------------------
+    const typeCount = {};
+    completed.forEach(r => {
+        typeCount[r.type] = (typeCount[r.type] || 0) + 1;
+    });
+
+    worksheet.addRow([]);
+    const typeStartRow = worksheet.lastRow.number + 1;
+    worksheet.addRow(['Сводка по типам работы']);
+    worksheet.addRow(['Тип работы', 'Количество']);
+    const typeHeader = worksheet.lastRow;
+
+    typeHeader.eachCell(cell => {
+        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF6C757D' } };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+        };
+    });
+
+    Object.entries(typeCount).forEach(([type, qty]) => {
+        const row = worksheet.addRow([type, qty]);
+        row.eachCell(cell => {
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+    });
+
+    worksheet.autoFilter = {
+        from: `A${typeStartRow + 1}`,
+        to: `B${worksheet.lastRow.number}`
+    };
+
+    // --------------------
+    // 5️⃣ Данные по месяцам
+    // --------------------
+    const monthCount = {};
+    completed.forEach(r => {
+        if (r.completionDate) {
+            const month = r.completionDate.slice(0, 7); // YYYY-MM
+            monthCount[month] = (monthCount[month] || 0) + 1;
+        }
+    });
+
+    worksheet.addRow([]);
+    const monthStartRow = worksheet.lastRow.number + 1;
+    worksheet.addRow(['Заказы по месяцам']);
+    worksheet.addRow(['Месяц', 'Количество']);
+    const monthHeader = worksheet.lastRow;
+
+    monthHeader.eachCell(cell => {
+        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFF5733' } };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+        };
+    });
+
+    Object.entries(monthCount).sort().forEach(([month, qty]) => {
+        const row = worksheet.addRow([month, qty]);
+        row.eachCell(cell => {
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+    });
+
+    worksheet.autoFilter = {
+        from: `A${monthStartRow + 1}`,
+        to: `B${worksheet.lastRow.number}`
+    };
+
+    // --------------------
+    // Автоширина колонок
+    // --------------------
+    worksheet.columns.forEach(col => {
+        let maxLength = 10;
+        col.eachCell({ includeEmpty: true }, cell => {
+            const value = cell.value ? cell.value.toString() : '';
+            maxLength = Math.max(maxLength, value.length + 2);
+        });
+        col.width = maxLength;
+    });
+
+    // --------------------
+    // Сохраняем Excel
+    // --------------------
+    const buf = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    saveAs(blob, "styled_completed_requests_report.xlsx");
 }
 // ==== Попап товара ====
 function openProductPopup(){ 
