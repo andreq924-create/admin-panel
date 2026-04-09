@@ -142,7 +142,22 @@
 const loginForm = document.getElementById('loginForm');
 const errorMessage = document.getElementById('error');
 
-loginForm.addEventListener('submit', async function(event) {
+// Загружаем пользователей один раз при загрузке страницы
+let users = [];
+
+window.addEventListener('load', async () => {
+    try {
+        const response = await fetch('./users.json', { cache: 'no-store' }); // отключаем кеш
+        if (!response.ok) throw new Error('Ошибка загрузки users.json');
+
+        users = await response.json();
+    } catch (error) {
+        console.error(error);
+        alert('Ошибка загрузки пользователей');
+    }
+});
+
+loginForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
     const username = document.getElementById('username').value;
@@ -162,29 +177,14 @@ loginForm.addEventListener('submit', async function(event) {
         return;
     }
 
-    try {
-        const response = await fetch('users.json');
+    // проверяем пользователя из users.json
+    const user = users.find(u => u.username === username && u.password === password);
 
-        if (!response.ok) {
-            throw new Error('Ошибка загрузки users.json');
-        }
-
-        const users = await response.json();
-
-        const user = users.find(u =>
-            u.username === username && u.password === password
-        );
-
-        if (user) {
-            sessionStorage.setItem('username', user.username);
-            window.location.href = "user_dashboard.html";
-        } else {
-            errorMessage.style.display = 'block';
-        }
-
-    } catch (error) {
-        console.error(error);
-        alert('Ошибка загрузки пользователей');
+    if (user) {
+        sessionStorage.setItem('username', user.username);
+        window.location.href = "user_dashboard.html";
+    } else {
+        errorMessage.style.display = 'block';
     }
 });
 </script>

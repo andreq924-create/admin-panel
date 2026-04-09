@@ -403,62 +403,103 @@
     return phonePattern.test(phone);
 }
     // Отправка заявки
-    function submitRequest() {
-	const items = JSON.parse(localStorage.getItem("selectedItems")) || [];
-        const lastname = document.getElementById("lastname").value.trim();
-        const firstname = document.getElementById("firstname").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const address = document.getElementById("address").value.trim();
-        const workType = document.getElementById("workType").value;
+    // Отправка заявки
+function submitRequest() {
+    const items = JSON.parse(localStorage.getItem("selectedItems")) || [];
+    const lastname = document.getElementById("lastname").value.trim();
+    const firstname = document.getElementById("firstname").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const workType = document.getElementById("workType").value;
 
-        let formValid = true;
+    let formValid = true;
 
-        // Проверяем все поля на наличие ошибок
-        if (!lastname || !validateName(lastname)) {
-            showError("lastname", "Фамилия должна содержать только буквы.");
-            formValid = false;
-        }
-        if (!firstname || !validateName(firstname)) {
-            showError("firstname", "Имя должно содержать только буквы.");
-            formValid = false;
-        }
-       const phonePattern = /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/;
+    // Проверка всех полей
+    if (!lastname || !validateName(lastname)) {
+        showError("lastname", "Фамилия должна содержать только буквы.");
+        formValid = false;
+    }
+    if (!firstname || !validateName(firstname)) {
+        showError("firstname", "Имя должно содержать только буквы.");
+        formValid = false;
+    }
+    const phonePattern = /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/;
+    if (!phone || !phonePattern.test(phone)) {
+        showError("phone", "Неверный формат телефона! Введите номер в формате: +7(XXX)XXX-XX-XX");
+        formValid = false;
+    }
+    if (!email || !/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(email)) {
+        showError("email", "Введите правильный E-mail.");
+        formValid = false;
+    }
+    if (!address) {
+        showError("address", "Адрес не может быть пустым.");
+        formValid = false;
+    }
 
-if (!phone || !phonePattern.test(phone)) {
-            showError("phone", "Неверный формат телефона! Введите номер в формате: +7(XXX)XXX-XX-XX");
-            formValid = false;
-        }
-        if (!email || !/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(email)) {
-            showError("email", "Введите правильный E-mail.");
-            formValid = false;
-        }
-        if (!address) {
-            showError("address", "Адрес не может быть пустым.");
-            formValid = false;
-        }
+    if (!formValid) {
+        alert("Пожалуйста, исправьте ошибки перед отправкой.");
+        return;
+    }
 
-        if (!formValid) {
-            alert("Пожалуйста, исправьте ошибки перед отправкой.");
+    const request = {
+        username,
+        date: new Date().toLocaleString(),
+        lastname,
+        firstname,
+        phone,
+        email,
+        address,
+        type: workType,
+        items,
+        status: "Новая",
+        createdAt: new Date().toISOString(),
+        expectedCallTime: new Date(Date.now() + 5 * 60 * 1000).toISOString()
+    };
+
+    // Сохраняем локально
+    const storedRequests = JSON.parse(localStorage.getItem("requests")) || [];
+    storedRequests.push(request);
+    localStorage.setItem("requests", JSON.stringify(storedRequests));
+
+    // **Сохраняем на сервер**
+    saveAllRequests();
+
+    // Переходим на страницу подтверждения
+    const summary = encodeURIComponent(JSON.stringify(request));
+    window.location.href = `confirmation.html?data=${summary}`;
+}
+
+
+
+function saveAllRequests() {
+    const requests = JSON.parse(localStorage.getItem('requests')) || [];
+    saveRequestsAll(requests); // Отправляем все заявки на сервер
+}
+
+async function saveRequestsAll(requestsData) {
+    try {
+        const response = await fetch('/api/updateRequestsAll', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requests: requestsData })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            console.error('Ошибка сервера:', result.error || result);
+            alert('Не удалось сохранить заявки');
             return;
         }
 
-        const request = {
-            username, date: new Date().toLocaleString(),
-            lastname, firstname, phone, email, address,
-            type: workType, items, status: "Новая",
-            createdAt: new Date().toISOString(),
-			 
-            expectedCallTime: new Date(Date.now() + 5 * 60 * 1000).toISOString()
-        };
-
-        const storedRequests = JSON.parse(localStorage.getItem("requests")) || [];
-        storedRequests.push(request);
-        localStorage.setItem("requests", JSON.stringify(storedRequests));
-
-        const summary = encodeURIComponent(JSON.stringify(request));
-        window.location.href = `confirmation.html?data=${summary}`;
+        console.log('Заявки обновлены:', result);
+    } catch (err) {
+        console.error('Ошибка:', err);
+        alert('Ошибка соединения с сервером');
     }
+}
 </script>
 
 </body>

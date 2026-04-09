@@ -189,6 +189,11 @@ img.preview {
   margin-top: 50px;
   padding: 20px;
 }
+
+.tabs button.active {
+    background: #007BFF;
+    color: white;
+}
 </style>
 </head>
 <body>
@@ -239,9 +244,9 @@ img.preview {
 <!-- ================= ЗАЯВКИ ================= -->
 <div id="requestsSection">
   <div class="tabs">
-    <button id="newRequestsBtn" class="active" onclick="showTable('new')">Новые (<span id="newRequestsCount">0</span>)</button>
-    <button id="pendingRequestsBtn" onclick="showTable('pending')">В ожидании (<span id="pendingRequestsCount">0</span>)</button>
-    <button id="completedRequestsBtn" onclick="showTable('completed')">Выполненные (<span id="completedRequestsCount">0</span>)</button>
+<button id="newRequestsBtn" class="active" onclick="showTable('new', this)">Новые (<span id="newRequestsCount">0</span>)</button>
+<button id="pendingRequestsBtn" onclick="showTable('pending', this)">В ожидании (<span id="pendingRequestsCount">0</span>)</button>
+<button id="completedRequestsBtn" onclick="showTable('completed', this)">Выполненные (<span id="completedRequestsCount">0</span>)</button>
   </div>
   <button onclick="downloadAllRequests()">💾 Скачать все заявки</button>
 
@@ -363,17 +368,49 @@ let productChildren = []; // дочерние элементы товара
 let productName, productCategory, productQty;
 
 // ==== Табы ====
-function showMainTab(tab){
-  document.getElementById('requestsSection').style.display='none';
-  document.getElementById('warehouseSection').style.display='none';
-  if(tab=='requests') document.getElementById('requestsSection').style.display='block';
-  if(tab=='warehouse') document.getElementById('warehouseSection').style.display='block';
-}
-function showTable(name){
-  document.querySelectorAll('.requestsTable').forEach(t=>t.style.display='none');
-  document.getElementById(name+'RequestsTable').style.display='table';
-}
+// Функция для переключения верхних вкладок: Заявки / Склад
+function showMainTab(tab) {
+    // Скрываем оба раздела
+    document.getElementById('requestsSection').style.display = 'none';
+    document.getElementById('warehouseSection').style.display = 'none';
 
+    // Снимаем активность со всех верхних вкладок
+    document.querySelectorAll('.tabs > button').forEach(b => b.classList.remove('active'));
+
+    if (tab === 'requests') {
+        document.getElementById('requestsSection').style.display = 'block';
+        document.getElementById('requestsTab').classList.add('active');
+
+        // **Ставим активной под-вкладку "Новые"**
+        showTable('new', document.getElementById('newRequestsBtn'));
+    }
+    if (tab === 'warehouse') {
+        document.getElementById('warehouseSection').style.display = 'block';
+        document.getElementById('warehouseTab').classList.add('active');
+    }
+}
+// При загрузке страницы делаем активной вкладку "Заявки"
+window.addEventListener('DOMContentLoaded', function() {
+    showMainTab('requests');  // по умолчанию активна "Заявки"
+    showTable('new', document.getElementById('newRequestsBtn')); // активная под-вкладка "Новые"
+});
+function showTable(name, btn) {
+    // Скрываем все таблицы
+    document.querySelectorAll('.requestsTable').forEach(t => t.style.display = 'none');
+
+    // Показываем выбранную таблицу
+    document.getElementById(name + 'RequestsTable').style.display = 'table';
+
+    // Снимаем класс active со всех кнопок вкладок заявок
+    document.querySelectorAll('#requestsSection .tabs button').forEach(b => b.classList.remove('active'));
+
+    // Делаем текущую кнопку синей
+    if (btn) btn.classList.add('active');
+}
+// При загрузке страницы кнопка 'Новые' уже активна
+window.onload = function() {
+  document.getElementById('newRequestsBtn').classList.add('active');
+};
 // ==== Заявки ====
 // Функция загрузки заявок
 function loadRequests() {
