@@ -91,6 +91,54 @@
             padding: 15px;
             font-size: 14px;
         }
+
+        /* Стили для уведомления */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #2f3f52;
+            color: #fff;
+            padding: 20px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.4s ease;
+            z-index: 9999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast button {
+            background-color: #FFD700;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .toast button:hover {
+            background-color: #FFC300;
+        }
+
+        .toast .close-btn {
+            background: none;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -121,8 +169,20 @@
     <p>&copy; 2026 МКУ "Кировсвет". Все права защищены.</p>
 </footer>
 
+<!-- Панель уведомления -->
+<div id="toast" class="toast">
+    <span>Вы зарегистрированы!</span>
+    <div>
+        <button id="loginBtn">Войти</button>
+        <button class="close-btn" id="closeToast">&times;</button>
+    </div>
+</div>
+
 <script>
 const registerForm = document.getElementById('registerForm');
+const toast = document.getElementById('toast');
+const loginBtn = document.getElementById('loginBtn');
+const closeToast = document.getElementById('closeToast');
 
 registerForm.addEventListener('submit', async function(event) {
     event.preventDefault();
@@ -130,22 +190,15 @@ registerForm.addEventListener('submit', async function(event) {
     const regUsername = document.getElementById('regUsername').value;
     const regPassword = document.getElementById('regPassword').value;
 
-    // Проверка на пустые значения
     if (!regUsername || !regPassword) {
         alert('Пожалуйста, заполните все поля!');
         return;
     }
 
-    const newUser = {
-        username: regUsername,
-        password: regPassword
-    };
+    const newUser = { username: regUsername, password: regPassword };
 
     try {
-        // Получаем текущих пользователей
         let users = JSON.parse(localStorage.getItem('users')) || [];
-
-        // Проверка, существует ли уже такой пользователь
         const existingUser = users.find(user => user.username === regUsername);
 
         if (existingUser) {
@@ -153,15 +206,11 @@ registerForm.addEventListener('submit', async function(event) {
             return;
         }
 
-        // Добавляем нового пользователя
         users.push(newUser);
 
-        // Отправляем ВСЁ на сервер
         const response = await fetch('/api/updateUsers', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ users: users })
         });
 
@@ -172,17 +221,33 @@ registerForm.addEventListener('submit', async function(event) {
             return;
         }
 
-        // Сохраняем локально
         localStorage.setItem('users', JSON.stringify(users));
 
-        alert('Регистрация успешна!');
-        window.location.href = "login.html";
+        // Показываем красивое уведомление
+        toast.classList.add('show');
 
     } catch (err) {
         console.error(err);
         alert('Ошибка соединения с сервером');
     }
 });
+
+// Кнопка "Войти"
+loginBtn.addEventListener('click', () => {
+    window.location.href = 'login.html';
+});
+
+// Крестик закрытия
+closeToast.addEventListener('click', () => {
+    toast.classList.remove('show');
+});
+
+// Автоматическое скрытие через 5 секунд
+setInterval(() => {
+    if (toast.classList.contains('show')) {
+        toast.classList.remove('show');
+    }
+}, 5000);
 </script>
 
 </body>
