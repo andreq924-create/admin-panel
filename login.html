@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<link rel="icon" href="favicon.png" type="image/png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход</title>
@@ -90,18 +91,56 @@
             background-color: #FFC300;
         }
 
-        #error {
-            text-align: center;
-            margin-top: 10px;
-            color: red;
-            display: none;
-        }
-
         footer {
             background: #000;
             text-align: center;
             padding: 15px;
             font-size: 14px;
+        }
+
+        /* МОДАЛКА */
+        #modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modalBox {
+            background: #fff;
+            color: #000;
+            padding: 25px;
+            border-radius: 12px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        }
+
+        #modalBox.success {
+            border-top: 6px solid #28a745;
+        }
+
+        #modalBox.error {
+            border-top: 6px solid #dc3545;
+        }
+
+        #modalBox button {
+            margin-top: 15px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            background: #FFD700;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #modalBox button:hover {
+            background: #FFC300;
         }
     </style>
 </head>
@@ -129,8 +168,6 @@
 
             <button type="submit">Войти</button>
         </form>
-
-        <div id="error">Неверный логин или пароль!</div>
     </div>
 </main>
 
@@ -138,22 +175,47 @@
     <p>&copy; 2026 МКУ "Кировсвет". Все права защищены.</p>
 </footer>
 
+<!-- МОДАЛЬНОЕ ОКНО -->
+<div id="modal">
+    <div id="modalBox">
+        <div id="modalText"></div>
+        <button onclick="closeModal()">Ок</button>
+    </div>
+</div>
+
 <script>
 const loginForm = document.getElementById('loginForm');
-const errorMessage = document.getElementById('error');
 
-// Загружаем пользователей один раз при загрузке страницы
+// модалка
+function showModal(message, type = "error") {
+    const modal = document.getElementById('modal');
+    const box = document.getElementById('modalBox');
+    const text = document.getElementById('modalText');
+
+    text.innerText = message;
+
+    box.classList.remove('success', 'error');
+    box.classList.add(type);
+
+    modal.style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = "none";
+}
+
+// Загружаем пользователей
 let users = [];
 
 window.addEventListener('load', async () => {
     try {
-        const response = await fetch('./users.json', { cache: 'no-store' }); // отключаем кеш
+        const response = await fetch('./users.json', { cache: 'no-store' });
         if (!response.ok) throw new Error('Ошибка загрузки users.json');
 
         users = await response.json();
     } catch (error) {
         console.error(error);
-        alert('Ошибка загрузки пользователей');
+        showModal('Ошибка загрузки пользователей', 'error');
     }
 });
 
@@ -163,7 +225,7 @@ loginForm.addEventListener('submit', (event) => {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    // дефолт пользователь
+    // дефолт
     if (username === '111' && password === '111') {
         sessionStorage.setItem('username', username);
         window.location.href = "user_dashboard.html";
@@ -177,14 +239,13 @@ loginForm.addEventListener('submit', (event) => {
         return;
     }
 
-    // проверяем пользователя из users.json
     const user = users.find(u => u.username === username && u.password === password);
 
     if (user) {
         sessionStorage.setItem('username', user.username);
         window.location.href = "user_dashboard.html";
     } else {
-        errorMessage.style.display = 'block';
+        showModal('Неверный логин или пароль!', 'error');
     }
 });
 </script>

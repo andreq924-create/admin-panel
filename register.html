@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<link rel="icon" href="favicon.png" type="image/png">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
@@ -91,6 +93,51 @@
             padding: 15px;
             font-size: 14px;
         }
+
+        /* МОДАЛКА */
+        #modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modalBox {
+            background: #fff;
+            color: #000;
+            padding: 25px;
+            border-radius: 12px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        }
+
+        #modalBox.success {
+            border-top: 6px solid #28a745;
+        }
+
+        #modalBox.error {
+            border-top: 6px solid #dc3545;
+        }
+
+        #modalBox button {
+            margin-top: 15px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            background: #FFD700;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #modalBox button:hover {
+            background: #FFC300;
+        }
     </style>
 </head>
 <body>
@@ -121,8 +168,33 @@
     <p>&copy; 2026 МКУ "Кировсвет". Все права защищены.</p>
 </footer>
 
+<!-- МОДАЛЬНОЕ ОКНО -->
+<div id="modal">
+    <div id="modalBox">
+        <div id="modalText"></div>
+        <button onclick="closeModal()">Ок</button>
+    </div>
+</div>
+
 <script>
 const registerForm = document.getElementById('registerForm');
+
+function showModal(message, type = "success") {
+    const modal = document.getElementById('modal');
+    const box = document.getElementById('modalBox');
+    const text = document.getElementById('modalText');
+
+    text.innerText = message;
+
+    box.classList.remove('success', 'error');
+    box.classList.add(type);
+
+    modal.style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = "none";
+}
 
 registerForm.addEventListener('submit', async function(event) {
     event.preventDefault();
@@ -130,9 +202,8 @@ registerForm.addEventListener('submit', async function(event) {
     const regUsername = document.getElementById('regUsername').value;
     const regPassword = document.getElementById('regPassword').value;
 
-    // Проверка на пустые значения
     if (!regUsername || !regPassword) {
-        alert('Пожалуйста, заполните все поля!');
+        showModal('Пожалуйста, заполните все поля!', 'error');
         return;
     }
 
@@ -142,21 +213,17 @@ registerForm.addEventListener('submit', async function(event) {
     };
 
     try {
-        // Получаем текущих пользователей
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        // Проверка, существует ли уже такой пользователь
         const existingUser = users.find(user => user.username === regUsername);
 
         if (existingUser) {
-            alert('Пользователь с таким именем уже зарегистрирован.');
+            showModal('Пользователь уже существует!', 'error');
             return;
         }
 
-        // Добавляем нового пользователя
         users.push(newUser);
 
-        // Отправляем ВСЁ на сервер
         const response = await fetch('/api/updateUsers', {
             method: 'POST',
             headers: {
@@ -168,19 +235,21 @@ registerForm.addEventListener('submit', async function(event) {
         const result = await response.json();
 
         if (!response.ok) {
-            alert('Ошибка: ' + (result.error || 'Неизвестная ошибка'));
+            showModal('Ошибка: ' + (result.error || 'Неизвестная ошибка'), 'error');
             return;
         }
 
-        // Сохраняем локально
         localStorage.setItem('users', JSON.stringify(users));
 
-        alert('Регистрация успешна!');
-        window.location.href = "login.html";
+        showModal('Регистрация успешна!', 'success');
+
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1500);
 
     } catch (err) {
         console.error(err);
-        alert('Ошибка соединения с сервером');
+        showModal('Ошибка соединения с сервером', 'error');
     }
 });
 </script>
