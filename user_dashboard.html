@@ -125,33 +125,95 @@
             letter-spacing: 2px;
         }
 
+        /* ФИЛЬТРЫ */
+        .filters {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: rgba(255, 215, 0, 0.4);
+        }
+
+        .filter-btn.active {
+            background: #FFD700;
+            color: #1e2a38;
+            font-weight: bold;
+        }
+
         /* КАРТОЧКИ (для мобильных) */
         .request-card {
-            background-color: #1f3145;
-            margin-bottom: 15px;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(145deg, rgba(31, 49, 69, 0.95), rgba(20, 32, 46, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+
+            margin-bottom: 18px;
+            padding: 18px 20px;
+            border-radius: 16px;
+
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
             display: block;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .request-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.08), transparent 60%);
+            transform: rotate(25deg);
+            pointer-events: none;
         }
 
         .request-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-6px) scale(1.01);
+            box-shadow:
+                0 15px 35px rgba(0, 0, 0, 0.45),
+                0 0 15px rgba(255, 215, 0, 0.08);
         }
 
         .request-card h3 {
-            margin: 0 0 10px;
+            margin: 0 0 12px;
             color: #FFD700;
-            font-size: 18px;
+            font-size: 19px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
         }
 
         .request-card p {
-            margin: 5px 0;
-            color: #fff;
+            margin: 6px 0;
+            color: rgba(255, 255, 255, 0.85);
             font-size: 14px;
+            position: relative;
+        }
+
+        .request-card p strong {
+            color: #ffffff;
         }
 
         /* Обертка для карточек с прокруткой */
@@ -164,6 +226,43 @@
             border-radius: 10px;
             background-color: #1f3145;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Стиль для изображений товаров */
+        .items-list {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 10px;
+            max-width: 120px;
+            text-align: center;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .item:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .item img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .item p {
+            font-size: 12px;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.8);
         }
 
         /* FOOTER */
@@ -225,25 +324,15 @@
             .request-card p {
                 font-size: 12px;
             }
-        }
 
-        /* Стиль для изображений товаров */
-        .items-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
+            .filters {
+                gap: 8px;
+            }
 
-        .item {
-            max-width: 120px;
-            text-align: center;
-        }
-
-        .item img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            .filter-btn {
+                padding: 9px 12px;
+                font-size: 13px;
+            }
         }
     </style>
 </head>
@@ -274,6 +363,13 @@
 <main>
     <h2>Мои заявки</h2>
 
+    <div class="filters">
+        <button class="filter-btn active" onclick="setFilter('all', this)">Все</button>
+        <button class="filter-btn" onclick="setFilter('new', this)">Новые</button>
+        <button class="filter-btn" onclick="setFilter('in_work', this)">В работе</button>
+        <button class="filter-btn" onclick="setFilter('done', this)">В завершено</button>
+    </div>
+
     <div class="request-container">
         <!-- Здесь будут отображаться карточки заявок -->
     </div>
@@ -285,6 +381,29 @@
 </footer>
 
 <script>
+    let currentFilter = 'all';
+
+    function normalizeStatus(status) {
+        return String(status || '')
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '_');
+    }
+
+    function setFilter(filter, btn) {
+        currentFilter = filter;
+
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.classList.remove('active');
+        });
+
+        if (btn) {
+            btn.classList.add('active');
+        }
+
+        displayRequests();
+    }
+
     // Загрузка заявок из requests_all.json
     async function loadRequests() {
         try {
@@ -304,7 +423,21 @@
     // Отображение заявок
     async function displayRequests() {
         const requests = await loadRequests();
-        const userRequests = requests.filter(request => request.username === sessionStorage.getItem('username'));
+        const myUsername = sessionStorage.getItem('username');
+
+        const userRequests = requests.filter(request => {
+            const isMine = request.username === myUsername;
+            if (!isMine) return false;
+
+            const status = normalizeStatus(request.status || 'new');
+
+            if (currentFilter === 'all') return true;
+            if (currentFilter === 'new') return status === 'new' || status === 'новая';
+            if (currentFilter === 'in_work') return status === 'in_work' || status === 'в_работе' || status === 'в_работе';
+            if (currentFilter === 'done') return status === 'done' || status === 'в_завершено' || status === 'завершено';
+
+            return true;
+        });
 
         const container = document.querySelector('.request-container');
         container.innerHTML = '';  // Очищаем контейнер
