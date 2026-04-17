@@ -11,7 +11,7 @@
         html, body {
             margin: 0;
             padding: 0;
-            overflow-x: hidden; /* Запрещаем горизонтальную прокрутку */
+            overflow-x: hidden;
             width: 100%;
             height: 100%;
         }
@@ -19,7 +19,7 @@
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box; /* Убедимся, что отступы и поля учитываются в ширине */
+            box-sizing: border-box;
         }
 
         body {
@@ -36,25 +36,30 @@
             background-color: #1e2a38;
             z-index: 1000;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* кнопка слева, логотип справа */
             align-items: center;
             padding: 10px 30px;
             box-sizing: border-box;
             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            max-width: 100vw; /* Убедимся, что шапка не выходит за пределы экрана */
-        }
-
-        #mainHeader img.logo {
-            width: 40px;
-            margin-right: 10px;
+            max-width: 100vw;
         }
 
         #mainHeader .header-left {
             display: flex;
             align-items: center;
-            gap: 10px;
         }
 
+        #mainHeader .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        #mainHeader img.logo {
+            width: 150px;
+            margin-left: 10px;
+        }
+
+        /* Кнопка «Вернуться назад» */
         #mainHeader .back-button {
             padding: 8px 14px;
             border: none;
@@ -84,7 +89,7 @@
             opacity: 0;
             transform: translateY(30px);
             animation: fadeInUp 0.8s forwards;
-            width: 100vw; /* Убедимся, что содержимое не выходит за пределы экрана */
+            width: 100vw;
         }
 
         @keyframes fadeInUp {
@@ -103,7 +108,7 @@
             width: 350px;
             max-width: 90%;
             margin: 0 auto;
-            box-sizing: border-box; /* Чтобы padding не создавал прокрутку */
+            box-sizing: border-box;
         }
 
         .contacts h2 {
@@ -157,8 +162,8 @@
 
         /* Карта */
         .map {
-            width: 90%; /* Ширина карты на ПК */
-            height: 500px; /* Уменьшаем высоту карты на ПК */
+            width: 90%;
+            height: 500px;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -184,6 +189,11 @@
                 padding: 20px;
             }
 
+            #mainHeader img.logo {
+                width: 100px;
+                margin-left: 5px;
+            }
+
             .contacts h2 {
                 font-size: 22px;
             }
@@ -198,13 +208,11 @@
                 margin-right: 8px;
             }
 
-            /* Карта на мобильных */
             .map {
-                height: 400px; /* Высота карты на мобильных устройствах */
+                height: 400px;
             }
         }
 
-        /* Очень маленькие экраны (менее 500px) */
         @media(max-width: 500px) {
             .contacts-wrapper {
                 max-width: 70%;
@@ -234,9 +242,8 @@
                 font-size: 20px;
             }
 
-            /* Карта на очень маленьких экранах */
             .map {
-                height: 400px; /* Высота карты на маленьких экранах */
+                height: 400px;
             }
         }
     </style>
@@ -245,8 +252,10 @@
 <!-- Шапка -->
 <header id="mainHeader">
     <div class="header-left">
-        <img src="sait1/logo.png" alt="Логотип" class="logo">
         <button class="back-button" onclick="history.back()">Вернуться назад</button>
+    </div>
+    <div class="header-right">
+        <img src="sait1/logo.png" alt="Логотип" class="logo">
     </div>
 </header>
 
@@ -277,7 +286,6 @@
             </div>
 
             <div class="social">
-                <!-- Обновленная ссылка на VK -->
                 <a href="https://vk.com/challenge.html?tid=2l6kuUpJdQPzjpN13uCHUM9b6tR9Rg&hash429=z1nVAmNI3Sr_LghQ8aQoFkhUGOG7Ck-cWO--245GyAo2Lg6L2A5FVm72S5BEfaTcKLljnmYcYhGBZ1VQJglmZo-VLYifRN6bmKkdAI9TCnzco6YK_Woq7QYp06Vx17BESlFOxZh9xfZO-xsX&redirect=/mku_kirovsvet&sign=Y_IOkuQIEiDxbQML6FebHA&lang_id=" target="_blank"><i class="fab fa-vk"></i>VK Сообщество</a>
             </div>
         </div>

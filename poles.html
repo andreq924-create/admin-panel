@@ -21,8 +21,10 @@ h2 {
     margin-bottom: 20px;
     font-size: 2.5rem;
     color: #FFD700;
+    animation: fadeInUp 0.5s ease;
 }
 
+/* ===== СЕТКА ПЕРВОГО УРОВНЯ ===== */
 .grid {
     display: flex;
     flex-wrap: wrap;
@@ -30,18 +32,33 @@ h2 {
     justify-content: flex-start;
 }
 
-.grid .card, .size-grid .card {
-    flex: 0 0 350px;
+.grid .card {
+    flex: 0 0 calc(25% - 20px);
+    min-width: 200px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s forwards;
 }
 
+.grid .card:nth-child(1) { animation-delay: 0.05s; }
+.grid .card:nth-child(2) { animation-delay: 0.1s; }
+.grid .card:nth-child(3) { animation-delay: 0.15s; }
+.grid .card:nth-child(4) { animation-delay: 0.2s; }
+
+/* ===== ДОЧЕРНИЕ (GRID) ===== */
 .size-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
-    justify-content: flex-start;
-    padding: 20px 0;
+    width: 100%;
+    animation: fadeInUp 0.5s ease;
 }
 
+.size-grid .card {
+    width: 100%;
+}
+
+/* ===== CARD ===== */
 .card {
     background-color: #2f2f2f;
     border: 1px solid #444;
@@ -56,8 +73,8 @@ h2 {
 }
 
 .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
     border-color: #FFD700;
 }
 
@@ -67,6 +84,11 @@ h2 {
     object-fit: contain;
     border-bottom: 1px solid #444;
     background-color: #1c1c1c;
+    transition: transform 0.5s ease;
+}
+
+.card:hover img {
+    transform: scale(1.05);
 }
 
 .card h3 {
@@ -85,6 +107,7 @@ h2 {
     border-radius: 4px;
     font-size: 16px;
     font-weight: bold;
+    animation: popIn 0.5s ease;
 }
 
 /* кнопки */
@@ -120,22 +143,22 @@ button.back-btn:hover {
     background-color: #218838;
 }
 
-/* ===== ДЕТАЛИ (как в "Освещение") ===== */
-
+/* ===== ДЕТАЛИ ===== */
 .details-container {
     display: flex;
     flex-direction: row;
     gap: 40px;
     margin-top: 20px;
     align-items: flex-start;
-
     flex-wrap: nowrap;
     justify-content: center;
+    animation: fadeIn 0.5s ease;
 }
 
 .details-container .image {
     width: 550px;
     flex: 0 0 550px;
+    animation: slideInLeft 0.5s ease;
 }
 
 .details-container .image img {
@@ -150,11 +173,11 @@ button.back-btn:hover {
 .details-container .info {
     width: 600px;
     flex: 0 0 600px;
-
     padding: 20px 15px;
     background-color: #2f2f2f;
     border: 1px solid #444;
     border-radius: 12px;
+    animation: slideInRight 0.5s ease;
 }
 
 .details-container table {
@@ -170,16 +193,33 @@ button.back-btn:hover {
 }
 
 /* 📱 адаптация */
-@media (max-width: 800px) {
-
-    .grid {
-        flex-direction: column;
-        align-items: center;
+@media (max-width: 1200px) {
+    .grid .card {
+        flex: 0 0 calc(33.33% - 20px);
     }
 
+    .size-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
     .grid .card {
-        width: 95%;
-        max-width: 500px;
+        flex: 0 0 calc(50% - 20px);
+    }
+
+    .size-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .grid .card {
+        flex: 0 0 100%;
+    }
+
+    .size-grid {
+        grid-template-columns: 1fr;
     }
 
     .details-container {
@@ -197,9 +237,8 @@ button.back-btn:hover {
         height: auto;
         max-height: 300px;
     }
-
-
 }
+
 /* ===== МОДАЛКА ===== */
 .modal {
     position: fixed;
@@ -216,7 +255,6 @@ button.back-btn:hover {
     animation: fadeIn 0.3s ease;
 }
 
-
 .hidden {
     display: none;
 }
@@ -225,15 +263,12 @@ button.back-btn:hover {
     background: rgba(47,47,47,0.9);
     border: 1px solid rgba(255, 215, 0, 0.3);
     backdrop-filter: blur(10px);
-
     padding: 30px 25px;
     border-radius: 16px;
     text-align: center;
     color: #eee;
-
     width: 340px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.7);
-
     animation: scaleIn 0.3s ease;
 }
 
@@ -296,21 +331,37 @@ button.back-btn:hover {
     transform: rotate(90deg);
 }
 
+/* ===== АНИМАЦИИ ===== */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
 @keyframes scaleIn {
-    from {
-        transform: scale(0.8);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+}
+
 </style>
 </head>
 
@@ -342,33 +393,14 @@ const grid = document.getElementById("grid");
 const urlParams = new URLSearchParams(window.location.search);
 const fromIndex = urlParams.get('from') === 'index';
 
-function goToMenu() {
-    window.location.href = "index.html";
-}
+function goToMenu() { window.location.href = "index.html"; }
+function toggleMenuBtn(show) { document.getElementById("menuBtn").style.display = show ? "block" : "none"; }
+function isUserLoggedIn() { return sessionStorage.getItem("username") !== null; }
+function openAuthModal() { document.getElementById("authModal").classList.remove("hidden"); }
+function closeAuthModal() { document.getElementById("authModal").classList.add("hidden"); }
+function goToLogin() { window.location.href = "login.html"; }
+function goToRegister() { window.location.href = "register.html"; }
 
-function toggleMenuBtn(show) {
-    document.getElementById("menuBtn").style.display = show ? "block" : "none";
-}
-
-function isUserLoggedIn() {
-    return sessionStorage.getItem("username") !== null;
-}
-
-function openAuthModal() {
-    document.getElementById("authModal").classList.remove("hidden");
-}
-
-function closeAuthModal() {
-    document.getElementById("authModal").classList.add("hidden");
-}
-
-function goToLogin() {
-    window.location.href = "login.html";
-}
-
-function goToRegister() {
-    window.location.href = "register.html";
-}
 async function loadWarehouse() {
     try {
         const response = await fetch('./warehouse.json');
@@ -384,7 +416,6 @@ async function loadWarehouse() {
 
 function loadGrid() {
     toggleMenuBtn(true);
-
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const poles = warehouse.filter(item => item.category === 'pole');
 
@@ -402,11 +433,9 @@ function loadGrid() {
 
 function showChildren(index) {
     toggleMenuBtn(false);
-
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const parent = warehouse[index];
     const children = parent.children || [];
-
     document.querySelector('h2').textContent = `Длина ${parent.name}`;
 
     grid.innerHTML = `
@@ -424,102 +453,78 @@ function showChildren(index) {
         <button class="back-btn" onclick="loadGrid()">Назад</button>
     `;
 }
-function handleAction(parentIndex, childIndex) {
 
+function handleAction(parentIndex, childIndex) {
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const parent = warehouse[parentIndex];
     const child = parent.children[childIndex];
 
     if (fromIndex) {
-
-        if (!isUserLoggedIn()) {
-            openAuthModal();
-            return;
-        }
-
-        localStorage.setItem("requestItem", JSON.stringify({
-            name: child.name,
-            price: child.price,
-            img: child.img || parent.img
-        }));
-
+        if (!isUserLoggedIn()) { openAuthModal(); return; }
+        localStorage.setItem("requestItem", JSON.stringify({ name: child.name, price: child.price, img: child.img || parent.img }));
         window.location.href = "submit_request.html";
-
     } else {
-
-        if (child.qty < 1) {
-            alert("Нет в наличии");
-            return;
-        }
-
+        if (child.qty < 1) { alert("Нет в наличии"); return; }
         let selected = JSON.parse(localStorage.getItem("selectedItems")) || [];
-
         let exist = selected.find(i => i.name === child.name);
-
-        if (exist) {
-            exist.qty += 1;
-        } else {
-            selected.push({
-                name: child.name,
-                price: child.price,
-                qty: 1,
-                img: parent.img
-            });
-        }
-
+        if (exist) exist.qty += 1;
+        else selected.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
         localStorage.setItem("selectedItems", JSON.stringify(selected));
 
-        
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAdmin = urlParams.get('forAdmin') === '1';
 
-        // ✅ ДОБАВЬ ЭТО:
+        if (isAdmin) {
+            let request = JSON.parse(localStorage.getItem("currentAdminRequest")) || {};
+            request.items = Array.isArray(request.items) ? request.items : [];
+            let exist2 = request.items.find(i => i.name === child.name);
+
+            if (exist2) exist2.qty += 1;
+            else request.items.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
+
+            localStorage.setItem("currentAdminRequest", JSON.stringify(request));
+            alert(`Добавлено: ${child.name}`);
+
+            if (window.opener && typeof window.opener.refreshAdminUI === "function") {
+                window.opener.refreshAdminUI();
+            }
+        }
+
         window.close();
     }
 }
+
 function showProductDetails(parentIndex, childIndex) {
     toggleMenuBtn(false);
-
     const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
     const child = warehouse[parentIndex].children[childIndex];
     const parent = warehouse[parentIndex];
 
     let infoTableHTML = '<table>';
-
     if (child.info) {
         child.info.split('\n').forEach(line => {
             if (!line.trim()) return;
             const parts = line.split(':');
-            if (parts.length >= 2) {
-                infoTableHTML += `<tr><td>${parts[0]}</td><td>${parts.slice(1).join(':')}</td></tr>`;
-            } else {
-                infoTableHTML += `<tr><td colspan="2">${line}</td></tr>`;
-            }
+            if (parts.length >= 2) infoTableHTML += `<tr><td>${parts[0]}</td><td>${parts.slice(1).join(':')}</td></tr>`;
+            else infoTableHTML += `<tr><td colspan="2">${line}</td></tr>`;
         });
-    } else {
-        infoTableHTML += '<tr><td colspan="2">Информация отсутствует</td></tr>';
-    }
-
+    } else infoTableHTML += '<tr><td colspan="2">Информация отсутствует</td></tr>';
     infoTableHTML += '</table>';
 
     grid.innerHTML = `
     <div class="details-container">
-        <div class="image">
-            <img src="${child.img || parent.img}">
-        </div>
-
+        <div class="image"><img src="${child.img || parent.img}"></div>
         <div class="info">
             <p><strong>Название:</strong> ${child.name}</p>
             <p><strong>В наличии:</strong> ${child.qty}</p>
             <p><strong>Информация:</strong></p>
             ${infoTableHTML}
-
-        <button onclick="handleAction(${parentIndex}, ${childIndex})">
-    ${fromIndex ? "Оставить заявку" : "Выбрать"}
-</button>
+            <button onclick="handleAction(${parentIndex}, ${childIndex})">
+                ${fromIndex ? "Оставить заявку" : "Выбрать"}
+            </button>
         </div>
     </div>
-
-    <button class="back-btn" onclick="showChildren(${parentIndex})">Назад</button>
-    `;
+    <button class="back-btn" onclick="showChildren(${parentIndex})">Назад</button>`;
 }
 
 loadWarehouse();

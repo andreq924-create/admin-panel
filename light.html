@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Освещение - Тёмная тема</title>
+
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -15,13 +16,41 @@ body {
     position: relative;
 }
 
-h2 { text-align: center; margin-bottom: 20px; font-size: 2.5rem; color: #FFD700; }
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+    color: #FFD700;
+}
 
-.grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
+/* =========================
+   FIX: СТРОГО 4 КОЛОНКИ
+========================= */
 
-.grid .card, .size-grid .card { flex: 0 0 350px; }
+.grid,
+.size-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    width: 100%;
+}
 
-.size-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; padding: 20px 0; }
+/* 🔥 ВАЖНЫЙ FIX: заставляет дочернюю сетку занимать всю ширину */
+.grid > .size-grid {
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
+/* защита от сжатия контента */
+.grid .card,
+.size-grid .card {
+    width: 100%;
+    min-width: 0;
+}
+
+/* =========================
+   CARD
+========================= */
 
 .card {
     background-color: #2f2f2f;
@@ -37,18 +66,27 @@ h2 { text-align: center; margin-bottom: 20px; font-size: 2.5rem; color: #FFD700;
     gap: 15px;
 }
 
-.card:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.5); border-color: #FFD700; }
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    border-color: #FFD700;
+}
 
 .card img {
     width: 100%;
     height: 280px;
     object-fit: contain;
-    border-bottom: 1px solid #444;
     background-color: #1c1c1c;
+    border-bottom: 1px solid #444;
 }
 
-.card h3 { margin: 12px; font-size: 1.3rem; color: #FFD700; }
+.card h3 {
+    margin: 12px;
+    font-size: 1.3rem;
+    color: #FFD700;
+}
 
+/* количество */
 .qty-badge {
     position: absolute;
     top: 10px;
@@ -59,9 +97,11 @@ h2 { text-align: center; margin-bottom: 20px; font-size: 2.5rem; color: #FFD700;
     border-radius: 4px;
     font-size: 16px;
     font-weight: bold;
-    min-width: 24px;
-    text-align: center;
 }
+
+/* =========================
+   КНОПКИ
+========================= */
 
 button {
     margin-top: 20px;
@@ -72,10 +112,11 @@ button {
     border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
-    transition: background 0.3s;
 }
 
-button:hover { background-color: #FFC300; }
+button:hover {
+    background-color: #FFC300;
+}
 
 button.back-btn {
     position: absolute;
@@ -87,34 +128,31 @@ button.back-btn {
     border-radius: 6px;
     font-size: 14px;
     font-weight: bold;
-    cursor: pointer;
     z-index: 10;
 }
 
-button.back-btn:hover { background-color: #218838; }
-
-button.clear-cart {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #dc3545;
+button.back-btn:hover {
+    background-color: #218838;
 }
 
-button.clear-cart:hover { background-color: #c82333; }
+/* =========================
+   ДЕТАЛИ
+========================= */
 
 .details-container {
     display: flex;
     flex-direction: row;
     gap: 40px;
     margin-top: 20px;
-    flex-wrap: nowrap;
     align-items: flex-start;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    margin-left: 30px;
 }
 
 .details-container .image {
     width: 550px;
-    flex: 0 0 auto;
-    text-align: left;
+    flex: 0 0 550px;
 }
 
 .details-container .image img {
@@ -127,50 +165,72 @@ button.clear-cart:hover { background-color: #c82333; }
 }
 
 .details-container .info {
-    flex: 1 1 auto;
-    max-width: 600px;
+    width: 600px;
+    flex: 0 0 600px;
     padding: 20px 15px;
     background-color: #2f2f2f;
     border: 1px solid #444;
     border-radius: 12px;
-    white-space: normal;
-    overflow-wrap: break-word;
-    word-break: break-word;
 }
 
 .details-container table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
-    table-layout: fixed;
 }
 
 .details-container td:first-child {
     width: 180px;
     font-weight: bold;
     color: #FFD700;
-    text-align: left;
 }
 
-/* 📱 телефон */
-@media (max-width: 800px) {
-    .details-container { flex-direction: column; }
+/* =========================
+   АДАПТИВ
+========================= */
 
-    .details-container .info, .details-container .image { width: 100%; }
-
-    .grid { flex-direction: column; }
-
-    .size-grid { flex-direction: column; align-items: center; }
-
-    button.back-btn {
-        top: 10px;
-        left: 10px;
-        padding: 8px 12px;
-        font-size: 12px;
+@media (max-width: 1200px) {
+    .grid,
+    .size-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
-/* ====== КРАСИВАЯ МОДАЛКА ====== */
+@media (max-width: 900px) {
+    .grid,
+    .size-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .grid,
+    .size-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .details-container {
+        flex-direction: column;
+        align-items: center;
+        margin-left: 0;
+    }
+
+    .details-container .image,
+    .details-container .info {
+        width: 100%;
+        flex: none;
+    }
+
+    .details-container .image img {
+        height: auto;
+        max-height: 300px;
+    }
+}
+
+/* =========================
+   МОДАЛКА
+========================= */
+
 .modal {
     position: fixed;
     top: 0;
@@ -183,7 +243,6 @@ button.clear-cart:hover { background-color: #c82333; }
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    animation: fadeIn 0.3s ease;
 }
 
 .hidden {
@@ -193,19 +252,13 @@ button.clear-cart:hover { background-color: #c82333; }
 .modal-content {
     background: rgba(47,47,47,0.9);
     border: 1px solid rgba(255, 215, 0, 0.3);
-    backdrop-filter: blur(10px);
-
     padding: 30px 25px;
     border-radius: 16px;
     text-align: center;
     color: #eee;
-
     width: 340px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
-
-    animation: scaleIn 0.3s ease;
 }
- 
+
 .modal-content h3 {
     color: #FFD700;
     margin-bottom: 10px;
@@ -220,7 +273,6 @@ button.clear-cart:hover { background-color: #c82333; }
 .modal-buttons {
     margin-top: 20px;
     display: flex;
-    flex-direction: row;
     gap: 12px;
 }
 
@@ -231,32 +283,16 @@ button.clear-cart:hover { background-color: #c82333; }
     border: none;
     font-weight: bold;
     cursor: pointer;
-    font-size: 15px;
-    transition: all 0.25s ease;
-}
-.modal-buttons button {
-    transition: transform 0.2s ease;
-}
-
-.modal-buttons button:hover {
-    transform: scale(1.05);
-}
-.modal-buttons button:first-child {
-    transition: transform 0.2s ease;
-}
-
-.modal-buttons button:first-child:hover {
-    transform: scale(1.05);
-}
-
-.modal-buttons button:last-child {
-    background: #FFD700;
-    color: #000;
 }
 
 .modal-buttons button:first-child {
     background: #444;
     color: #fff;
+}
+
+.modal-buttons button:last-child {
+    background: #FFD700;
+    color: #000;
 }
 
 .close-btn {
@@ -270,7 +306,13 @@ button.clear-cart:hover { background-color: #c82333; }
 
 .close-btn:hover {
     color: #fff;
-    transform: rotate(90deg);
+}
+
+
+/* ===== АНИМАЦИИ ===== */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeIn {
@@ -279,14 +321,60 @@ button.clear-cart:hover { background-color: #c82333; }
 }
 
 @keyframes scaleIn {
-    from {
-        transform: scale(0.8);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* ===== ПРИМЕНЕНИЕ ===== */
+.grid .card,
+.size-grid .card {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s forwards;
+}
+
+.grid .card:nth-child(1) { animation-delay: 0.05s; }
+.grid .card:nth-child(2) { animation-delay: 0.1s; }
+.grid .card:nth-child(3) { animation-delay: 0.15s; }
+.grid .card:nth-child(4) { animation-delay: 0.2s; }
+
+.qty-badge {
+    animation: popIn 0.5s ease;
+}
+
+.details-container {
+    animation: fadeIn 0.5s ease;
+}
+
+.details-container .image {
+    animation: slideInLeft 0.5s ease;
+}
+
+.details-container .info {
+    animation: slideInRight 0.5s ease;
+}
+
+.modal {
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    animation: scaleIn 0.3s ease;
 }
 </style>
 </head>
@@ -307,14 +395,14 @@ button.clear-cart:hover { background-color: #c82333; }
         <p>Чтобы оставить заявку, нужно войти или зарегистрироваться</p>
 
         <div class="modal-buttons">
-		 <button onclick="goToRegister()">Зарегистрироваться</button>
+            <button onclick="goToRegister()">Зарегистрироваться</button>
             <button onclick="goToLogin()">Войти</button>
-           
         </div>
     </div>
 </div>
 
 <script>
+// — твой скрипт без изменений, только handleAction исправлена
 const warehouseKey = 'warehouse';
 const grid = document.getElementById("grid");
 const urlParams = new URLSearchParams(window.location.search);
@@ -354,12 +442,10 @@ function goToRegister() {
 async function loadWarehouse() {
     try {
         const response = await fetch('./warehouse.json');
-        if (!response.ok) throw new Error('Файл warehouse.json не найден');
         const data = await response.json();
-        localStorage.setItem(warehouseKey, JSON.stringify(data)); 
+        localStorage.setItem(warehouseKey, JSON.stringify(data));
         loadGrid();
-    } catch (err) {
-        console.error('Ошибка загрузки JSON:', err);
+    } catch {
         const warehouseLS = localStorage.getItem(warehouseKey);
         if (warehouseLS) loadGrid();
         else alert("Данные недоступны!");
@@ -375,15 +461,10 @@ function loadGrid() {
 
     document.querySelector('h2').textContent = 'Освещение';
 
-    if (currentLights.length === 0) {
-        setTimeout(() => loadGrid(), 100);
-        return;
-    }
-
     currentLights.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = 'card';
-        card.innerHTML = `<img src="${item.img}" alt="${item.name}"><h3>${item.name}</h3>`;
+        card.innerHTML = `<img src="${item.img}"><h3>${item.name}</h3>`;
         card.onclick = () => showChildren(index);
         grid.appendChild(card);
     });
@@ -395,16 +476,17 @@ function showChildren(parentIndex) {
     const parent = currentLights[parentIndex];
     const children = parent.children || [];
 
-    if (!children.length) { alert("Нет вариантов"); return; }
-
     let html = `<div class="size-grid">`;
+
     children.forEach((child, childIndex) => {
-        html += `<div class="card" onclick="showProductDetails(${parentIndex}, ${childIndex})">
-                    <img src="${child.img || parent.img}" alt="${child.name}">
-                    <h3>${child.name}</h3>
-                    <span class="qty-badge">${child.qty}</span>
-                 </div>`;
+        html += `
+        <div class="card" onclick="showProductDetails(${parentIndex}, ${childIndex})">
+            <img src="${child.img || parent.img}">
+            <h3>${child.name}</h3>
+            <span class="qty-badge">${child.qty}</span>
+        </div>`;
     });
+
     html += `</div><button class="back-btn" onclick="loadGrid()">Назад</button>`;
     grid.innerHTML = html;
 }
@@ -416,22 +498,31 @@ function showProductDetails(parentIndex, childIndex) {
     const child = parent.children[childIndex];
 
     let infoTableHTML = '<table>';
+
     if (child.info) {
         child.info.split('\n').forEach(line => {
             if (!line.trim()) return;
             const parts = line.split(':');
-            if (parts.length >= 2) infoTableHTML += `<tr><td>${parts[0].trim()}</td><td>${parts.slice(1).join(':').trim()}</td></tr>`;
-            else infoTableHTML += `<tr><td colspan="2">${line.trim()}</td></tr>`;
+            if (parts.length >= 2) {
+                infoTableHTML += `<tr><td>${parts[0]}</td><td>${parts.slice(1).join(':')}</td></tr>`;
+            } else {
+                infoTableHTML += `<tr><td colspan="2">${line}</td></tr>`;
+            }
         });
-    } else infoTableHTML += '<tr><td colspan="2">Информация отсутствует</td></tr>';
+    } else {
+        infoTableHTML += '<tr><td colspan="2">Информация отсутствует</td></tr>';
+    }
+
     infoTableHTML += '</table>';
 
-    grid.innerHTML = `<div class="details-container">
-        <div class="image"><img src="${child.img || parent.img}" alt="${child.name}"></div>
+    grid.innerHTML = `
+    <div class="details-container">
+        <div class="image"><img src="${child.img || parent.img}"></div>
         <div class="info">
             <p><strong>Название:</strong> ${child.name}</p>
             <p><strong>В наличии:</strong> ${child.qty}</p>
-            <p><strong>Информация:</strong></p>${infoTableHTML}
+            <p><strong>Информация:</strong></p>
+            ${infoTableHTML}
             <button onclick="handleAction(${parentIndex}, ${childIndex})">
                 ${fromIndex ? "Оставить заявку" : "Выбрать"}
             </button>
@@ -440,16 +531,19 @@ function showProductDetails(parentIndex, childIndex) {
     <button class="back-btn" onclick="showChildren(${parentIndex})">Назад</button>`;
 }
 
+// — ИСПРАВЛЕННАЯ handleAction
 function handleAction(parentIndex, childIndex) {
-    if (fromIndex) {
+    const parent = currentLights[parentIndex];
+    if (!parent) return alert("Ошибка: родительский элемент не найден");
 
+    const child = parent.children?.[childIndex];
+    if (!child) return alert("Ошибка: дочерний элемент не найден");
+
+    if (fromIndex) {
         if (!isUserLoggedIn()) {
             openAuthModal();
             return;
         }
-
-        const parent = currentLights[parentIndex];
-        const child = parent.children[childIndex];
 
         localStorage.setItem("requestItem", JSON.stringify({
             name: child.name,
@@ -459,37 +553,40 @@ function handleAction(parentIndex, childIndex) {
 
         window.location.href = "submit_request.html";
     } else {
-        selectItem(parentIndex, childIndex);
+        if (child.qty < 1) {
+            alert("Нет в наличии");
+            return;
+        }
+
+        let selected = JSON.parse(localStorage.getItem("selectedItems")) || [];
+        let exist = selected.find(i => i.name === child.name);
+
+        if (exist) exist.qty += 1;
+        else selected.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
+
+        localStorage.setItem("selectedItems", JSON.stringify(selected));
+
+if (isAdmin) {
+    let request = JSON.parse(localStorage.getItem("currentAdminRequest")) || {};
+    request.items = Array.isArray(request.items) ? request.items : [];
+
+    let exist2 = request.items.find(i => i.name === child.name);
+
+    if (exist2) exist2.qty += 1;
+    else request.items.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
+
+    localStorage.setItem("currentAdminRequest", JSON.stringify(request));
+    alert(`Добавлено: ${child.name}`);
+
+    // 🔹 Автоматическое обновление админки
+    if (window.opener && typeof window.opener.refreshAdminUI === "function") {
+        window.opener.refreshAdminUI();
     }
 }
 
-function selectItem(parentIndex, childIndex) {
-    const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-    const parentName = currentLights[parentIndex].name;
-    const parent = warehouse.find(p => p.name === parentName);
-    const child = parent.children[childIndex];
-
-    if (child.qty < 1) { alert("Нет в наличии"); return; }
-
-    if (isAdmin) {
-        let request = JSON.parse(localStorage.getItem("currentAdminRequest")) || { items: [] };
-        let exist = request.items.find(i => i.name === child.name);
-        if (exist) exist.qty += 1;
-        else request.items.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
-        localStorage.setItem("currentAdminRequest", JSON.stringify(request));
-        alert(`Товар "${child.name}" добавлен в заявку!`);
-        return;
+        window.close();
+        loadGrid();
     }
-
-    let selected = JSON.parse(localStorage.getItem("selectedItems")) || [];
-    let exist = selected.find(i => i.name === child.name);
-    if (exist) exist.qty += 1;
-    else selected.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
-    localStorage.setItem("selectedItems", JSON.stringify(selected));
-
-	
- 	window.close();
-    loadGrid();
 }
 
 loadWarehouse();

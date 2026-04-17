@@ -13,6 +13,8 @@
       margin: 0; 
       background: #f0f0f0; 
       color: #333; 
+      font-size: 16px;
+      transition: font-size 0.3s;
     }
 
     header { 
@@ -20,10 +22,40 @@
       padding: 40px 20px; 
       background: linear-gradient(135deg,#FFD700,#C0C0C0);
       color: #000; 
+      opacity: 0;
+      animation: fadeInHeader 0.6s forwards;
     }
 
     header h1 { margin:0; font-size:2.5em; }
     header p { margin-top:5px; font-size:1.2em; }
+
+    /* Кнопки увеличения/уменьшения шрифта */
+    .accessibility-controls {
+      margin: 15px 0 0 0;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .accessibility-controls button {
+      padding: 10px 20px;
+      background: #FFD700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      color: black;
+      transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+    }
+
+    .accessibility-controls button:hover {
+      background: #e6c200;
+      transform: scale(1.05);
+    }
+
+    .accessibility-controls button:active {
+      transform: scale(0.95);
+    }
 
     .back-btn {
       margin: 15px 20px;
@@ -34,12 +66,16 @@
       cursor: pointer;
       font-weight: bold;
       color: black;
-      transition: 0.3s;
+      transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
     }
 
     .back-btn:hover {
       background: #e6c200;
       transform: scale(1.05);
+    }
+
+    .back-btn:active {
+      transform: scale(0.95);
     }
 
     .container { 
@@ -56,6 +92,8 @@
       border-radius:12px; 
       box-shadow:0 6px 15px rgba(0,0,0,0.1); 
       padding:20px; 
+      opacity: 0;
+      animation: fadeInSidebar 0.6s forwards;
     }
 
     .sidebar h2 { 
@@ -70,12 +108,13 @@
       border-radius:8px; 
       cursor:pointer; 
       background:#e0e0e0; 
-      transition: 0.3s;
+      transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
     }
 
     .category:hover, .category.active { 
       background:#FFD700; 
       color:black; 
+      transform: scale(1.05);
     }
 
     .content { 
@@ -91,11 +130,22 @@
       border-radius:12px; 
       overflow:hidden; 
       box-shadow:0 6px 15px rgba(0,0,0,0.1); 
-      transition: 0.3s;
+      opacity: 0;
+      transform: translateY(30px) scale(0.98);
+      animation: fadeInUp 0.6s forwards;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
+    /* Анимация задержки для каждой карточки */
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
+
     .card:hover { 
-      transform: translateY(-5px); 
+      transform: translateY(-8px) scale(1.02); 
+      box-shadow: 0 12px 25px rgba(0,0,0,0.15);
     }
 
     .card img { width:200px; object-fit:cover; }
@@ -125,6 +175,31 @@
       .card{flex-direction:column;} 
       .card img{width:100%; height:200px;} 
     }
+
+    /* Плавное увеличение текста */
+    body, header, .sidebar, .card, .card-title, .card-text, .category {
+      transition: font-size 0.3s;
+    }
+
+    /* Анимации */
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px) scale(0.98); }
+      60% { opacity: 0.7; transform: translateY(-10px) scale(1.02); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes fadeInSidebar {
+      0% { opacity: 0; transform: translateX(-20px); }
+      50% { opacity: 0.5; transform: translateX(5px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes fadeInHeader {
+      0% { opacity: 0; transform: translateY(-20px) scale(0.98); }
+      60% { opacity: 0.8; transform: translateY(5px) scale(1.02); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
   </style>
 </head>
 
@@ -133,6 +208,11 @@
 <header>
   <h1>Блог о свете</h1>
   <p>Категории освещения</p>
+
+  <div class="accessibility-controls">
+    <button onclick="adjustFontSize('increase')">A+</button>
+    <button onclick="adjustFontSize('decrease')">A−</button>
+  </div>
 </header>
 
 <button class="back-btn" onclick="history.back()">← Назад</button>
@@ -155,7 +235,7 @@
       <div class="card-body">
         <div class="card-title">Улица Чистопрудненская</div>
         <div class="card-text">
-          На улице Чистопрудненской были установлены новые столбы ОГКФ и светильники SLP Ex. Эти обновления обеспечивают высококачественное освещение, улучшая видимость и безопасность на улице в тёмное время суток. Столбы ОГКФ отличаются своей прочностью и долговечностью, а светильники SLP Ex обеспечивают равномерное и яркое освещение, создавая комфортную атмосферу для пешеходов и водителей. Эти изменения значительно повысили уровень безопасности на улице и сделали её более удобной для прогулок и транспортировки.
+          На улице Чистопрудненской были установлены новые столбы ОГКФ и светильники SLP Ex. Эти обновления обеспечивают высококачественное освещение, улучшая видимость и безопасность на улице в тёмное время суток.
         </div>
       </div>
     </div>
@@ -165,7 +245,7 @@
       <div class="card-body">
         <div class="card-title">Октябрьский проспект</div>
         <div class="card-text">
-          На Октябрьском проспекте проведена замена освещения на более мощное. Новые светильники обеспечивают яркое и равномерное освещение всей территории, повышая безопасность для пешеходов и водителей.
+          На Октябрьском проспекте проведена замена освещения на более мощное. Новые светильники обеспечивают яркое и равномерное освещение всей территории.
         </div>
       </div>
     </div>
@@ -209,12 +289,10 @@
 
   function showCategory(category) {
     categories.forEach(c => c.classList.remove('active'));
-
     if (category) {
       const activeCat = document.querySelector(`.category[data-category="${category}"]`);
       if (activeCat) activeCat.classList.add('active');
     }
-
     cards.forEach(card => {
       card.style.display = (!category || card.dataset.category === category) ? 'flex' : 'none';
     });
@@ -222,7 +300,6 @@
 
   const urlParams = new URLSearchParams(window.location.search);
   const initialCategory = urlParams.get('category');
-
   showCategory(initialCategory);
 
   categories.forEach(cat => {
@@ -230,6 +307,21 @@
       showCategory(cat.dataset.category);
     });
   });
+
+  // Увеличение/уменьшение текста с ограничением
+  let fontSize = 16;
+  const minFontSize = 12;
+  const maxFontSize = 24;
+
+  function adjustFontSize(action) {
+    if(action === 'increase' && fontSize < maxFontSize) fontSize += 2;
+    if(action === 'decrease' && fontSize > minFontSize) fontSize -= 2;
+
+    const textElements = document.querySelectorAll('body, header, .sidebar, .card, .card-title, .card-text, .category');
+    textElements.forEach(el => {
+      el.style.fontSize = fontSize + 'px';
+    });
+  }
 </script>
 
 </body>

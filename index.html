@@ -28,7 +28,7 @@ html, body {
 }
 
 .logo { 
-    width: 50px; 
+    width: 155px; 
     margin-right: 10px; 
 }
 
@@ -277,7 +277,7 @@ padding-top: 90px;
 /* Стили для кнопок в секции "Кейсы" */
 .cases-buttons button {
     position: relative;
-    width: 350px; /* Увеличиваем ширину кнопки */
+    width: 380px; /* Увеличиваем ширину кнопки */
     height: 400px; /* Увеличиваем высоту кнопки */
     background-size: cover; /* Картинка будет растягиваться по кнопке */
     background-position: center; /* Центрируем картинку */
@@ -658,10 +658,17 @@ footer a {
 footer a:hover {
     color: #FFC300;
 }
-
+@media (max-width: 1300px) {
+    .cases-buttons button {
+        width: 290px;  /* уменьшаем ширину */
+        height: 350px; /* уменьшаем высоту */
+        border-radius: 10px; /* можно чуть уменьшить скругление */
+        margin-bottom: 20px; /* меньше отступ */
+    }
+}
  
 /* Мобильные адаптации */
-@media (max-width: 768px) {
+@media (max-width: 950px) {
     .hero {
         padding-left: 0; /* Убираем отступ слева */
         padding-top: 50px; /* Уменьшаем отступ сверху */
@@ -820,10 +827,10 @@ footer a:hover {
  
 
 .logo {
-    width: 25px;
+    width: 80px;
     position: absolute;
     left: 10px;
-    top: 10px; /* было 15px — уменьшаем, чтобы поднять */
+    top: 12px; /* было 15px — уменьшаем, чтобы поднять */
 }
 
     /* Уменьшаем размер шрифта для ссылок меню */

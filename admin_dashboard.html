@@ -506,20 +506,17 @@ function editRequest(createdAt){
     currentRequestCopy = JSON.parse(JSON.stringify(req));
 
     // ======== Вставка сюда ========
-    let updatedRequest = JSON.parse(localStorage.getItem("currentAdminRequest"));
-if (updatedRequest) {
+let updatedRequest = JSON.parse(localStorage.getItem("currentAdminRequest"));
+if (updatedRequest && updatedRequest.items) {
     if (!currentRequestCopy.items) currentRequestCopy.items = [];
-
     updatedRequest.items.forEach(newItem => {
         let existing = currentRequestCopy.items.find(i => i.name === newItem.name);
-
         if (existing) {
             existing.qty += newItem.qty;
         } else {
             currentRequestCopy.items.push(newItem);
         }
     });
-
     renderSelectedItems();
     localStorage.removeItem("currentAdminRequest");
 }
@@ -1363,7 +1360,20 @@ function openWarehousePopup(forAdmin = false){
     document.getElementById('warehouseSelectPopup').style.display='flex';
   }
 }
+function openProductPopup() {
+    editIndex = null;
+    productChildren = [];
+    renderProductChildren();
 
+    document.getElementById('productName').value = '';
+    document.getElementById('productCategory').value = 'light';
+    document.getElementById('productFile').value = '';
+
+    // ❌ скрываем дочерние объекты
+    document.getElementById('productChildrenContainer').style.display = 'none';
+
+    document.getElementById('productPopup').style.display = 'flex';
+}
 
 function addItemFromWarehouse(item, index){
   if(selectForAdmin){
@@ -1571,7 +1581,25 @@ function saveAllRequests() {
   const requests = JSON.parse(localStorage.getItem('requests')) || [];
   saveRequestsAll(requests); // Отправляем все заявки на сервер
 }
+function refreshAdminUI() {
+    if (!currentRequestCopy) return;
+    let updatedRequest = JSON.parse(localStorage.getItem("currentAdminRequest"));
+    if (!updatedRequest || !updatedRequest.items) return;
 
+    // Добавляем новые предметы в текущую заявку
+    if (!currentRequestCopy.items) currentRequestCopy.items = [];
+    updatedRequest.items.forEach(newItem => {
+        let existing = currentRequestCopy.items.find(i => i.name === newItem.name);
+        if (existing) {
+            existing.qty += newItem.qty;
+        } else {
+            currentRequestCopy.items.push(newItem);
+        }
+    });
+
+    renderSelectedItems();
+    localStorage.removeItem("currentAdminRequest"); // очищаем, чтобы не дублировать
+}
 async function saveRequestsAll(requestsData) {
     try {
         const response = await fetch('/api/updateRequestsAll', {

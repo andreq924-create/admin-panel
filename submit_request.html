@@ -90,92 +90,54 @@
         }
         .left { display: flex; align-items: center; gap: 10px; }
         .left img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #555; }
-     .controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* квадратные кнопки + и - */
-.controls button {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 6px;
-    border: none;
-    background: #444;
-    color: #fff;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.controls button:hover {
-    background: #666;
-}
-
-/* число по центру */
-.controls span {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 32px;
-    height: 32px;
-    font-weight: bold;
-    font-size: 16px;
-}
-.qty-value {
-    margin-top: 7px; /* подстрой значение */
-}
-/* кнопка удаления (мусорка) */
-.delete {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #f44336;
-    color: #fff;
-    border-radius: 6px;
-    font-size: 16px;
-    padding: 0;
-}
-.qty-block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 50px;
-}
-
-.qty-label {
-    font-size: 12px;
-    color: #aaa;
-}
-
-.qty-value {
-    font-size: 16px;
-    font-weight: bold;
- 
-
-}
-
-
-.delete:hover {
-    background: #d32f2f;
-}
-
-        .error-message {
-            color: #f44336;
-            font-size: 12px;
-            margin-top: 5px;
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-
-        .error-border {
-            border-color: #f44336 !important;
+        .controls button {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 6px;
+            border: none;
+            background: #444;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
         }
+        .controls button:hover { background: #666; }
+        .controls span {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 32px;
+            height: 32px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .qty-value { margin-top: 7px; font-size: 16px; font-weight: bold; }
+        .delete {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f44336;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 16px;
+            padding: 0;
+        }
+        .qty-block { display: flex; flex-direction: column; align-items: center; min-width: 50px; }
+        .qty-label { font-size: 12px; color: #aaa; }
+        .delete:hover { background: #d32f2f; }
+        .error-message { color: #f44336; font-size: 12px; margin-top: 5px; }
+        .error-border { border-color: #f44336 !important; }
     </style>
 </head>
 <body>
@@ -196,8 +158,12 @@
     <label>E-mail</label><input type="email" id="email" placeholder="example@mail.com">
     <div id="email-error" class="error-message" style="display: none;"></div>
 
-    <label>Адрес</label><input type="text" id="address">
+    <label>Адрес</label>
+    <input type="text" id="address">
     <div id="address-error" class="error-message" style="display: none;"></div>
+
+    <!-- КОНТЕЙНЕР ДЛЯ КАРТЫ -->
+    <div id="map" style="width: 100%; height: 300px; margin-top: 10px; border-radius: 10px; border: 1px solid #555;"></div>
 
     <label>Тип работы</label>
     <select id="workType" onchange="toggleInputs()">
@@ -206,11 +172,9 @@
         <option value="repair">Ремонт повреждения электрических сетей</option>
     </select>
 
-    <!-- Кнопки для установки -->
     <button class="openBtn" id="polesBtn" onclick="openPage('poles.html')">Установка столбов</button>
     <button class="openBtn" id="lightBtn" onclick="openPage('light.html')">Установка светильников</button>
 
-    <!-- Поле для описания проблемы -->
     <div id="problemDiv" style="display:none; margin-top:15px;">
         <label>Опишите проблему</label>
         <textarea id="problemDescription" rows="4" placeholder="Опишите повреждение или неисправность..."></textarea>
@@ -223,189 +187,203 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.6/dist/inputmask.min.js"></script>
-
+<script src="https://api-maps.yandex.ru/2.1/?apikey=3d9109bf-3187-4628-88a3-3f0004742d25&lang=ru_RU"></script>
 <script>
-    const username = sessionStorage.getItem('username');
-    if (!username) { alert('Вы не вошли в систему.'); window.location.href='login.html'; }
-	localStorage.removeItem("selectedItems");
-    function goHome() { window.location.href='index.html'; }
-    function openPage(page) { window.open(page, "_blank"); }
+const username = sessionStorage.getItem('username');
+if (!username) { 
+    alert('Вы не вошли в систему.'); 
+    window.location.href='login.html'; 
+}
 
-    // Переключение кнопок и текстового поля
-    function toggleInputs() {
-        const type = document.getElementById('workType').value;
-        const polesBtn = document.getElementById('polesBtn');
-        const lightBtn = document.getElementById('lightBtn');
-        const problemDiv = document.getElementById('problemDiv');
-        const result = document.getElementById('result'); 
+localStorage.removeItem("selectedItems");
 
-        if (type === 'both') {
-            polesBtn.style.display = 'block';
-            lightBtn.style.display = 'block';
-            problemDiv.style.display = 'none';
-            result.innerHTML = '<p>Вы выбрали установку столбов и светильников.</p>';
-        } else if (type === 'repair') {
-            polesBtn.style.display = 'none';
-            lightBtn.style.display = 'none';
-            problemDiv.style.display = 'block';
-            result.innerHTML = '<p>Вы выбрали ремонт повреждения электрических сетей. Пожалуйста, опишите проблему.</p>';
-        } else {
-            polesBtn.style.display = 'none';
-            lightBtn.style.display = 'none';
-            problemDiv.style.display = 'none';
-            result.innerHTML = ''; 
-        }
+function goHome() { window.location.href='index.html'; }
+function openPage(page) { window.open(page, "_blank"); }
+
+function toggleInputs() {
+    const type = document.getElementById('workType').value;
+    const polesBtn = document.getElementById('polesBtn');
+    const lightBtn = document.getElementById('lightBtn');
+    const problemDiv = document.getElementById('problemDiv');
+    const result = document.getElementById('result'); 
+
+    if (type === 'both') {
+        polesBtn.style.display = 'block';
+        lightBtn.style.display = 'block';
+        problemDiv.style.display = 'none';
+        result.innerHTML = '<p>Вы выбрали установку столбов и светильников.</p>';
+    } else if (type === 'repair') {
+        polesBtn.style.display = 'none';
+        lightBtn.style.display = 'none';
+        problemDiv.style.display = 'block';
+        result.innerHTML = '<p>Вы выбрали ремонт повреждения электрических сетей. Пожалуйста, опишите проблему.</p>';
+    } else {
+        polesBtn.style.display = 'none';
+        lightBtn.style.display = 'none';
+        problemDiv.style.display = 'none';
+        result.innerHTML = ''; 
     }
+}
 
-    // Валидация имени и фамилии (только буквы)
-    function validateName(name) {
-        const regex = /^[a-zA-Zа-яА-ЯёЁ]+$/;
-        return regex.test(name);
-    }
+// --- ВАЛИДАЦИЯ ---
+function validateName(name) { return /^[a-zA-Zа-яА-ЯёЁ'-\s]{2,50}$/.test(name); }
+function validatePhone(phone) { return /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/.test(phone); }
+function validateEmail(email) { return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email); }
+function validateAddress(address) { return /^[\w\d\s.,-]{5,100}$/.test(address); }
 
-    // Валидация телефона
-    const phoneInput = document.getElementById("phone");
-    const phoneMask = new Inputmask("+7(999)999-99-99");
-    phoneMask.mask(phoneInput);
+function showError(inputId, message) {
+    const input = document.getElementById(inputId);
+    const errorElement = document.getElementById(inputId + '-error');
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+    input.classList.add('error-border');
+}
 
-    // Валидация и отображение ошибок
-    function showError(inputId, message) {
-        const input = document.getElementById(inputId);
-        const errorElement = document.getElementById(inputId + '-error');
-        errorElement.textContent = message;
-        errorElement.style.display = 'block';
-        input.classList.add('error-border');
-    }
+function hideError(inputId) {
+    const input = document.getElementById(inputId);
+    const errorElement = document.getElementById(inputId + '-error');
+    errorElement.style.display = 'none';
+    input.classList.remove('error-border');
+}
 
-    function hideError(inputId) {
-        const input = document.getElementById(inputId);
-        const errorElement = document.getElementById(inputId + '-error');
-        errorElement.style.display = 'none';
-        input.classList.remove('error-border');
-    }
+Inputmask("+7(999)999-99-99").mask(document.getElementById("phone"));
 
-    // Валидация всех полей при вводе
-    document.getElementById("lastname").addEventListener("input", function() {
-        const lastname = this.value.trim();
-        if (!lastname || !validateName(lastname)) {
-            showError("lastname", "Фамилия должна содержать только буквы.");
-        } else {
-            hideError("lastname");
+["lastname", "firstname", "phone", "email", "address"].forEach(id => {
+    document.getElementById(id).addEventListener("input", function() {
+        const value = this.value.trim();
+        switch(id){
+            case "lastname":
+            case "firstname":
+                validateName(value) ? hideError(id) : showError(id, "Недопустимые символы");
+                break;
+            case "phone":
+                validatePhone(value) ? hideError(id) : showError(id, "Неверный формат телефона");
+                break;
+            case "email":
+                validateEmail(value) ? hideError(id) : showError(id, "Неверный E-mail");
+                break;
+            case "address":
+                validateAddress(value) ? hideError(id) : showError(id, "Недопустимый адрес");
+                break;
         }
     });
+});
 
-    document.getElementById("firstname").addEventListener("input", function() {
-        const firstname = this.value.trim();
-        if (!firstname || !validateName(firstname)) {
-            showError("firstname", "Имя должно содержать только буквы.");
-        } else {
-            hideError("firstname");
-        }
-    });
+// --- Работа с выбранными товарами ---
+function getData() { return JSON.parse(localStorage.getItem("selectedItems")) || []; }
 
-    document.getElementById("phone").addEventListener("input", function() {
-        const phone = this.value.trim();
-        const phonePattern = /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/;
-        if (!phone || !phonePattern.test(phone)) {
-            showError("phone", "Неверный формат телефона! Введите номер в формате: +7(XXX)XXX-XX-XX");
-        } else {
-            hideError("phone");
-        }
-    });
+function sanitizeItems(items) {
+    return items.filter(item => item.name && item.img && Number(item.qty) >= 1)
+                .map(item => ({ name: String(item.name).substring(0,100), img: String(item.img).substring(0,300), qty: Number(item.qty) }));
+}
 
-    document.getElementById("email").addEventListener("input", function() {
-        const email = this.value.trim();
-        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!email || !emailPattern.test(email)) {
-            showError("email", "Введите правильный E-mail.");
-        } else {
-            hideError("email");
-        }
-    });
+function render() {
+    const data = getData();
+    const result = document.getElementById("result");
+    result.innerHTML = "";  
+    if (data.length === 0) { result.innerHTML = "<p>Вы не выбрали товары.</p>"; return; }
 
-    document.getElementById("address").addEventListener("input", function() {
-        const address = this.value.trim();
-        if (!address) {
-            showError("address", "Адрес не может быть пустым.");
-        } else {
-            hideError("address");
-        }
-    });
-
-    // Работа с выбранными товарами
-    function getData() {
-        return JSON.parse(localStorage.getItem("selectedItems")) || [];
-    }
-
-    function render() {
-        const data = getData();
-        const result = document.getElementById("result");
-        result.innerHTML = "";  // Очистка старых товаров
-
-        if (data.length === 0) {
-            result.innerHTML = "<p>Вы не выбрали товары.</p>";
-            return;
-        }
-
-        data.forEach((item, index) => {
-            item.qty = Number(item.qty) || 1;
-            const div = document.createElement("div");
-            div.className = "selectedItem";
-            div.innerHTML = `
-                <div class="left">
-                    <img src="${decodeURIComponent(item.img)}">
-                    <div>${item.name}</div>
+    data.forEach((item,index)=>{
+        item.qty=Number(item.qty)||1;
+        const div = document.createElement("div");
+        div.className="selectedItem";
+        div.innerHTML=`
+            <div class="left">
+                <img src="${decodeURIComponent(item.img)}">
+                <div>${item.name}</div>
+            </div>
+            <div class="controls">
+                <button onclick="minus(${index})">-</button>
+                <div class="qty-block">
+                    <span class="qty-value">${item.qty}</span>
                 </div>
-          <div class="controls">
-    <button onclick="minus(${index})">-</button>
+                <button onclick="plus(${index})">+</button>
+                <button class="delete" onclick="removeItem(${index})">×</button>
+            </div>
+        `;
+        result.appendChild(div);
+    });
+}
 
-    <div class="qty-block">
-         
-        <span class="qty-value">${item.qty}</span>
-    </div>
+function plus(i) { let data=getData(); data[i].qty++; localStorage.setItem("selectedItems",JSON.stringify(data)); render(); }
+function minus(i) { let data=getData(); if(data[i].qty>1){data[i].qty--;} localStorage.setItem("selectedItems",JSON.stringify(data)); render(); }
+function removeItem(i) { let data=getData(); data.splice(i,1); localStorage.setItem("selectedItems",JSON.stringify(data)); render(); }
 
-    <button onclick="plus(${index})">+</button>
-    <button class="delete" onclick="removeItem(${index})">×</button>
-</div>
-            `;
-            result.appendChild(div);
+window.addEventListener("focus", render);
+render();
+ymaps.ready(initMap);
+
+function initMap() {
+    var myMap = new ymaps.Map("map", {
+        center: [55.76, 37.64],
+        zoom: 10,
+        controls: ['zoomControl']
+    });
+
+    var placemark;
+
+function updateAddress(coords) {
+    ymaps.geocode(coords, { results: 1 }).then(function (res) {
+        var firstGeoObject = res.geoObjects.get(0);
+
+        if (firstGeoObject) {
+            // Получаем полный адрес через свойства
+            var address = firstGeoObject.getProperty('text');
+
+            document.getElementById("address").value = address;
+        } else {
+            document.getElementById("address").value = '';
+        }
+    }).catch(function(err) {
+        console.error('Ошибка геокодирования:', err);
+        document.getElementById("address").value = '';
+    });
+}
+
+    // Клик по карте
+    myMap.events.add('click', function (e) {
+        var coords = e.get('coords');
+
+        if (placemark) {
+            placemark.geometry.setCoordinates(coords);
+        } else {
+            placemark = new ymaps.Placemark(coords, {}, { draggable: true });
+            myMap.geoObjects.add(placemark);
+
+            // Событие при перетаскивании маркера
+            placemark.events.add('dragend', function () {
+                updateAddress(placemark.geometry.getCoordinates());
+            });
+        }
+
+        updateAddress(coords);
+    });
+
+    // Автоустановка маркера по текущему местоположению
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (pos) {
+            var coords = [pos.coords.latitude, pos.coords.longitude];
+            myMap.setCenter(coords, 15);
+
+            if (!placemark) {
+                placemark = new ymaps.Placemark(coords, {}, { draggable: true });
+                myMap.geoObjects.add(placemark);
+
+                placemark.events.add('dragend', function () {
+                    updateAddress(placemark.geometry.getCoordinates());
+                });
+            }
+
+            updateAddress(coords);
+        }, function (err) {
+            console.warn('Геолокация не доступна:', err);
         });
     }
-
-    function plus(i) {
-        let data = getData();
-        data[i].qty++;
-        localStorage.setItem("selectedItems", JSON.stringify(data));
-        render();
-    }
-
-    function minus(i) {
-        let data = getData();
-        if (data[i].qty > 1) {
-            data[i].qty--;
-        }
-        localStorage.setItem("selectedItems", JSON.stringify(data));
-        render();
-    }
-
-    function removeItem(i) {
-        let data = getData();
-        data.splice(i, 1);
-        localStorage.setItem("selectedItems", JSON.stringify(data));
-        render();
-    }
-
-    window.addEventListener("focus", render);  // Перерисовать, когда окно получает фокус
-
-    render();  // Инициализация рендеринга при загрузке страницы
-	function validatePhone(phone) {
-    const phonePattern = /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/;
-    return phonePattern.test(phone);
 }
-    // Отправка заявки
-    // Отправка заявки
+
+// --- Отправка заявки ---
 function submitRequest() {
-    const items = JSON.parse(localStorage.getItem("selectedItems")) || [];
+    const items = sanitizeItems(getData());
     const lastname = document.getElementById("lastname").value.trim();
     const firstname = document.getElementById("firstname").value.trim();
     const phone = document.getElementById("phone").value.trim();
@@ -415,67 +393,39 @@ function submitRequest() {
 
     let formValid = true;
 
-    // Проверка всех полей
-    if (!lastname || !validateName(lastname)) {
-        showError("lastname", "Фамилия должна содержать только буквы.");
-        formValid = false;
-    }
-    if (!firstname || !validateName(firstname)) {
-        showError("firstname", "Имя должно содержать только буквы.");
-        formValid = false;
-    }
-    const phonePattern = /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/;
-    if (!phone || !phonePattern.test(phone)) {
-        showError("phone", "Неверный формат телефона! Введите номер в формате: +7(XXX)XXX-XX-XX");
-        formValid = false;
-    }
-    if (!email || !/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(email)) {
-        showError("email", "Введите правильный E-mail.");
-        formValid = false;
-    }
-    if (!address) {
-        showError("address", "Адрес не может быть пустым.");
-        formValid = false;
-    }
+    if (!validateName(lastname)) { showError("lastname","Фамилия недопустима"); formValid=false; } else hideError("lastname");
+    if (!validateName(firstname)) { showError("firstname","Имя недопустимо"); formValid=false; } else hideError("firstname");
+    if (!validatePhone(phone)) { showError("phone","Телефон неверен"); formValid=false; } else hideError("phone");
+    if (!validateEmail(email)) { showError("email","E-mail неверен"); formValid=false; } else hideError("email");
+    if (!validateAddress(address)) { showError("address","Адрес недопустим"); formValid=false; } else hideError("address");
+    if (items.length===0 && workType==='both') { alert("Выберите хотя бы один товар"); formValid=false; }
 
-    if (!formValid) {
-        alert("Пожалуйста, исправьте ошибки перед отправкой.");
-        return;
-    }
+    if(!formValid){ alert("Исправьте ошибки"); return; }
 
     const request = {
         username,
         date: new Date().toLocaleString(),
-        lastname,
-        firstname,
-        phone,
-        email,
-        address,
+        lastname, firstname, phone, email, address,
         type: workType,
         items,
         status: "Новая",
         createdAt: new Date().toISOString(),
-        expectedCallTime: new Date(Date.now() + 5 * 60 * 1000).toISOString()
+        expectedCallTime: new Date(Date.now() + 5*60*1000).toISOString()
     };
 
-    // Сохраняем локально
     const storedRequests = JSON.parse(localStorage.getItem("requests")) || [];
     storedRequests.push(request);
     localStorage.setItem("requests", JSON.stringify(storedRequests));
 
-    // **Сохраняем на сервер**
     saveAllRequests();
 
-    // Переходим на страницу подтверждения
     const summary = encodeURIComponent(JSON.stringify(request));
     window.location.href = `confirmation.html?data=${summary}`;
 }
 
-
-
 function saveAllRequests() {
     const requests = JSON.parse(localStorage.getItem('requests')) || [];
-    saveRequestsAll(requests); // Отправляем все заявки на сервер
+    saveRequestsAll(requests);
 }
 
 async function saveRequestsAll(requestsData) {
@@ -485,20 +435,10 @@ async function saveRequestsAll(requestsData) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ requests: requestsData })
         });
-
         const result = await response.json();
-
-        if (!response.ok) {
-            console.error('Ошибка сервера:', result.error || result);
-            alert('Не удалось сохранить заявки');
-            return;
-        }
-
+        if (!response.ok) { console.error('Ошибка сервера:', result.error || result); alert('Не удалось сохранить заявки'); return; }
         console.log('Заявки обновлены:', result);
-    } catch (err) {
-        console.error('Ошибка:', err);
-        alert('Ошибка соединения с сервером');
-    }
+    } catch(err) { console.error('Ошибка:',err); alert('Ошибка соединения с сервером'); }
 }
 </script>
 
