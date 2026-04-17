@@ -12,13 +12,12 @@
             height: 100%;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #1e2a38; /* Однородный темный фон */
+            background-color: #1e2a38;
             color: #fff;
             display: flex;
             flex-direction: column;
         }
 
-        /* HEADER */
         header {
             background-color: #1e2a38;
             padding: 15px 30px;
@@ -27,7 +26,7 @@
             align-items: center;
             flex-wrap: wrap;
             position: relative;
-            z-index: 10; /* Обеспечивает, чтобы шапка была сверху */
+            z-index: 10;
         }
 
         header h1 {
@@ -35,7 +34,6 @@
             font-size: 22px;
         }
 
-        /* Кнопка меню */
         .menu-button {
             display: none;
             cursor: pointer;
@@ -75,10 +73,9 @@
             color: #FFD700;
         }
 
-        /* Панель меню сверху */
         .menu-panel {
             position: absolute;
-            top: -100%; /* Начальное скрытое положение меню (выше экрана) */
+            top: -100%;
             left: 0;
             width: 100%;
             background-color: #1e2a38;
@@ -88,32 +85,31 @@
             flex-direction: column;
             gap: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            transition: top 0.3s ease-in-out; /* Плавное появление */
+            transition: top 0.3s ease-in-out;
             z-index: 5;
             overflow: hidden;
             max-height: 80vh;
         }
 
         .menu-panel a {
-            color: #fff; /* Устанавливаем белый цвет для текста */
+            color: #fff;
             font-size: 18px;
             text-decoration: none;
             transition: color 0.2s ease;
         }
 
         .menu-panel a:hover {
-            color: #FFD700; /* Цвет при наведении */
+            color: #FFD700;
         }
 
         .menu-panel.active {
-            top: 0; /* При активации панель спускается */
+            top: 0;
         }
 
-        /* MAIN */
         main {
             padding: 40px;
             flex: 1;
-            transition: margin-top 0.3s ease; /* Плавное движение контента */
+            transition: margin-top 0.3s ease;
         }
 
         main h2 {
@@ -125,36 +121,58 @@
             letter-spacing: 2px;
         }
 
-        /* КАРТОЧКИ (для мобильных) */
+        /* ====== НОВЫЙ ДОРОГОЙ ДИЗАЙН КАРТОЧЕК ====== */
+
         .request-card {
-            background-color: #1f3145;
-            margin-bottom: 15px;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(145deg, rgba(31,49,69,0.95), rgba(25,38,55,0.95));
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            margin-bottom: 18px;
+            padding: 18px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: block;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .request-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #FFD700, transparent);
+            opacity: 0.8;
         }
 
         .request-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-6px);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+            border-color: rgba(255, 215, 0, 0.25);
         }
 
         .request-card h3 {
-            margin: 0 0 10px;
+            margin: 0 0 12px;
             color: #FFD700;
             font-size: 18px;
-            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .request-card p {
-            margin: 5px 0;
-            color: #fff;
+            margin: 6px 0;
+            color: rgba(255,255,255,0.85);
             font-size: 14px;
+            line-height: 1.4;
         }
 
-        /* Обертка для карточек с прокруткой */
+        .request-card p strong {
+            color: #fff;
+        }
+
         .request-container {
             max-height: 400px;
             overflow-y: auto;
@@ -166,7 +184,42 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
-        /* FOOTER */
+        .items-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.04);
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: 0.2s;
+        }
+
+        .item:hover {
+            background: rgba(255,255,255,0.07);
+            transform: translateY(-2px);
+        }
+
+        .item img {
+            width: 42px;
+            height: 42px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+        }
+
+        .item p {
+            margin: 0;
+            font-size: 13px;
+        }
+
         footer {
             background: #000;
             text-align: center;
@@ -174,76 +227,9 @@
             font-size: 14px;
         }
 
-        /* Адаптивность для мобильных */
         @media (max-width: 768px) {
-            .request-card {
-                padding: 15px;
-                margin-bottom: 15px;
-            }
-
-            header h1 {
-                font-size: 16px;
-            }
-
-            nav ul {
-                gap: 10px;
-                justify-content: center;
-                padding: 10px 0;
-            }
-
-            footer p {
-                font-size: 12px;
-            }
-
-            .menu-button {
-                display: flex;
-            }
-
-            nav {
-                display: none;
-            }
-
-            .menu-panel {
-                top: -100%; /* Мобильное меню скрыто за экраном */
-            }
-
-            .menu-panel.active {
-                top: 0; /* Панель открывается сверху */
-            }
-        }
-
-        @media (max-width: 480px) {
-            header h1 {
-                font-size: 14px;
-            }
-
-            nav ul {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .request-card p {
-                font-size: 12px;
-            }
-        }
-
-        /* Стиль для изображений товаров */
-        .items-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .item {
-            max-width: 120px;
-            text-align: center;
-        }
-
-        .item img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            .menu-button { display: flex; }
+            nav { display: none; }
         }
     </style>
 </head>
@@ -275,9 +261,7 @@
     <h2>Мои заявки</h2>
 
     <div class="request-container">
-        <!-- Здесь будут отображаться карточки заявок -->
     </div>
-
 </main>
 
 <footer>
@@ -285,91 +269,67 @@
 </footer>
 
 <script>
-    // Загрузка заявок из requests_all.json
-    async function loadRequests() {
-        try {
-            const response = await fetch('requests_all.json');  // Путь к вашему JSON файлу
-            if (!response.ok) {
-                throw new Error('Не удалось загрузить данные');
-            }
-            const requests = await response.json();
-            return requests;
-        } catch (error) {
-            console.error('Ошибка при загрузке данных:', error);
-            alert('Ошибка при загрузке данных. Проверьте консоль для подробностей.');
-            return [];
+async function loadRequests() {
+    try {
+        const response = await fetch('requests_all.json');
+        const requests = await response.json();
+        return requests;
+    } catch (error) {
+        return [];
+    }
+}
+
+async function displayRequests() {
+    const requests = await loadRequests();
+    const userRequests = requests.filter(r => r.username === sessionStorage.getItem('username'));
+
+    const container = document.querySelector('.request-container');
+    container.innerHTML = '';
+
+    userRequests.forEach(request => {
+
+        let itemsText = '-';
+        if (request.items && request.items.length > 0) {
+            itemsText = request.items.map(i => `${i.name} (${i.qty || 1} шт)`).join(', ');
         }
-    }
 
-    // Отображение заявок
-    async function displayRequests() {
-        const requests = await loadRequests();
-        const userRequests = requests.filter(request => request.username === sessionStorage.getItem('username'));
+        let typeName = '';
+        if (request.type === 'both') typeName = 'Установка столбов и светильников';
+        else if (request.type === 'repair') typeName = 'Ремонт повреждения электрических сетей';
+        else typeName = request.type || '-';
 
-        const container = document.querySelector('.request-container');
-        container.innerHTML = '';  // Очищаем контейнер
+        const createdAt = new Date(request.createdAt);
+        const expectedCallTime = new Date(request.expectedCallTime);
 
-        userRequests.forEach(request => {
-            const requestCard = document.createElement('div');
-            requestCard.classList.add('request-card');
+        const card = document.createElement('div');
+        card.className = 'request-card';
 
-            // Формируем список товаров (items)
-            let itemsText = '-';
-            if (request.items && request.items.length > 0) {
-                itemsText = request.items.map(i => `${i.name} (${i.qty || 1} шт)`).join(', ');
-            }
+        card.innerHTML = `
+            <h3>${typeName}</h3>
+            <p><strong>Дата:</strong> ${createdAt.toLocaleString()}</p>
+            <p><strong>Имя:</strong> ${request.firstname} ${request.lastname}</p>
+            <p><strong>Телефон:</strong> ${request.phone}</p>
+            <p><strong>Email:</strong> ${request.email}</p>
+            <p><strong>Адрес:</strong> ${request.address}</p>
+            <p><strong>Описание товаров:</strong> ${itemsText}</p>
+            <p><strong>Описание проблемы:</strong> ${request.problemDescription || '-'}</p>
+            <p><strong>Статус:</strong> ${request.status || 'Новая'}</p>
+        `;
 
-            // Форматируем тип заявки
-            let typeName = '';
-            if (request.type === 'both') typeName = 'Установка столбов и светильников';
-            else if (request.type === 'repair') typeName = 'Ремонт повреждения электрических сетей';
-            else typeName = request.type || '-';
+        container.appendChild(card);
+    });
+}
 
-            // Форматируем дату
-            const createdAt = new Date(request.createdAt);
-            const expectedCallTime = new Date(request.expectedCallTime);
+function logout() {
+    sessionStorage.removeItem('username');
+    window.location.href = 'index.html';
+}
 
-            requestCard.innerHTML = `
-                <h3>Тип заявки: ${typeName}</h3>
-                <p><strong>Дата создания:</strong> ${createdAt.toLocaleString()}</p>
-                <p><strong>Имя:</strong> ${request.firstname} ${request.lastname}</p>
-                <p><strong>Телефон:</strong> ${request.phone}</p>
-                <p><strong>Email:</strong> ${request.email}</p>
-                <p><strong>Адрес:</strong> ${request.address}</p>
-                <p><strong>Описание:</strong> ${itemsText}</p>
-                <p><strong>Дата завершения:</strong> ${expectedCallTime.toLocaleString()}</p>
-                <p><strong>Статус:</strong> ${request.status || 'Новая'}</p>
-                <div class="items-list">
-                    ${request.items.map(item => `
-                        <div class="item">
-                            <img src="${item.img}" alt="${item.name}" class="item-img">
-                            <p><strong>${item.name}</strong> (${item.qty} шт)</p>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
+function toggleMenu() {
+    document.querySelector('.menu-panel').classList.toggle('active');
+}
 
-            container.appendChild(requestCard);
-        });
-    }
-
-    // Выход
-    function logout() {
-        sessionStorage.removeItem('username');
-        alert('Вы вышли из системы.');
-        window.location.href = 'index.html';
-    }
-
-    // Функция для переключения меню
-    function toggleMenu() {
-        const menuPanel = document.querySelector('.menu-panel');
-        const mainContent = document.querySelector('main');
-        menuPanel.classList.toggle('active');
-        mainContent.style.marginTop = menuPanel.classList.contains('active') ? '200px' : '40px'; // Поднимаем контент, когда меню открыто
-    }
-
-    // Вызываем функцию для отображения заявок
-    displayRequests();
+displayRequests();
 </script>
 
 </body>
