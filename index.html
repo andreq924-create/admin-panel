@@ -506,7 +506,18 @@ padding-top: 90px;
     height: 450px; 
     border: none; 
 }
-
+.header-right .phone {
+    color: #fff !important;
+    font-weight: bold;
+}
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-left: auto;
+    font-size: 18px;
+    transform: translateX(-65px);
+}
 /* Модалка */
 .modal { 
     display: none; 
@@ -674,7 +685,31 @@ footer a:hover {
         padding-top: 50px; /* Уменьшаем отступ сверху */
         text-align: left;  /* Текст выравнивается по левому краю */
     }
- 
+
+     .header-right {
+        gap: 5px;
+        transform: translateX(65px); /* или вообще 0 */
+        font-size: 14px;
+        justify-content: flex-end;
+        width: 100%;
+	 
+
+		 
+    }
+
+    .phone {
+        font-size: 12px;
+        white-space: nowrap;
+		    color: #fff;
+    font-weight: bold;
+    }
+
+
+
+    #loginLink a,
+    #registerLink a {
+        font-size: 5px;
+    }
     .hero-content {
         max-width: 100%;
         padding-left: 2; /* Убираем отступ слева */
@@ -830,7 +865,7 @@ footer a:hover {
     width: 80px;
     position: absolute;
     left: 10px;
-    top: 12px; /* было 15px — уменьшаем, чтобы поднять */
+    top: 11px; /* было 15px — уменьшаем, чтобы поднять */
 }
 
     /* Уменьшаем размер шрифта для ссылок меню */
@@ -948,17 +983,17 @@ html {
     </div>
 
     <!-- Правый блок -->
-	<div style="display: flex; align-items: center; gap: 20px; font-size: 18px; margin-left: auto; transform: translateX(-65px);">
-      <div style="font-weight: bold; color: #fff; margin-top: 4px;">+7 919 519 15 28</div>
+<div class="header-right">
+    <div class="phone">+7 919 519 15 28</div>
 
-      <div id="loginLink"><a href="login.html">Войти</a></div>
-      <div id="registerLink"><a href="register.html">Регистрация</a></div>
+    <div id="loginLink"><a href="login.html">Войти</a></div>
+    <div id="registerLink"><a href="register.html">Регистрация</a></div>
 
-      <div id="userInfo" onclick="goToDashboard()">
+    <div id="userInfo" onclick="goToDashboard()">
         <img id="userImage" src="" alt="User">
-        <span id="username" style="color:#fff; font-weight:bold;"></span>
-      </div>
+        <span id="username"></span>
     </div>
+</div>
     
     <!-- Кнопка для мобильного меню -->
     <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
