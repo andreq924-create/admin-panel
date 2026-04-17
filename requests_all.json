@@ -457,9 +457,11 @@
     "type": "repair",
     "problemDescription": "укппку",
     "items": [],
-    "status": "Новая",
+    "status": "В процессе",
     "createdAt": "2026-04-17T18:48:46.462Z",
-    "expectedCallTime": "2026-04-17T18:53:46.462Z"
+    "expectedCallTime": "2026-04-17T18:53:46.462Z",
+    "callDate": "",
+    "completionDate": ""
   },
   {
     "username": "111",
