@@ -133,6 +133,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
+            position: relative;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -162,27 +163,28 @@
             font-size: 14px;
         }
 
-        /* Статус заявки - разное оформление для каждого */
-        .request-card .status {
-            display: inline-block;
+        /* Статус заявки в правом верхнем углу */
+        .status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
             padding: 5px 15px;
             font-weight: bold;
             border-radius: 5px;
-            margin-top: 10px;
             text-transform: uppercase;
         }
 
-        .request-card .status.new {
+        .status.new {
             background-color: #FF6347;
             color: white;
         }
 
-        .request-card .status.in_progress {
+        .status.in_progress {
             background-color: #FFD700;
             color: black;
         }
 
-        .request-card .status.completed {
+        .status.completed {
             background-color: #32CD32;
             color: white;
         }
@@ -344,21 +346,20 @@
 
             // Форматируем тип заявки
             let typeName = '';
-            if (request.type === 'both') typeName = 'Установка столбов и светильников';
-            else if (request.type === 'repair') typeName = 'Ремонт повреждения электрических сетей';
-            else typeName = request.type || '-';
+            let typeIcon = '🛠'; // Эмодзи по умолчанию (например, для ремонта)
+            if (request.type === 'both') {
+                typeName = 'Установка столбов и светильников';
+                typeIcon = '🔧🌟'; // Эмодзи для установки
+            } else if (request.type === 'repair') {
+                typeName = 'Ремонт повреждения электрических сетей';
+                typeIcon = '⚡️🔧'; // Эмодзи для ремонта
+            } else {
+                typeName = request.type || '-';
+            }
 
             // Форматируем дату
             const createdAt = new Date(request.createdAt);
             const expectedCallTime = new Date(request.expectedCallTime);
-
-            // Выбираем иконку в зависимости от типа заявки
-            let typeIcon = '';
-            if (request.type === 'both') {
-                typeIcon = 'install-icon.png'; // Установите свой путь к иконке
-            } else if (request.type === 'repair') {
-                typeIcon = 'repair-icon.png'; // Установите свой путь к иконке
-            }
 
             // Определение статуса заявки
             let statusClass = 'new';
@@ -369,7 +370,7 @@
             }
 
             requestCard.innerHTML = `
-                <h3><img src="${typeIcon}" alt="Тип заявки"> ${typeName}</h3>
+                <h3>${typeIcon} ${typeName}</h3>
                 <p><strong>Дата создания:</strong> ${createdAt.toLocaleString()}</p>
                 <p><strong>Имя:</strong> ${request.firstname} ${request.lastname}</p>
                 <p><strong>Телефон:</strong> ${request.phone}</p>
@@ -378,7 +379,10 @@
                 <p><strong>Описание товаров:</strong> ${itemsText}</p>
                 <p><strong>Описание проблемы:</strong> ${request.problemDescription || '-'}</p>
                 <p><strong>Дата завершения:</strong> ${expectedCallTime.toLocaleString()}</p>
-                <p><strong>Статус:</strong> <span class="status ${statusClass}">${request.status || 'Новая'}</span></p>
+
+                <!-- Статус в правом верхнем углу -->
+                <span class="status ${statusClass}">${request.status || 'Новая'}</span>
+
                 <div class="items-list">
                     ${(request.items || []).map(item => `
                         <div class="item">
