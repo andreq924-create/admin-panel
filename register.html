@@ -662,7 +662,7 @@ registerForm.addEventListener('submit', async function(event) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username, password: hashedPassword })
+            body: JSON.stringify({ users: users })
         });
 
         let result = {};
