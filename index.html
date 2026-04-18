@@ -101,8 +101,7 @@ html, body {
 padding-top: 90px;
     height: 100vh; 
 
-    background: url('sait1/main-photo.jpg') center/cover no-repeat; 
-    display: flex; 
+     display: flex; 
 	background-position: center 10%; /* смещает изображение вниз */
     align-items: center; 
     padding-left: 60px; 
@@ -123,6 +122,9 @@ padding-top: 90px;
 .hero-content h2 { 
     font-size: 36px; 
     margin-bottom: 5px; 
+	    color: #FFD700;
+
+ 
 }
 
 .hero-content h3 { 
@@ -529,7 +531,14 @@ padding-top: 90px;
     background: rgba(0, 0, 0, 0.6); 
     backdrop-filter: blur(4px); 
 }
+@media (max-width: 1300px) {
+    .hero-content {
+        transform: scale(0.83);
+        transform-origin: left top;
+		    margin-top:70px;
 
+    }
+}
 .modal-content { 
     background: #fff; 
     margin: auto; 
@@ -956,12 +965,82 @@ footer a:hover {
     transform-origin: center;
     transition: transform 0.3s ease;
 }
+/* Анимация "дорогого" появления */
+.fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(6px);
+    transition: all 0.8s ease;
+}
 
+.fade-up.show {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+
+/* Задержки для последовательного появления */
+.delay-1 { transition-delay: 0.2s; }
+.delay-2 { transition-delay: 0.4s; }
+.delay-3 { transition-delay: 0.6s; }
+.delay-4 { transition-delay: 0.8s; }
+.delay-5 { transition-delay: 1s; }
+.delay-6 { transition-delay: 1.2s; }
+.delay-7 { transition-delay: 1.4s; }
+
+/* Премиум эффект для заголовка */
+.hero-content h2 {
+    color: #fff;
+
+ }
+
+@keyframes shine {
+    from { background-position: -200px; }
+    to { background-position: 200px; }
+}
 .nav-menu a:hover::after {
     transform: translateX(-50%) scaleX(1);
 }
 html {
     scroll-behavior: smooth;
+}
+
+.hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('sait1/main-photo.jpg') center/cover no-repeat;
+		background-position: center 10%; /* смещает изображение вниз */
+
+    filter: blur(12px);
+    transform: scale(1.1);
+    animation: unblur 2s ease forwards;
+    z-index: 0;
+}
+.hero-content {
+    font-size: 17.5px;
+}
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes unblur {
+    from { filter: blur(12px); transform: scale(1.1); }
+    to { filter: blur(0); transform: scale(1); }
 }
 </style>
 </head>
@@ -1020,18 +1099,46 @@ html {
 <!-- HERO -->
 <section class="hero" id="home">
     <div class="hero-content">
-        <h2>МКУ Кировсвет</h2>
-        <h3><span style="color: #FFD700;">профессиональный</span> свет</h3>
+
+        <h2 class="fade-up delay-1">МКУ Кировсвет</h2>
+
+        <h3 class="fade-up delay-2">
+            <span style="color: #FFD700;">профессиональный</span> свет
+        </h3>
+
         <ul>
-            <li>Металлические опоры освещения СТВ, ОГК и другие</li>
-<li>Светодиодные LED светильники на <span style="background-color: #FFD700; color: #000000; padding: 2px 5px; border-radius: 4px; font-weight: bold;">любой бюджет</span></li>            <li>Отгрузка со склада сразу же в день оплаты</li>
-<li>Доставка в <span style="background-color: #FFD700; color: #000000; padding: 2px 5px; border-radius: 4px; font-weight: bold;">любую точку Кирова</span> по честной цене</li>            <li>Изготовим по вашему техническому заданию с заключением лаборатории</li>
+            <li class="fade-up delay-3">
+                Металлические опоры освещения СТВ, ОГК и другие
+            </li>
+
+            <li class="fade-up delay-4">
+                Светодиодные LED светильники на 
+                <span style="background-color:#FFD700; color:#000; padding:2px 5px; border-radius:4px; font-weight:bold;">
+                    любой бюджет
+                </span>
+            </li>
+
+            <li class="fade-up delay-5">
+                Отгрузка со склада сразу же в день оплаты
+            </li>
+
+            <li class="fade-up delay-6">
+                Доставка в 
+                <span style="background-color:#FFD700; color:#000; padding:2px 5px; border-radius:4px; font-weight:bold;">
+                   любую точку Кирова</span> по честной цене
+            </li>
+
+            <li class="fade-up delay-7">
+                Изготовим по вашему техническому заданию с заключением лаборатории
+            </li>
         </ul>
-   <div class="hero-buttons">
-    <button onclick="window.location.href='poles.html?from=index'">🏗️ Опоры освещения</button>
-    <button onclick="window.location.href='light.html?from=index'">💡 LED светильники</button>
-    <button onclick="handleRequestClick(event)">⚡ Ремонт электрических сетей</button>
-</div>
+
+        <div class="hero-buttons fade-up delay-7">
+            <button onclick="window.location.href='poles.html?from=index'">🏗️ Опоры освещения</button>
+            <button onclick="window.location.href='light.html?from=index'">💡 LED светильники</button>
+            <button onclick="handleRequestClick(event)">⚡ Ремонт электрических сетей</button>
+        </div>
+
     </div>
 </section>
 
@@ -1112,6 +1219,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
+
+	    const elements = document.querySelectorAll('.fade-up');
+
+    elements.forEach(el => {
+        setTimeout(() => {
+            el.classList.add('show');
+        }, 100);
+    });
 
     const observer = new IntersectionObserver(handleIntersection, {
         threshold: 0.5 // Элемент будет виден, когда его 50% будет видно на экране
