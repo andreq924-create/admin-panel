@@ -476,9 +476,11 @@
     "type": "repair",
     "problemDescription": "укппукупкупк",
     "items": [],
-    "status": "Новая",
+    "status": "В процессе",
     "createdAt": "2026-04-17T19:33:47.623Z",
-    "expectedCallTime": "2026-04-17T19:38:47.623Z"
+    "expectedCallTime": "2026-04-17T19:38:47.623Z",
+    "callDate": "",
+    "completionDate": ""
   },
   {
     "username": "111",
