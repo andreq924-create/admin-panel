@@ -7,24 +7,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
     <style>
+        :root {
+            --bg-1: #1e2a38;
+            --bg-2: #2f3f52;
+            --card-border: rgba(255,255,255,0.10);
+            --text-muted: #d7deea;
+            --accent: #FFD700;
+            --accent-hover: #FFC300;
+            --success: #28a745;
+            --error: #dc3545;
+            --shadow: 0 20px 50px rgba(0,0,0,0.42);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e2a38, #2f3f52);
+            background:
+                radial-gradient(circle at top left, rgba(255,215,0,0.10), transparent 22%),
+                radial-gradient(circle at bottom right, rgba(255,255,255,0.06), transparent 22%),
+                linear-gradient(135deg, var(--bg-1), var(--bg-2));
             color: #fff;
+            min-height: 100vh;
         }
 
         header {
-            background-color: #1e2a38;
+            background-color: rgba(30, 42, 56, 0.96);
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
         header h1 {
             margin: 0;
             font-size: 22px;
+            letter-spacing: 0.2px;
         }
 
         nav ul {
@@ -32,11 +56,14 @@
             display: flex;
             gap: 20px;
             margin: 0;
+            padding: 0;
+            flex-wrap: wrap;
         }
 
         nav a {
             color: #fff;
             text-decoration: none;
+            transition: color 0.2s ease, opacity 0.2s ease;
         }
 
         nav a:hover {
@@ -47,44 +74,179 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: calc(100vh - 140px);
+            min-height: calc(100vh - 140px);
+            padding: 28px 16px;
+        }
+
+.register-panel {
+    width: min(100%, 480px); /* Увеличено с 360px до 480px */
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+        .register-title {
+            margin: 0;
+            text-align: center;
+            font-size: 28px;
+            line-height: 1.1;
+            letter-spacing: 0.2px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.18);
+        }
+
+        .register-subtitle {
+            margin: 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
         }
 
         form {
-            background: #fff;
+            background: rgba(255, 255, 255, 0.98);
             color: #000;
-            padding: 30px;
-            border-radius: 12px;
-            width: 320px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            padding: 32px;
+            border-radius: 18px;
+            width: 100%;
+            box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
+            border: 1px solid var(--card-border);
+            animation: fadeUp 0.35s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        form label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .input-wrap {
+            position: relative;
         }
 
         form input {
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid #d1d5db;
             outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+            background: #fff;
+            font-size: 15px;
         }
 
         form input:focus {
             border-color: #FFD700;
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.14);
+        }
+
+        .helper-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            font-size: 12px;
+            line-height: 1.45;
+            color: #6b7280;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.45;
+        }
+
+        .hint strong {
+            color: #374151;
+        }
+
+        .validity-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #3730a3;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .password-wrap {
+            position: relative;
+        }
+
+        .toggle-pass {
+            position: absolute;
+            right: 10px;
+            top: 10%;
+             border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 0;
+        }
+
+        .toggle-pass:hover {
+            color: #333;
+        }
+
+        .strength {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        .strength div {
+            height: 100%;
+            width: 120%;
+            background: #dc3545;
+            transition: width 0.25s ease, background 0.25s ease;
         }
 
         form button {
             margin-top: 10px;
-            padding: 12px;
+            padding: 13px 14px;
             border: none;
-            border-radius: 6px;
-            background-color: #FFD700;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #FFD700, #FFC300);
             cursor: pointer;
             font-weight: bold;
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.18);
+            transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
         }
 
         form button:hover {
-            background-color: #FFC300;
+            background: linear-gradient(135deg, #ffe24d, #ffc300);
+            transform: translateY(-1px);
+        }
+
+        form button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
         }
 
         footer {
@@ -105,6 +267,8 @@
             display: none;
             justify-content: center;
             align-items: center;
+            padding: 20px;
+            z-index: 1000;
         }
 
         #modalBox {
@@ -115,6 +279,7 @@
             width: 300px;
             text-align: center;
             box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            border-top: 6px solid transparent;
         }
 
         #modalBox.success {
@@ -138,6 +303,43 @@
         #modalBox button:hover {
             background: #FFC300;
         }
+
+        .hidden-honeypot {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+            height: 0;
+            width: 0;
+        }
+		@media (min-width: 768px) {
+    .register-panel {
+        width: 500px; /* Ширина формы для экранов больше 768px */
+    }
+}
+        @media (max-width: 640px) {
+            header {
+                padding: 14px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            header h1 {
+                font-size: 20px;
+            }
+
+            nav ul {
+                gap: 14px;
+            }
+
+            form {
+                padding: 24px;
+            }
+
+            .register-title {
+                font-size: 24px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -153,15 +355,41 @@
 </header>
 
 <main>
-    <form id="registerForm">
-        <label>Имя пользователя:</label>
-        <input type="text" id="regUsername" required>
+    <div class="register-panel">
+        <h2 class="register-title">Создать аккаунт</h2>
+ 
+        <form id="registerForm" autocomplete="off" novalidate>
+            <div class="field">
+                <label for="regUsername">Имя пользователя:</label>
+                <div class="input-wrap">
+                    <input type="text" id="regUsername" required maxlength="20" minlength="3" autocomplete="username" spellcheck="false" placeholder="например: ivan_123">
+                </div>
+                <div class="helper-row">
+                    <span class="hint" id="usernameHint">Только латиница, цифры и _. 3–20 символов.</span>
+                    <span class="validity-pill" id="usernameCount">0 / 20</span>
+                </div>
+            </div>
 
-        <label>Пароль:</label>
-        <input type="password" id="regPassword" required>
+            <div class="field">
+                <label for="regPassword">Пароль:</label>
+                <div class="password-wrap">
+                    <input type="password" id="regPassword" required minlength="8" autocomplete="new-password" placeholder="Минимум 8 символов">
+                    <button type="button" class="toggle-pass" id="togglePassBtn">показать</button>
+                </div>
+                <div class="strength" aria-hidden="true"><div id="strengthBar"></div></div>
+                <div class="hint" id="strengthText">Уровень пароля: слабый</div>
+            </div>
 
-        <button type="submit">Зарегистрироваться</button>
-    </form>
+            <div class="field">
+                <label for="regPassword2">Повтор пароля:</label>
+                <input type="password" id="regPassword2" required minlength="8" autocomplete="new-password" placeholder="Повторите пароль">
+            </div>
+
+            <input type="text" id="hiddenField" class="hidden-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+            <button type="submit" id="submitBtn">Зарегистрироваться</button>
+        </form>
+    </div>
 </main>
 
 <footer>
@@ -172,70 +400,282 @@
 <div id="modal">
     <div id="modalBox">
         <div id="modalText"></div>
-        <button onclick="closeModal()">Ок</button>
+        <button type="button" id="closeModalBtn">Ок</button>
     </div>
 </div>
 
 <script>
 const registerForm = document.getElementById('registerForm');
+const regUsername = document.getElementById('regUsername');
+const regPassword = document.getElementById('regPassword');
+const regPassword2 = document.getElementById('regPassword2');
+const hiddenField = document.getElementById('hiddenField');
+const submitBtn = document.getElementById('submitBtn');
+const strengthBar = document.getElementById('strengthBar');
+const strengthText = document.getElementById('strengthText');
+const togglePassBtn = document.getElementById('togglePassBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const usernameHint = document.getElementById('usernameHint');
+const usernameCount = document.getElementById('usernameCount');
 
-function showModal(message, type = "success") {
+const API_ENDPOINT = '/api/register';
+const COOLDOWN_MS = 30000;
+const WINDOW_MS = 60000;
+const MAX_ATTEMPTS = 5;
+
+function showModal(message, type = 'success') {
     const modal = document.getElementById('modal');
     const box = document.getElementById('modalBox');
     const text = document.getElementById('modalText');
 
     text.innerText = message;
-
     box.classList.remove('success', 'error');
     box.classList.add(type);
-
-    modal.style.display = "flex";
+    modal.style.display = 'flex';
 }
 
 function closeModal() {
-    document.getElementById('modal').style.display = "none";
+    document.getElementById('modal').style.display = 'none';
 }
+
+function isValidUsername(value) {
+    // Проверяем, что в имени есть хотя бы одна буква (латиница или кириллица) и что формат соответствует
+    return /[a-zA-Zа-яА-ЯёЁ]/.test(value) && /^[a-zA-Z0-9_а-яА-ЯёЁ]{3,20}$/.test(value);
+}
+function getPasswordScore(password) {
+    let score = 0;
+    if (password.length >= 8) score += 1;
+    if (password.length >= 12) score += 1;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score += 1;
+    if (/\d/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+    return Math.min(score, 5);
+}
+
+function updateStrength(password) {
+    const score = getPasswordScore(password);
+    const width = (score / 5) * 100;
+    strengthBar.style.width = width + '%';
+
+    if (score <= 1) {
+        strengthBar.style.background = '#dc3545';
+        strengthText.textContent = 'Уровень пароля: слабый';
+    } else if (score === 2) {
+        strengthBar.style.background = '#ffc107';
+        strengthText.textContent = 'Уровень пароля: средний';
+    } else {
+        strengthBar.style.background = '#28a745';
+        strengthText.textContent = 'Уровень пароля: сильный';
+    }
+}
+function updateUsernameHint() {
+    const value = regUsername.value.trim();
+    const length = value.length;
+    usernameCount.textContent = `${length} / 20`;
+
+    // Проверяем, что логин состоит хотя бы из одной буквы
+    if (length === 0) {
+        usernameHint.textContent = 'Только латиница, цифры и _. 3–20 символов.';
+        usernameCount.style.background = '#eef2ff';
+        usernameCount.style.color = '#3730a3';
+        return;
+    }
+
+    if (length < 3) {
+        usernameHint.textContent = `Ещё ${3 - length} символ(а), чтобы логин стал валидным.`;
+        usernameCount.style.background = '#fee2e2';
+        usernameCount.style.color = '#991b1b';
+        return;
+    }
+
+    // Проверяем, что логин содержит хотя бы одну букву
+    if (!/[a-zA-Zа-яА-ЯёЁ]/.test(value)) {
+        usernameHint.textContent = 'Логин должен содержать хотя бы одну букву.';
+        usernameCount.style.background = '#fee2e2';
+        usernameCount.style.color = '#991b1b';
+        return;
+    }
+
+    // Проверяем, что логин соответствует формату
+    if (!/^[a-zA-Z0-9_а-яА-ЯёЁ]*$/.test(value)) {
+        usernameHint.textContent = 'Можно использовать только латиницу, цифры и символ _.';
+        usernameCount.style.background = '#fef3c7';
+        usernameCount.style.color = '#92400e';
+        return;
+    }
+
+    if (length > 20) {
+        usernameHint.textContent = 'Слишком длинный логин.';
+        usernameCount.style.background = '#fee2e2';
+        usernameCount.style.color = '#991b1b';
+        return;
+    }
+
+    usernameHint.textContent = 'Хорошо. Логин подходит по формату.';
+    usernameCount.style.background = '#dcfce7';
+    usernameCount.style.color = '#166534';
+}
+
+function getAttempts() {
+    try {
+        return JSON.parse(localStorage.getItem('registerAttempts') || '[]');
+    } catch {
+        return [];
+    }
+}
+
+function saveAttempts(attempts) {
+    localStorage.setItem('registerAttempts', JSON.stringify(attempts));
+}
+
+function canAttemptRegister() {
+    const now = Date.now();
+    const lastAttempt = Number(localStorage.getItem('lastRegisterAttempt') || 0);
+
+    if (lastAttempt && now - lastAttempt < COOLDOWN_MS) {
+        return {
+            ok: false,
+            message: `Слишком часто. Подождите ${Math.ceil((COOLDOWN_MS - (now - lastAttempt)) / 1000)} сек.`
+        };
+    }
+
+    const attempts = getAttempts().filter(ts => now - ts < WINDOW_MS);
+    saveAttempts(attempts);
+
+    if (attempts.length >= MAX_ATTEMPTS) {
+        return {
+            ok: false,
+            message: 'Слишком много попыток. Подождите минуту и попробуйте снова.'
+        };
+    }
+
+    return { ok: true };
+}
+
+function registerAttempt() {
+    const now = Date.now();
+    const attempts = getAttempts().filter(ts => now - ts < WINDOW_MS);
+    attempts.push(now);
+    saveAttempts(attempts.slice(-MAX_ATTEMPTS * 2));
+    localStorage.setItem('lastRegisterAttempt', String(now));
+}
+
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+}
+
+togglePassBtn.addEventListener('click', () => {
+    const show = regPassword.type === 'password';
+    regPassword.type = show ? 'text' : 'password';
+    togglePassBtn.textContent = show ? 'скрыть' : 'показать';
+    regPassword.focus();
+});
+
+regPassword.addEventListener('input', () => updateStrength(regPassword.value));
+regUsername.addEventListener('input', updateUsernameHint);
+updateStrength('');
+updateUsernameHint();
+
+closeModalBtn.addEventListener('click', closeModal);
+document.getElementById('modal').addEventListener('click', (e) => {
+    if (e.target.id === 'modal') closeModal();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+});
 
 registerForm.addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    const regUsername = document.getElementById('regUsername').value;
-    const regPassword = document.getElementById('regPassword').value;
+    const username = regUsername.value.trim();
+    const password = regPassword.value;
+    const password2 = regPassword2.value;
 
-    if (!regUsername || !regPassword) {
+    if (hiddenField.value.trim() !== '') {
+        return;
+    }
+
+    if (!username || !password || !password2) {
         showModal('Пожалуйста, заполните все поля!', 'error');
         return;
     }
 
-    const newUser = {
-        username: regUsername,
-        password: regPassword
-    };
+    if (!isValidUsername(username)) {
+        showModal('Логин должен быть от 3 до 20 символов и содержать только буквы, цифры или _.', 'error');
+        return;
+    }
+
+    if (password.length < 8) {
+        showModal('Пароль должен быть минимум 8 символов.', 'error');
+        return;
+    }
+
+    if (password !== password2) {
+        showModal('Пароли не совпадают.', 'error');
+        return;
+    }
+
+    if (getPasswordScore(password) < 3) {
+        showModal('Сделайте пароль сложнее: добавьте заглавные буквы, цифры и символы.', 'error');
+        return;
+    }
+
+    const cooldown = canAttemptRegister();
+    if (!cooldown.ok) {
+        showModal(cooldown.message, 'error');
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Проверка...';
 
     try {
+        registerAttempt();
+
+        const hashedPassword = await hashPassword(password);
+
+        const newUser = {
+            username: username,
+            password: hashedPassword
+        };
+
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        const existingUser = users.find(user => user.username === regUsername);
-
+        const existingUser = users.find(user => user.username === username);
         if (existingUser) {
             showModal('Пользователь уже существует!', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Зарегистрироваться';
             return;
         }
 
         users.push(newUser);
 
-        const response = await fetch('/api/updateUsers', {
+        const response = await fetch(API_ENDPOINT, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ users: users })
+            body: JSON.stringify({ username, password: hashedPassword })
         });
 
-        const result = await response.json();
+        let result = {};
+        try {
+            result = await response.json();
+        } catch (e) {
+            result = {};
+        }
 
         if (!response.ok) {
             showModal('Ошибка: ' + (result.error || 'Неизвестная ошибка'), 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Зарегистрироваться';
             return;
         }
 
@@ -244,12 +684,15 @@ registerForm.addEventListener('submit', async function(event) {
         showModal('Регистрация успешна!', 'success');
 
         setTimeout(() => {
-            window.location.href = "login.html";
+            window.location.href = 'login.html';
         }, 1500);
 
     } catch (err) {
         console.error(err);
         showModal('Ошибка соединения с сервером', 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Зарегистрироваться';
     }
 });
 </script>

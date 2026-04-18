@@ -1,30 +1,55 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
-<link rel="icon" href="favicon.png" type="image/png">
+    <link rel="icon" href="favicon.png" type="image/png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход</title>
 
     <style>
+        /* Ваши стили остаются прежними */
+        :root {
+            --bg-1: #1e2a38;
+            --bg-2: #2f3f52;
+            --card-border: rgba(255, 255, 255, 0.10);
+            --text-muted: #d7deea;
+            --accent: #FFD700;
+            --accent-hover: #FFC300;
+            --success: #28a745;
+            --error: #dc3545;
+            --shadow: 0 20px 50px rgba(0, 0, 0, 0.42);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e2a38, #2f3f52);
+            background: radial-gradient(circle at top left, rgba(255, 215, 0, 0.10), transparent 22%),
+                        radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.06), transparent 22%),
+                        linear-gradient(135deg, var(--bg-1), var(--bg-2));
             color: #fff;
+            min-height: 100vh;
         }
 
         header {
-            background-color: #1e2a38;
+            background-color: rgba(30, 42, 56, 0.96);
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         header h1 {
             margin: 0;
             font-size: 22px;
+            letter-spacing: 0.2px;
         }
 
         nav ul {
@@ -38,6 +63,7 @@
         nav a {
             color: #fff;
             text-decoration: none;
+            transition: color 0.2s ease, opacity 0.2s ease;
         }
 
         nav a:hover {
@@ -48,47 +74,90 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: calc(100vh - 140px);
+            min-height: calc(100vh - 140px);
+            padding: 28px 16px;
         }
 
         .form-container {
-            background: #fff;
-            color: #000;
-            padding: 30px;
-            border-radius: 12px;
-            width: 320px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            width: min(100%, 480px);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .form-title {
+            margin: 0;
+            text-align: center;
+            font-size: 28px;
+            line-height: 1.1;
+            letter-spacing: 0.2px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+        }
+
+        .form-subtitle {
+            margin: 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
         }
 
         form {
+            background: rgba(255, 255, 255, 0.98);
+            color: #000;
+            padding: 32px;
+            border-radius: 18px;
+            width: 100%;
+            box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
+            border: 1px solid var(--card-border);
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        form label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #111827;
         }
 
         form input {
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid #d1d5db;
             outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+            background: #fff;
+            font-size: 15px;
         }
 
         form input:focus {
             border-color: #FFD700;
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.14);
         }
 
         form button {
             margin-top: 10px;
-            padding: 12px;
+            padding: 13px 14px;
             border: none;
-            border-radius: 6px;
-            background-color: #FFD700;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #FFD700, #FFC300);
             cursor: pointer;
             font-weight: bold;
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.18);
+            transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
         }
 
         form button:hover {
-            background-color: #FFC300;
+            background: linear-gradient(135deg, #ffe24d, #ffc300);
+            transform: translateY(-1px);
         }
 
         footer {
@@ -105,10 +174,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             display: none;
             justify-content: center;
             align-items: center;
+            padding: 20px;
+            z-index: 1000;
         }
 
         #modalBox {
@@ -118,7 +189,8 @@
             border-radius: 12px;
             width: 300px;
             text-align: center;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            border-top: 6px solid transparent;
         }
 
         #modalBox.success {
@@ -159,14 +231,20 @@
 
 <main>
     <div class="form-container">
-        <form id="loginForm">
-            <label>Имя пользователя:</label>
-            <input type="text" id="username" required>
+        <h2 class="form-title">Добро пожаловать!</h2>
+ 
+        <form id="loginForm" autocomplete="off" novalidate>
+            <div class="field">
+                <label for="username">Имя пользователя:</label>
+                <input type="text" id="username" required>
+            </div>
 
-            <label>Пароль:</label>
-            <input type="password" id="password" required>
+            <div class="field">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" required>
+            </div>
 
-            <button type="submit">Войти</button>
+            <button type="submit" id="submitBtn">Войти</button>
         </form>
     </div>
 </main>
@@ -179,76 +257,116 @@
 <div id="modal">
     <div id="modalBox">
         <div id="modalText"></div>
-        <button onclick="closeModal()">Ок</button>
+        <button type="button" id="closeModalBtn">Ок</button>
     </div>
 </div>
 
 <script>
-const loginForm = document.getElementById('loginForm');
+    const loginForm = document.getElementById('loginForm');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    
+    let failedAttempts = parseInt(sessionStorage.getItem('failedAttempts')) || 0;
+    let blockTime = parseInt(sessionStorage.getItem('blockTime')) || 0;
 
-// модалка
-function showModal(message, type = "error") {
-    const modal = document.getElementById('modal');
-    const box = document.getElementById('modalBox');
-    const text = document.getElementById('modalText');
+    // Модалка для отображения ошибок
+    function showModal(message, type = "error") {
+        const modal = document.getElementById('modal');
+        const box = document.getElementById('modalBox');
+        const text = document.getElementById('modalText');
 
-    text.innerText = message;
+        text.innerText = message;
 
-    box.classList.remove('success', 'error');
-    box.classList.add(type);
+        box.classList.remove('success', 'error');
+        box.classList.add(type);
 
-    modal.style.display = "flex";
-}
-
-function closeModal() {
-    document.getElementById('modal').style.display = "none";
-}
-
-// Загружаем пользователей
-let users = [];
-
-window.addEventListener('load', async () => {
-    try {
-        const response = await fetch('./users.json', { cache: 'no-store' });
-        if (!response.ok) throw new Error('Ошибка загрузки users.json');
-
-        users = await response.json();
-    } catch (error) {
-        console.error(error);
-        showModal('Ошибка загрузки пользователей', 'error');
-    }
-});
-
-loginForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    // дефолт
-    if (username === '111' && password === '111') {
-        sessionStorage.setItem('username', username);
-        window.location.href = "user_dashboard.html";
-        return;
+        modal.style.display = "flex";
     }
 
-    // админ
-    if (username === 'Admin' && password === 'Admin') {
-        sessionStorage.setItem('username', username);
-        window.location.href = "admin_dashboard.html";
-        return;
+    // Закрытие модалки
+    function closeModal() {
+        document.getElementById('modal').style.display = "none";
     }
 
-    const user = users.find(u => u.username === username && u.password === password);
+    // Загружаем пользователей
+    let users = [];
 
-    if (user) {
-        sessionStorage.setItem('username', user.username);
-        window.location.href = "user_dashboard.html";
-    } else {
-        showModal('Неверный логин или пароль!', 'error');
-    }
-});
+    window.addEventListener('load', async () => {
+        try {
+            const response = await fetch('./users.json', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Ошибка загрузки users.json');
+
+            users = await response.json();
+        } catch (error) {
+            console.error(error);
+            showModal('Ошибка загрузки пользователей', 'error');
+        }
+    });
+
+    // Логика входа с ограничением
+    loginForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        // Проверка на пустые данные
+        if (!username || !password) {
+            showModal('Пожалуйста, заполните все поля!', 'error');
+            return;
+        }
+
+        const currentTime = Date.now();
+
+        // Проверка на блокировку
+        if (blockTime > currentTime) {
+            const remainingTime = Math.floor((blockTime - currentTime) / 1000);
+            showModal(`Вы заблокированы на ${remainingTime} секунд!`, 'error');
+            return;
+        }
+
+        // Сбросить неудачные попытки после блокировки
+        if (blockTime <= currentTime && failedAttempts >= 5) {
+            failedAttempts = 0;
+            sessionStorage.setItem('failedAttempts', failedAttempts);
+        }
+
+        // Проверка на дефолтного пользователя
+        if (username === '111' && password === '111') {
+            sessionStorage.setItem('username', username);
+            window.location.href = "user_dashboard.html";
+            return;
+        }
+
+        // Проверка на админа
+        if (username === 'Admin' && password === 'Admin') {
+            sessionStorage.setItem('username', username);
+            window.location.href = "admin_dashboard.html";
+            return;
+        }
+
+        // Проверка пользователей из файла
+        const user = users.find(u => u.username === username && u.password === password);
+
+        if (user) {
+            sessionStorage.setItem('username', user.username);
+            window.location.href = "user_dashboard.html";
+        } else {
+            failedAttempts++;
+            sessionStorage.setItem('failedAttempts', failedAttempts);
+
+            if (failedAttempts >= 5) {
+                blockTime = currentTime + 10000; // блокировка на 10 секунд
+                sessionStorage.setItem('blockTime', blockTime);
+                showModal('Превышено количество попыток! Блокировка на 10 секунд.', 'error');
+            } else {
+                showModal('Неверный логин или пароль!', 'error');
+            }
+        }
+    });
+
+    closeModalBtn.addEventListener('click', closeModal);
 </script>
 
 </body>
+
 </html>

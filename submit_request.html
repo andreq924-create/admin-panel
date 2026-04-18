@@ -72,10 +72,10 @@
             border-color: #FFD700;
         }
 
-        #address {
-            background: #2a3b55;
-            cursor: not-allowed;
-        }
+   #address {
+    background: #2a3b55; /* Можно заменить на другой цвет, если хотите */
+    cursor: text; /* Сделать курсор текстовым, когда пользователь кликает на поле */
+}
 
         .map-wrapper {
             position: relative;
@@ -455,8 +455,9 @@
     <label>E-mail</label><input type="email" id="email" placeholder="example@mail.com">
     <div id="email-error" class="error-message" style="display: none;"></div>
 
-    <label>Адрес</label><input type="text" id="address" readonly>
-    <div id="address-error" class="error-message" style="display: none;"></div>
+<label>Адрес</label>
+<input type="text" id="address">
+<div id="address-error" class="error-message" style="display: none;"></div>
 
     <div class="map-wrapper" id="mapWrapper">
         <div class="map-address" id="mapAddress">Адрес появится здесь</div>
