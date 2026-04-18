@@ -11,7 +11,7 @@
             height: 100%;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #1e2a38; /* Однородный темный фон */
+            background-color: #1e2a38;
             color: #fff;
             display: flex;
             flex-direction: column;
@@ -26,7 +26,7 @@
             align-items: center;
             flex-wrap: wrap;
             position: relative;
-            z-index: 10; /* Обеспечивает, чтобы шапка была сверху */
+            z-index: 10;
         }
 
         header h1 {
@@ -77,7 +77,7 @@
         /* Панель меню сверху */
         .menu-panel {
             position: absolute;
-            top: -100%; /* Начальное скрытое положение меню (выше экрана) */
+            top: -100%;
             left: 0;
             width: 100%;
             background-color: #1e2a38;
@@ -87,32 +87,32 @@
             flex-direction: column;
             gap: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            transition: top 0.3s ease-in-out; /* Плавное появление */
+            transition: top 0.3s ease-in-out;
             z-index: 5;
             overflow: hidden;
             max-height: 80vh;
         }
 
         .menu-panel a {
-            color: #fff; /* Устанавливаем белый цвет для текста */
+            color: #fff;
             font-size: 18px;
             text-decoration: none;
             transition: color 0.2s ease;
         }
 
         .menu-panel a:hover {
-            color: #FFD700; /* Цвет при наведении */
+            color: #FFD700;
         }
 
         .menu-panel.active {
-            top: 0; /* При активации панель спускается */
+            top: 0;
         }
 
         /* MAIN */
         main {
             padding: 40px;
             flex: 1;
-            transition: margin-top 0.3s ease; /* Плавное движение контента */
+            transition: margin-top 0.3s ease;
         }
 
         main h2 {
@@ -130,6 +130,7 @@
             justify-content: center;
             gap: 10px;
             margin-bottom: 30px;
+            flex-wrap: wrap;
         }
 
         .filter-button {
@@ -150,9 +151,18 @@
         .filter-button.active {
             background-color: #FFD700;
             border-color: #FFD700;
+            color: #000;
         }
 
-        /* КАРТОЧКИ (для мобильных) */
+        /* Сообщение о пустых заявках */
+        .no-requests-message {
+            color: #ccc;
+            text-align: center;
+            font-size: 18px;
+            margin-top: 30px;
+        }
+
+        /* КАРТОЧКИ */
         .request-card {
             background-color: #1f3145;
             margin-bottom: 20px;
@@ -191,7 +201,7 @@
             font-size: 14px;
         }
 
-        /* Статус заявки в правом верхнем углу */
+        /* Статус заявки */
         .status {
             position: absolute;
             top: 20px;
@@ -275,11 +285,11 @@
             }
 
             .menu-panel {
-                top: -100%; /* Мобильное меню скрыто за экраном */
+                top: -100%;
             }
 
             .menu-panel.active {
-                top: 0; /* Панель открывается сверху */
+                top: 0;
             }
         }
 
@@ -297,7 +307,6 @@
                 font-size: 12px;
             }
         }
-
     </style>
 </head>
 <body>
@@ -327,18 +336,18 @@
 <main>
     <h2>Мои заявки</h2>
 
-    <!-- Фильтры -->
     <div class="filter-buttons">
-        <button class="filter-button active" onclick="filterRequests('all')">Все</button>
-        <button class="filter-button" onclick="filterRequests('new')">Новые</button>
-        <button class="filter-button" onclick="filterRequests('in_progress')">В работе</button>
-        <button class="filter-button" onclick="filterRequests('completed')">Завершенные</button>
+        <button class="filter-button active" data-status="all" onclick="filterRequests('all')">Все</button>
+        <button class="filter-button" data-status="new" onclick="filterRequests('new')">Новые</button>
+        <button class="filter-button" data-status="in_progress" onclick="filterRequests('in_progress')">В работе</button>
+        <button class="filter-button" data-status="completed" onclick="filterRequests('completed')">Завершенные</button>
     </div>
 
-    <div class="request-container">
-        <!-- Здесь будут отображаться карточки заявок -->
-    </div>
+    <div class="request-container"></div>
 
+    <div class="no-requests-message" id="no-requests-message" style="display: none;">
+        Нет заявок с таким статусом.
+    </div>
 </main>
 
 <footer>
@@ -348,7 +357,6 @@
 <script>
     let currentFilter = 'all';
 
-    // Загрузка заявок из requests_all.json
     async function loadRequests() {
         try {
             const response = await fetch('requests_all.json');
@@ -364,56 +372,51 @@
         }
     }
 
-    // Отображение заявок
     async function displayRequests() {
         try {
-            // Загружаем заявки
             const requests = await loadRequests();
-
-            // Фильтруем заявки по текущему пользователю и выбранному фильтру
             const userRequests = requests.filter(request => request.username === sessionStorage.getItem('username'));
-
-            // Фильтруем заявки по выбранному фильтру
             const filteredRequests = userRequests.filter(request => currentFilter === 'all' || request.status === currentFilter);
 
-            // Находим контейнер для заявок
             const container = document.querySelector('.request-container');
-            container.innerHTML = ''; // Очищаем контейнер перед добавлением новых данных
+            container.innerHTML = '';
 
-            // Перебираем заявки и генерируем карточки
+            const noRequestsMessage = document.getElementById('no-requests-message');
+
+            if (filteredRequests.length === 0) {
+                noRequestsMessage.style.display = 'block';
+            } else {
+                noRequestsMessage.style.display = 'none';
+            }
+
             filteredRequests.forEach(request => {
                 const requestCard = document.createElement('div');
                 requestCard.classList.add('request-card');
 
-                // Формируем список товаров (items)
                 let itemsText = request.items && request.items.length > 0
                     ? request.items.map(i => `${i.name} (${i.qty || 1} шт)`).join(', ')
                     : null;
 
-                // Форматируем описание проблемы
-                let problemText = request.problemDescription && request.problemDescription !== '-' 
+                let problemText = request.problemDescription && request.problemDescription !== '-'
                     ? `Описание проблемы: 📝 ${request.problemDescription}`
                     : null;
 
-                // Форматируем тип заявки
                 let typeName = '';
-                let typeIcon = ''; // Без эмодзи по умолчанию
+                let typeIcon = '';
 
                 if (request.type === 'both') {
                     typeName = 'Установка столбов и светильников';
-                    typeIcon = ''; // Без эмодзи для установки
+                    typeIcon = '';
                 } else if (request.type === 'repair') {
                     typeName = 'Ремонт повреждения электрических сетей';
-                    typeIcon = ''; // Без эмодзи для ремонта
+                    typeIcon = '';
                 } else {
-                    typeName = request.type || '-'; // Если тип не задан, показываем дефолтное значение '-'
+                    typeName = request.type || '-';
                 }
 
-                // Форматируем дату
                 const createdAt = new Date(request.createdAt);
                 const expectedCallTime = new Date(request.expectedCallTime);
 
-                // Определение статуса заявки
                 let statusClass = 'new';
                 if (request.status === 'in_progress') {
                     statusClass = 'in_progress';
@@ -421,7 +424,6 @@
                     statusClass = 'completed';
                 }
 
-                // Формируем HTML для карточки
                 requestCard.innerHTML = `
                     <h3>${typeIcon} ${typeName}</h3>
                     <p><strong>Дата создания:</strong> 🗓️ ${createdAt.toLocaleString()}</p>
@@ -429,11 +431,10 @@
                     <p><strong>Телефон:</strong> 📞 ${request.phone}</p>
                     <p><strong>Email:</strong> 📧 ${request.email}</p>
                     <p><strong>Адрес:</strong> 📍 ${request.address}</p>
-                    ${itemsText ? `<p><strong>Описание товаров:</strong> 🛍️ ${itemsText}</p>` : ''} <!-- Условие для товаров -->
-                    ${problemText ? `<p><strong>Описание проблемы:</strong> 📝 ${request.problemDescription}</p>` : ''} <!-- Условие для проблемы -->
+                    ${itemsText ? `<p><strong>Описание товаров:</strong> 🛍️ ${itemsText}</p>` : ''}
+                    ${problemText ? `<p><strong>Описание проблемы:</strong> 📝 ${request.problemDescription}</p>` : ''}
                     <p><strong>Дата завершения:</strong> 🕒 ${expectedCallTime.toLocaleString()}</p>
 
-                    <!-- Статус в правом верхнем углу -->
                     <span class="status ${statusClass}">${request.status || 'Новая'}</span>
 
                     <div class="items-list">
@@ -446,7 +447,6 @@
                     </div>
                 `;
 
-                // Добавляем карточку в контейнер
                 container.appendChild(requestCard);
             });
         } catch (error) {
@@ -455,46 +455,38 @@
         }
     }
 
+    function filterRequests(status) {
+        currentFilter = status;
 
-   // Фильтрация заявок
-function filterRequests(status) {
-    // Обновляем текущий фильтр
-    currentFilter = status;
+        const buttons = document.querySelectorAll('.filter-button');
+        buttons.forEach(button => {
+            button.classList.remove('active');
+        });
 
-    // Обновляем стиль активной кнопки
-    const buttons = document.querySelectorAll('.filter-button');
-    
-    // Убираем класс active у всех кнопок
-    buttons.forEach(button => {
-        button.classList.remove('active');
-    });
+        const activeButton = Array.from(buttons).find(button => {
+            return button.dataset.status === status;
+        });
 
-    // Находим кнопку, на которую нажали, и добавляем класс active
-    const activeButton = Array.from(buttons).find(button => button.textContent.trim() === status);
-    if (activeButton) {
-        activeButton.classList.add('active'); // Добавляем класс active
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
+
+        displayRequests();
     }
 
-    // Перерисовываем заявки с учетом нового фильтра
-    displayRequests();
-}
-
-    // Выход
     function logout() {
         sessionStorage.removeItem('username');
         alert('Вы вышли из системы.');
         window.location.href = 'index.html';
     }
 
-    // Функция для переключения меню
     function toggleMenu() {
         const menuPanel = document.querySelector('.menu-panel');
         const mainContent = document.querySelector('main');
         menuPanel.classList.toggle('active');
-        mainContent.style.marginTop = menuPanel.classList.contains('active') ? '200px' : '40px'; // Поднимаем контент, когда меню открыто
+        mainContent.style.marginTop = menuPanel.classList.contains('active') ? '200px' : '40px';
     }
 
-    // Вызываем функцию для отображения заявок
     displayRequests();
 </script>
 
