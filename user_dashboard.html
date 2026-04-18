@@ -15,6 +15,7 @@
             color: #fff;
             display: flex;
             flex-direction: column;
+            font-size: 16px;
         }
 
         /* HEADER */
@@ -213,17 +214,17 @@
         }
 
         .status.new {
-            background-color: #FF6347;
+            background-color: #1E90FF;
             color: white;
         }
 
         .status.in_progress {
-            background-color: #FFD700;
+            background-color: #FFA500;
             color: black;
         }
 
         .status.completed {
-            background-color: #32CD32;
+            background-color: #28a745;
             color: white;
         }
 
@@ -245,6 +246,37 @@
             height: auto;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Кнопки для слабовидящих */
+        .font-controls {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 999;
+        }
+
+        .font-controls button {
+            background: #FFD700;
+            color: #000;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            transition: 0.2s;
+            min-width: 52px;
+        }
+
+        .font-controls button:hover {
+            background: #e6c200;
+        }
+
+        .font-controls button:active {
+            transform: scale(0.97);
         }
 
         /* FOOTER */
@@ -291,6 +323,11 @@
             .menu-panel.active {
                 top: 0;
             }
+
+            .font-controls {
+                right: 12px;
+                bottom: 12px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -305,6 +342,11 @@
 
             .request-card p {
                 font-size: 12px;
+            }
+
+            .font-controls button {
+                padding: 9px 12px;
+                min-width: 48px;
             }
         }
     </style>
@@ -339,8 +381,8 @@
     <div class="filter-buttons">
         <button class="filter-button active" data-status="all" onclick="filterRequests('all')">Все</button>
         <button class="filter-button" data-status="new" onclick="filterRequests('new')">Новые</button>
-        <button class="filter-button" data-status="in_progress" onclick="filterRequests('in_progress')">В работе</button>
-        <button class="filter-button" data-status="completed" onclick="filterRequests('completed')">Завершенные</button>
+        <button class="filter-button" data-status="in_progress" onclick="filterRequests('in_progress')">В ожидании</button>
+        <button class="filter-button" data-status="completed" onclick="filterRequests('completed')">Выполненные</button>
     </div>
 
     <div class="request-container"></div>
@@ -350,12 +392,51 @@
     </div>
 </main>
 
+<div class="font-controls">
+    <button type="button" onclick="changeFont(-1)">A−</button>
+    <button type="button" onclick="changeFont(1)">A+</button>
+</div>
+
 <footer>
     <p>&copy; 2026 МКУ "Кировсвет". Все права защищены.</p>
 </footer>
 
 <script>
     let currentFilter = 'all';
+    let currentFontSize = 16;
+    const MIN_FONT_SIZE = 12;
+    const MAX_FONT_SIZE = 24;
+
+    function applyFontSize(size) {
+        document.documentElement.style.fontSize = size + 'px';
+        document.body.style.fontSize = size + 'px';
+    }
+
+    function loadFontSize() {
+        const saved = localStorage.getItem('fontSize');
+        if (saved !== null) {
+            const parsed = parseInt(saved, 10);
+            if (!isNaN(parsed)) {
+                currentFontSize = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, parsed));
+            }
+        }
+        applyFontSize(currentFontSize);
+    }
+
+    function changeFont(step) {
+        currentFontSize += step;
+
+        if (currentFontSize < MIN_FONT_SIZE) {
+            currentFontSize = MIN_FONT_SIZE;
+        }
+
+        if (currentFontSize > MAX_FONT_SIZE) {
+            currentFontSize = MAX_FONT_SIZE;
+        }
+
+        applyFontSize(currentFontSize);
+        localStorage.setItem('fontSize', currentFontSize);
+    }
 
     async function loadRequests() {
         try {
@@ -372,11 +453,37 @@
         }
     }
 
+    function normalizeStatus(status) {
+        const s = (status || '').toString().trim().toLowerCase();
+
+        if (['new', 'новая', 'новые', 'новый'].includes(s)) return 'new';
+        if (['in_progress', 'в работе', 'ожидание', 'в ожидании', 'в обработке'].includes(s)) return 'in_progress';
+        if (['completed', 'завершено', 'выполнено', 'выполненный', 'выполнена', 'готово'].includes(s)) return 'completed';
+
+        return s;
+    }
+
+    function getStatusText(status) {
+        const normalized = normalizeStatus(status);
+
+        if (normalized === 'new') return 'Новая';
+        if (normalized === 'in_progress') return 'В ожидании';
+        if (normalized === 'completed') return 'Выполнено';
+
+        return status || 'Новая';
+    }
+
     async function displayRequests() {
         try {
             const requests = await loadRequests();
-            const userRequests = requests.filter(request => request.username === sessionStorage.getItem('username'));
-            const filteredRequests = userRequests.filter(request => currentFilter === 'all' || request.status === currentFilter);
+            const currentUsername = sessionStorage.getItem('username');
+
+            const userRequests = requests.filter(request => request.username === currentUsername);
+
+            const filteredRequests = userRequests.filter(request => {
+                if (currentFilter === 'all') return true;
+                return normalizeStatus(request.status) === currentFilter;
+            });
 
             const container = document.querySelector('.request-container');
             container.innerHTML = '';
@@ -393,11 +500,11 @@
                 const requestCard = document.createElement('div');
                 requestCard.classList.add('request-card');
 
-                let itemsText = request.items && request.items.length > 0
+                const itemsText = request.items && request.items.length > 0
                     ? request.items.map(i => `${i.name} (${i.qty || 1} шт)`).join(', ')
                     : null;
 
-                let problemText = request.problemDescription && request.problemDescription !== '-'
+                const problemText = request.problemDescription && request.problemDescription !== '-'
                     ? `Описание проблемы: 📝 ${request.problemDescription}`
                     : null;
 
@@ -417,12 +524,16 @@
                 const createdAt = new Date(request.createdAt);
                 const expectedCallTime = new Date(request.expectedCallTime);
 
+                const normalizedStatus = normalizeStatus(request.status);
                 let statusClass = 'new';
-                if (request.status === 'in_progress') {
+
+                if (normalizedStatus === 'in_progress') {
                     statusClass = 'in_progress';
-                } else if (request.status === 'completed') {
+                } else if (normalizedStatus === 'completed') {
                     statusClass = 'completed';
                 }
+
+                const statusText = getStatusText(request.status);
 
                 requestCard.innerHTML = `
                     <h3>${typeIcon} ${typeName}</h3>
@@ -435,7 +546,7 @@
                     ${problemText ? `<p><strong>Описание проблемы:</strong> 📝 ${request.problemDescription}</p>` : ''}
                     <p><strong>Дата завершения:</strong> 🕒 ${expectedCallTime.toLocaleString()}</p>
 
-                    <span class="status ${statusClass}">${request.status || 'Новая'}</span>
+                    <span class="status ${statusClass}">${statusText}</span>
 
                     <div class="items-list">
                         ${(request.items || []).map(item => `
@@ -463,10 +574,7 @@
             button.classList.remove('active');
         });
 
-        const activeButton = Array.from(buttons).find(button => {
-            return button.dataset.status === status;
-        });
-
+        const activeButton = Array.from(buttons).find(button => button.dataset.status === status);
         if (activeButton) {
             activeButton.classList.add('active');
         }
@@ -487,6 +595,7 @@
         mainContent.style.marginTop = menuPanel.classList.contains('active') ? '200px' : '40px';
     }
 
+    loadFontSize();
     displayRequests();
 </script>
 
