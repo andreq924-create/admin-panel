@@ -5,22 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет</title>
+
     <style>
-        /* ОСНОВА */
+        :root {
+            --bg: #1e2a38;
+            --card-bg: #1f3145;
+            --panel-bg: #1e2a38;
+            --text: #ffffff;
+            --accent: #FFD700;
+            --muted: #cccccc;
+            --btn-bg: #FFD700;
+            --btn-bg-hover: #e6c200;
+            --status-new: #1E90FF;       /* синий */
+            --status-progress: #FFA500;  /* оранжевый */
+            --status-completed: #28a745;  /* зелёный */
+        }
+
         html, body {
             height: 100%;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #1e2a38;
-            color: #fff;
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             flex-direction: column;
-            font-size: 16px;
         }
 
-        /* HEADER */
         header {
-            background-color: #1e2a38;
+            background-color: var(--panel-bg);
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
@@ -35,7 +47,6 @@
             font-size: 22px;
         }
 
-        /* Кнопка меню */
         .menu-button {
             display: none;
             cursor: pointer;
@@ -72,16 +83,15 @@
         }
 
         nav a:hover {
-            color: #FFD700;
+            color: var(--accent);
         }
 
-        /* Панель меню сверху */
         .menu-panel {
             position: absolute;
             top: -100%;
             left: 0;
             width: 100%;
-            background-color: #1e2a38;
+            background-color: var(--panel-bg);
             height: auto;
             padding: 60px 20px 20px 20px;
             display: flex;
@@ -102,14 +112,13 @@
         }
 
         .menu-panel a:hover {
-            color: #FFD700;
+            color: var(--accent);
         }
 
         .menu-panel.active {
             top: 0;
         }
 
-        /* MAIN */
         main {
             padding: 40px;
             flex: 1;
@@ -118,14 +127,13 @@
 
         main h2 {
             margin-bottom: 20px;
-            color: #FFD700;
+            color: var(--accent);
             font-size: 24px;
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
 
-        /* Фильтры статусов */
         .filter-buttons {
             display: flex;
             justify-content: center;
@@ -134,38 +142,42 @@
             flex-wrap: wrap;
         }
 
-        .filter-button {
-            padding: 10px 20px;
-            border-radius: 30px;
-            background-color: #333;
-            color: #fff;
-            border: 2px solid #333;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+.filter-button {
+    padding: 10px 20px;
+    border-radius: 30px;
+    background-color: #333; /* ТЁМНЫЕ */
+    color: #fff;
+    border: 2px solid #333;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
 
-        .filter-button:hover {
-            background-color: #444;
-        }
 
-        .filter-button.active {
-            background-color: #FFD700;
-            border-color: #FFD700;
-            color: #000;
-        }
+.filter-button:hover {
+    background-color: #444;
+}
 
-        /* Сообщение о пустых заявках */
+/* АКТИВНАЯ кнопка */
+.filter-button.active {
+    background-color: #FFD700; /* ЖЁЛТАЯ */
+    border-color: #FFD700;
+    color: #000;
+}
+
         .no-requests-message {
-            color: #ccc;
+            color: var(--muted);
             text-align: center;
             font-size: 18px;
             margin-top: 30px;
         }
 
-        /* КАРТОЧКИ */
+        .request-container {
+            --request-font-size: 16px;
+        }
+
         .request-card {
-            background-color: #1f3145;
+            background-color: var(--card-bg);
             margin-bottom: 20px;
             padding: 20px;
             border-radius: 10px;
@@ -174,6 +186,7 @@
             flex-direction: column;
             position: relative;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-size: var(--request-font-size);
         }
 
         .request-card:hover {
@@ -183,26 +196,21 @@
 
         .request-card h3 {
             margin: 0 0 15px;
-            color: #FFD700;
-            font-size: 20px;
+            color: var(--accent);
+            font-size: 1.25em;
             text-transform: uppercase;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .request-card h3 img {
-            width: 24px;
-            height: 24px;
-        }
-
         .request-card p {
             margin: 5px 0;
             color: #fff;
-            font-size: 14px;
+            font-size: 0.92em;
+            line-height: 1.4;
         }
 
-        /* Статус заявки */
         .status {
             position: absolute;
             top: 20px;
@@ -211,24 +219,24 @@
             font-weight: bold;
             border-radius: 5px;
             text-transform: uppercase;
+            font-size: 0.85em;
         }
 
         .status.new {
-            background-color: #1E90FF;
-            color: white;
+            background-color: var(--status-new);
+            color: #fff;
         }
 
         .status.in_progress {
-            background-color: #FFA500;
-            color: black;
+            background-color: var(--status-progress);
+            color: #000;
         }
 
         .status.completed {
-            background-color: #28a745;
-            color: white;
+            background-color: var(--status-completed);
+            color: #fff;
         }
 
-        /* Стили для изображения товаров */
         .items-list {
             display: flex;
             flex-wrap: wrap;
@@ -248,7 +256,6 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        /* Кнопки для слабовидящих */
         .font-controls {
             position: fixed;
             right: 20px;
@@ -259,7 +266,7 @@
         }
 
         .font-controls button {
-            background: #FFD700;
+            background: var(--accent);
             color: #000;
             border: none;
             padding: 10px 14px;
@@ -279,7 +286,6 @@
             transform: scale(0.97);
         }
 
-        /* FOOTER */
         footer {
             background: #000;
             text-align: center;
@@ -287,7 +293,6 @@
             font-size: 14px;
         }
 
-        /* Адаптивность для мобильных */
         @media (max-width: 768px) {
             .request-card {
                 padding: 15px;
@@ -341,7 +346,7 @@
             }
 
             .request-card p {
-                font-size: 12px;
+                font-size: 0.9em;
             }
 
             .font-controls button {
@@ -379,10 +384,10 @@
     <h2>Мои заявки</h2>
 
     <div class="filter-buttons">
-        <button class="filter-button active" data-status="all" onclick="filterRequests('all')">Все</button>
-        <button class="filter-button" data-status="new" onclick="filterRequests('new')">Новые</button>
-        <button class="filter-button" data-status="in_progress" onclick="filterRequests('in_progress')">В ожидании</button>
-        <button class="filter-button" data-status="completed" onclick="filterRequests('completed')">Выполненные</button>
+        <button class="filter-button active" data-status="all" onclick="filterRequests('all', this)">Все</button>
+        <button class="filter-button" data-status="new" onclick="filterRequests('new', this)">Новая</button>
+        <button class="filter-button" data-status="in_progress" onclick="filterRequests('in_progress', this)">В процессе</button>
+        <button class="filter-button" data-status="completed" onclick="filterRequests('completed', this)">Завершена</button>
     </div>
 
     <div class="request-container"></div>
@@ -408,12 +413,11 @@
     const MAX_FONT_SIZE = 24;
 
     function applyFontSize(size) {
-        document.documentElement.style.fontSize = size + 'px';
-        document.body.style.fontSize = size + 'px';
+        document.querySelector('.request-container').style.setProperty('--request-font-size', size + 'px');
     }
 
     function loadFontSize() {
-        const saved = localStorage.getItem('fontSize');
+        const saved = localStorage.getItem('requestsFontSize');
         if (saved !== null) {
             const parsed = parseInt(saved, 10);
             if (!isNaN(parsed)) {
@@ -426,16 +430,11 @@
     function changeFont(step) {
         currentFontSize += step;
 
-        if (currentFontSize < MIN_FONT_SIZE) {
-            currentFontSize = MIN_FONT_SIZE;
-        }
-
-        if (currentFontSize > MAX_FONT_SIZE) {
-            currentFontSize = MAX_FONT_SIZE;
-        }
+        if (currentFontSize < MIN_FONT_SIZE) currentFontSize = MIN_FONT_SIZE;
+        if (currentFontSize > MAX_FONT_SIZE) currentFontSize = MAX_FONT_SIZE;
 
         applyFontSize(currentFontSize);
-        localStorage.setItem('fontSize', currentFontSize);
+        localStorage.setItem('requestsFontSize', currentFontSize);
     }
 
     async function loadRequests() {
@@ -457,8 +456,8 @@
         const s = (status || '').toString().trim().toLowerCase();
 
         if (['new', 'новая', 'новые', 'новый'].includes(s)) return 'new';
-        if (['in_progress', 'в работе', 'ожидание', 'в ожидании', 'в обработке'].includes(s)) return 'in_progress';
-        if (['completed', 'завершено', 'выполнено', 'выполненный', 'выполнена', 'готово'].includes(s)) return 'completed';
+        if (['in_progress', 'в процессе', 'в работе', 'ожидание', 'в ожидании', 'в обработке'].includes(s)) return 'in_progress';
+        if (['completed', 'завершено', 'завершена', 'выполнено', 'выполненный', 'выполнена', 'готово'].includes(s)) return 'completed';
 
         return s;
     }
@@ -467,8 +466,8 @@
         const normalized = normalizeStatus(status);
 
         if (normalized === 'new') return 'Новая';
-        if (normalized === 'in_progress') return 'В ожидании';
-        if (normalized === 'completed') return 'Выполнено';
+        if (normalized === 'in_progress') return 'В процессе';
+        if (normalized === 'completed') return 'Завершена';
 
         return status || 'Новая';
     }
@@ -566,17 +565,15 @@
         }
     }
 
-    function filterRequests(status) {
+    function filterRequests(status, clickedButton) {
         currentFilter = status;
 
-        const buttons = document.querySelectorAll('.filter-button');
-        buttons.forEach(button => {
+        document.querySelectorAll('.filter-button').forEach(button => {
             button.classList.remove('active');
         });
 
-        const activeButton = Array.from(buttons).find(button => button.dataset.status === status);
-        if (activeButton) {
-            activeButton.classList.add('active');
+        if (clickedButton) {
+            clickedButton.classList.add('active');
         }
 
         displayRequests();
