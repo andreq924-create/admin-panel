@@ -533,8 +533,9 @@
                 }
 
                 const createdAt = new Date(request.createdAt);
-                const expectedCallTime = new Date(request.expectedCallTime);
-
+const completionDate = request.completionDate
+    ? new Date(request.completionDate).toLocaleDateString('ru-RU')
+    : '—';
                 const normalizedStatus = normalizeStatus(request.status);
                 let statusClass = 'new';
 
@@ -555,7 +556,7 @@
                     <p><strong>Адрес:</strong> 📍 ${request.address}</p>
                     ${itemsText ? `<p><strong>Описание товаров:</strong> 🛍️ ${itemsText}</p>` : ''}
                     ${problemText ? `<p><strong>Описание проблемы:</strong> 📝 ${request.problemDescription}</p>` : ''}
-                    <p><strong>Дата завершения:</strong> 🕒 ${expectedCallTime.toLocaleString()}</p>
+                 <p><strong>Дата завершения:</strong> 🕒 ${completionDate}</p>
 
                     <span class="status ${statusClass}">${statusText}</span>
 
