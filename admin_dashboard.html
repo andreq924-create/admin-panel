@@ -8,195 +8,517 @@
 <meta charset="UTF-8">
 <title>Панель администратора</title>
 <style>
-/* Общие настройки */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f0f2f5;
-    padding: 20px;
-    margin: 0;
-    color: #333;
+:root{
+  --bg-1: #eef4ff;
+  --bg-2: #f8fbff;
+  --bg-3: #edf7ff;
+
+  --card: rgba(255,255,255,0.82);
+  --glass: rgba(255,255,255,0.68);
+
+  --text: #0f172a;
+  --muted: #64748b;
+
+  --primary: #4f9ee3;
+  --primary-soft: #7cc4f3;
+  --primary-deep: #347fc4;
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  --line: rgba(148,163,184,0.20);
+
+  --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+  --shadow-soft: 0 12px 30px rgba(15, 23, 42, 0.06);
+
+  --radius: 20px;
+  --radius-lg: 26px;
 }
 
-.container {
-    max-width: 1100px;
-    margin: auto;
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+*{
+  box-sizing:border-box;
 }
 
-/* Заголовки */
-h2, h3, h4 {
-    margin-bottom: 15px;
-    color: #222;
+html{
+  scroll-behavior:smooth;
 }
 
-/* Кнопки */
-button {
-    padding: 8px 15px;
-    cursor: pointer;
-    margin: 3px 2px;
-    border: none;
-    border-radius: 8px;
-    background-color: #007BFF;
-    color: white;
-    font-weight: 500;
-    transition: 0.2s;
-}
-button:hover {
-    background-color: #0056b3;
-}
-
-/* Таблицы */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-th, td {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-    text-align: left;
-}
-th {
-    background-color: #f7f7f7;
-}
-tr:hover {
-    background-color: #f1faff;
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+  padding:24px;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(79,158,227,0.16), transparent 24%),
+    radial-gradient(circle at 90% 15%, rgba(124,196,243,0.16), transparent 28%),
+    radial-gradient(circle at 20% 90%, rgba(79,158,227,0.10), transparent 24%),
+    linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
 }
 
-/* Inputs & Selects */
-input, select {
-    padding: 8px;
-    margin: 5px 0;
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    transition: 0.2s;
-}
-input:focus, select:focus {
-    outline: none;
-    border-color: #007BFF;
-}
-
-/* Оверлей и попап */
-.overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-    animation: fadeIn 0.3s;
-}
-.popup {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    max-width: 550px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+/* мягкий “дорогой” фон */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(rgba(255,255,255,0.22), rgba(255,255,255,0.22)),
+    radial-gradient(circle at 1px 1px, rgba(15,23,42,0.05) 1px, transparent 0);
+  background-size:auto, 28px 28px;
+  opacity:0.28;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.55), rgba(0,0,0,0.95));
 }
 
-/* Выбранные предметы */
-.selected-items div, #productChildrenList div {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    align-items: center;
-    padding: 8px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    background: #fafafa;
-    transition: 0.2s;
-}
-.selected-items div:hover, #productChildrenList div:hover {
-    background: #f0f8ff;
+/* ================= CONTAINER ================= */
+.container{
+  max-width: 1480px;
+  margin: 0 auto;
 }
 
-/* Превью картинок */
-img.preview {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    margin-right: 10px;
-    border-radius: 6px;
+/* ================= TOP BAR ================= */
+.top-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  flex-wrap:wrap;
+
+  padding:18px 20px;
+  border-radius:var(--radius-lg);
+
+  background:var(--glass);
+  backdrop-filter:blur(18px);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow-soft);
+
+  position:relative;
+  z-index:1;
 }
 
-/* Вкладки */
-.tabs {
-    margin-bottom: 20px;
-}
-.tabs button {
-    background: #f0f2f5;
-    color: #555;
-    border: 1px solid #ddd;
-}
-.tabs button.active {
-    background: #007BFF;
-    color: white;
+.top-bar h2{
+  margin:0;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-0.03em;
 }
 
-/* Анимация */
-@keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
+/* ================= BUTTONS ================= */
+button{
+  border:none;
+  border-radius:14px;
+  padding:12px 16px;
+
+  cursor:pointer;
+  font-size:15px;
+  font-weight:700;
+
+  background:linear-gradient(135deg, var(--primary), var(--primary-soft));
+  color:#fff;
+
+  box-shadow:0 12px 26px rgba(79,158,227,0.25);
+  transition: all .2s ease;
 }
 
-
-.header {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-bottom: 15px;
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 16px 30px rgba(79,158,227,0.30);
 }
 
-.menu-button, .logout-button {
-  padding: 10px 20px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
+button:active{
+  transform:scale(.98);
 }
 
-.menu-button:hover, .logout-button:hover {
-  background-color: #2980b9;
-}
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.header {
-  margin-top: 10px; /* регулируй значение */
-
-  display: flex;
-  gap: 10px;
+/* secondary buttons */
+.menu-button,
+.logout-button{
+  background:rgba(255,255,255,0.92);
+  color:var(--text);
+  border:1px solid var(--line);
+  box-shadow:none;
 }
 
-.top-bar h2 {
-  margin: 0;
-}
-.content {
-  margin-top: 50px;
-  padding: 20px;
+.menu-button:hover,
+.logout-button:hover{
+  background:#fff;
 }
 
-.tabs button.active {
-    background: #007BFF;
-    color: white;
+/* ================= TABS ================= */
+.tabs{
+  display:flex;
+  gap:12px;
+  margin:18px 0;
+  flex-wrap:wrap;
+}
+
+.tabs button{
+  background:rgba(255,255,255,0.88);
+  color:var(--muted);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow-soft);
+  padding:12px 16px;
+}
+
+.tabs button.active{
+  background:#fff;
+  color:var(--text);
+  font-weight:800;
+  border-color:rgba(79,158,227,0.25);
+  box-shadow:0 14px 28px rgba(15,23,42,0.08);
+}
+
+/* ================= INPUTS ================= */
+input, select, textarea{
+  width:100%;
+  padding:13px 14px;
+
+  border-radius:14px;
+  border:1px solid var(--line);
+
+  background:#fff;
+  outline:none;
+
+  font-size:15px;
+  transition:.15s ease;
+  box-shadow:0 4px 16px rgba(15,23,42,0.03);
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(79,158,227,0.14);
+}
+
+/* labels */
+label{
+  display:block;
+  margin:10px 0 6px;
+  font-weight:700;
+  color:#334155;
+  font-size:14px;
+}
+
+/* ================= MAIN AREAS ================= */
+#requestsSection,
+#warehouseSection{
+  margin-top:18px;
+}
+
+#requestsSection h3,
+#warehouseSection h3{
+  font-size:22px;
+  margin:14px 0;
+  letter-spacing:-0.02em;
+}
+
+/* ================= TABLES ================= */
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0 12px;
+  table-layout:fixed;
+}
+
+thead th{
+  background:transparent;
+  color:var(--muted);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  padding:10px 14px;
+  text-align:left;
+}
+
+tbody tr{
+  background:rgba(255,255,255,0.92);
+  border:1px solid var(--line);
+  box-shadow:0 10px 24px rgba(15,23,42,0.06);
+  transition:.2s ease;
+  position:relative;
+}
+
+tbody tr:hover{
+  transform:translateY(-2px);
+  box-shadow:0 16px 36px rgba(15,23,42,0.10);
+}
+
+tbody tr td{
+  background:transparent;
+  padding:16px 14px;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  vertical-align:middle;
+  font-size:15px;
+  line-height:1.35;
+  word-break:break-word;
+}
+
+tbody tr td:first-child{
+  border-left:1px solid var(--line);
+  border-top-left-radius:16px;
+  border-bottom-left-radius:16px;
+  font-weight:700;
+}
+
+tbody tr td:last-child{
+  border-right:1px solid var(--line);
+  border-top-right-radius:16px;
+  border-bottom-right-radius:16px;
+}
+
+/* left accent on hover */
+tbody tr td:first-child{
+  position:relative;
+}
+
+tbody tr td:first-child::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:18%;
+  bottom:18%;
+  width:4px;
+  border-radius:999px;
+  background:linear-gradient(180deg,var(--primary),var(--primary-soft));
+  opacity:0;
+  transition:.2s;
+}
+
+tbody tr:hover td:first-child::before{
+  opacity:1;
+}
+
+/* ================= NESTED / GROUP ROWS ================= */
+tr[data-role="parent"] td{
+  background:#f8fbff !important;
+  font-weight:800;
+  color:#1e293b;
+}
+
+tr[data-role="parent"] td:first-child{
+  font-size:15px;
+}
+
+.child-row td{
+  background:#fbfdff !important;
+  font-size:14px;
+  color:#475569;
+}
+
+.child-row td:first-child{
+  font-weight:600;
+}
+
+/* ================= TABLE BUTTONS ================= */
+table button{
+  padding:8px 12px;
+  font-size:13px;
+  border-radius:10px;
+
+  background:rgba(79,158,227,0.12);
+  color:var(--primary-deep);
+
+  box-shadow:none;
+  border:1px solid rgba(79,158,227,0.14);
+}
+
+table button:hover{
+  background:rgba(79,158,227,0.18);
+  transform:none;
+}
+
+/* ================= STATUS ================= */
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+
+  padding:6px 11px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.status-new{
+  background:rgba(59,130,246,0.12);
+  color:#2563eb;
+}
+
+.status-pending{
+  background:rgba(245,158,11,0.14);
+  color:#d97706;
+}
+
+.status-done{
+  background:rgba(34,197,94,0.14);
+  color:#16a34a;
+}
+
+/* ================= POPUPS ================= */
+.overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,0.40);
+  backdrop-filter:blur(12px);
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  padding:18px;
+}
+
+.popup{
+  width:min(920px, 96vw);
+  max-height:92vh;
+  overflow:auto;
+
+  background:rgba(255,255,255,0.96);
+  backdrop-filter:blur(20px);
+
+  border-radius:24px;
+  padding:24px;
+
+  box-shadow:var(--shadow);
+  border:1px solid rgba(255,255,255,0.7);
+}
+
+.popup h3{
+  margin-top:0;
+  font-size:24px;
+  letter-spacing:-0.02em;
+}
+
+.popup h4{
+  margin:18px 0 10px;
+  font-size:18px;
+}
+
+/* ================= BLOCKS ================= */
+.problem-box,
+.selected-items div,
+#productChildrenList div{
+  background:rgba(248,250,252,0.95);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 8px 20px rgba(15,23,42,0.04);
+}
+
+.selected-items{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* ================= MONTH LIST ================= */
+#monthsList{
+  max-height:320px;
+  overflow-y:auto;
+
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+
+  padding:10px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.72);
+  border:1px solid var(--line);
+}
+
+#monthsList label{
+  margin:0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+
+  padding:10px 12px;
+  border-radius:14px;
+  background:#fff;
+  border:1px solid var(--line);
+}
+
+/* ================= IMAGES ================= */
+img.preview{
+  width:52px;
+  height:52px;
+  border-radius:14px;
+  object-fit:cover;
+  border:1px solid var(--line);
+  box-shadow:0 8px 18px rgba(15,23,42,0.08);
+}
+
+/* ================= SCROLLBAR ================= */
+::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+::-webkit-scrollbar-track{
+  background:rgba(255,255,255,0.35);
+}
+::-webkit-scrollbar-thumb{
+  background:rgba(100,116,139,0.28);
+  border-radius:999px;
+}
+::-webkit-scrollbar-thumb:hover{
+  background:rgba(79,158,227,0.40);
+}
+
+/* ================= HELPER CLASSES ================= */
+.container, .top-bar, .tabs, table, .popup{
+  position:relative;
+  z-index:1;
+}
+
+/* ================= MOBILE ================= */
+@media(max-width:900px){
+  body{
+    padding:14px;
+  }
+
+  .top-bar{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .tabs{
+    flex-direction:column;
+  }
+
+  button{
+    width:100%;
+  }
+
+  table{
+    display:block;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+
+  .popup{
+    width:min(100%, 96vw);
+    padding:18px;
+  }
+}
+
+@media(max-width:600px){
+  .top-bar h2{
+    font-size:24px;
+  }
+
+  tbody tr td{
+    padding:14px 12px;
+    font-size:14px;
+  }
+
+  input, select, textarea, button{
+    font-size:14px;
+  }
 }
 </style>
 </head>
@@ -207,6 +529,24 @@ img.preview {
   <div class="header">
     <button class="menu-button" onclick="goToMainMenu()">Главное меню</button>
     <button class="logout-button" onclick="logout()">Выйти</button>
+  </div>
+</div>
+
+
+<div id="reportPopup" class="overlay">
+  <div class="popup">
+    <h3>Выбор месяцев для отчета</h3>
+
+    <div style="margin-bottom:10px;">
+      <button onclick="selectAllMonths(true)">Выбрать все</button>
+      <button onclick="selectAllMonths(false)">Снять все</button>
+    </div>
+
+    <div id="monthsList"></div>
+
+    <br>
+    <button onclick="downloadSelectedReport()">📥 Скачать</button>
+    <button onclick="closeReportPopup()">Отмена</button>
   </div>
 </div>
  
@@ -246,6 +586,15 @@ img.preview {
   </div>
 </div>
 <!-- ================= ЗАЯВКИ ================= -->
+
+<input 
+    type="text" 
+    id="requestSearch" 
+    placeholder="Поиск по ФИО или телефону..." 
+    oninput="filterRequests()"
+    style="width:100%; margin:10px 0; padding:10px; border-radius:10px;"
+>
+
 <div id="requestsSection">
   <div class="tabs">
 <button id="newRequestsBtn" class="active" onclick="showTable('new', this)">Новые (<span id="newRequestsCount">0</span>)</button>
@@ -253,20 +602,41 @@ img.preview {
 <button id="completedRequestsBtn" onclick="showTable('completed', this)">Выполненные (<span id="completedRequestsCount">0</span>)</button>
   </div>
   <button onclick="downloadAllRequests()">💾 Скачать все заявки</button>
-<button onclick="downloadStyledReportExcel()">Скачать отчет Excel</button>
+  <button onclick="openReportPopup()">Скачать отчет Excel</button>
 
   <table id="newRequestsTable" class="requestsTable">
-  <thead><tr><th>ФИО</th><th>Телефон</th><th>Тип работы</th><th>Выбранные предметы</th><th>Действия</th></tr></thead>
+  <thead><tr><th>ФИО</th><th>Телефон</th><th>
+    Тип работы<br>
+    <select onchange="filterByType(this.value)" style="width:100%; margin-top:5px;">
+        <option value="">Все</option>
+        <option value="Установка столбов и освещения">Установка столбов и освещения</option>
+        <option value="Ремонт повреждения электрических сетей">Ремонт повреждения электрических сетей</option>
+    </select>
+</th><th>Выбранные предметы</th><th>Действия</th></tr></thead>
   <tbody></tbody>
   </table>
 
   <table id="pendingRequestsTable" class="requestsTable">
-  <thead><tr><th>ФИО</th><th>Телефон</th><th>Тип работы</th><th>Выбранные предметы</th><th>Дата звонка</th><th>Дата завершения</th><th>Действия</th></tr></thead>
+  <thead><tr><th>ФИО</th><th>Телефон</th><th>
+    Тип работы<br>
+    <select onchange="filterByType(this.value)" style="width:100%; margin-top:5px;">
+        <option value="">Все</option>
+        <option value="Установка столбов и освещения">Установка столбов и освещения</option>
+        <option value="Ремонт повреждения электрических сетей">Ремонт повреждения электрических сетей</option>
+    </select>
+</th><th>Выбранные предметы</th><th>Дата звонка</th><th>Дата завершения</th><th>Действия</th></tr></thead>
   <tbody></tbody>
   </table>
 
   <table id="completedRequestsTable" class="requestsTable">
-  <thead><tr><th>ФИО</th><th>Телефон</th><th>Тип работы</th><th>Выбранные предметы</th><th>Дата завершения</th></tr></thead>
+  <thead><tr>
+<th>ФИО</th>
+<th>Телефон</th>
+<th>Тип работы</th>
+<th>Выбранные предметы</th>
+<th>Дата завершения</th>
+<th>Действия</th>
+</tr></thead>
   <tbody></tbody>
   </table>
 </div>
@@ -289,9 +659,13 @@ img.preview {
 <div id="overlay" class="overlay">
   <div class="popup">
     <h3>Редактировать заявку</h3>
+<h4>Выбранные предметы:</h4>
+<div class="selected-items" id="selectedItems"></div>
 
-    <h4>Выбранные предметы:</h4>
-    <div class="selected-items" id="selectedItems"></div>
+<div class="problem-box">
+    <label for="editProblemDescription">Описание проблемы</label>
+    <textarea id="editProblemDescription" placeholder="Опишите проблему или дополнительные детали..."></textarea>
+</div>
 
     <label>Фамилия</label><input type="text" id="editLastname">
     <label>Имя</label><input type="text" id="editFirstname">
@@ -304,8 +678,8 @@ img.preview {
 
     <h4>Добавить товар со склада:</h4>
     <div style="display:flex; gap:10px;">
-      <button onclick="openWarehousePopup(true)">Выбрать товар</button>
-      <button onclick="window.open('light.html?forAdmin=1','_blank')">Вторая кнопка</button>
+      <button onclick="openWarehousePopup(true)">Опоры</button>
+      <button onclick="window.open('light.html?forAdmin=1','_blank')">Освещение</button>
     </div>
     <br><br>
     
@@ -392,6 +766,7 @@ function showMainTab(tab) {
         document.getElementById('warehouseSection').style.display = 'block';
         document.getElementById('warehouseTab').classList.add('active');
     }
+	updateSearchPlaceholder(tab);
 }
 // При загрузке страницы делаем активной вкладку "Заявки"
 window.addEventListener('DOMContentLoaded', function() {
@@ -399,16 +774,23 @@ window.addEventListener('DOMContentLoaded', function() {
     showTable('new', document.getElementById('newRequestsBtn')); // активная под-вкладка "Новые"
 });
 function showTable(name, btn) {
-    // Скрываем все таблицы
+    // 🔥 СБРОС ПОИСКА
+ 
+    // 🔥 СБРОС ФИЛЬТРА ТИПА
+    document.querySelectorAll('select').forEach(s => {
+        if (s.onchange) s.value = '';
+    });
+
+    // скрываем таблицы
     document.querySelectorAll('.requestsTable').forEach(t => t.style.display = 'none');
 
-    // Показываем выбранную таблицу
+    // показываем нужную
     document.getElementById(name + 'RequestsTable').style.display = 'table';
 
-    // Снимаем класс active со всех кнопок вкладок заявок
-    document.querySelectorAll('#requestsSection .tabs button').forEach(b => b.classList.remove('active'));
+    // активные кнопки
+    document.querySelectorAll('#requestsSection .tabs button')
+        .forEach(b => b.classList.remove('active'));
 
-    // Делаем текущую кнопку синей
     if (btn) btn.classList.add('active');
 }
 // При загрузке страницы кнопка 'Новые' уже активна
@@ -444,59 +826,367 @@ function loadRequests() {
     // Отображаем заявки в таблицах
     renderRequests(newR, 'newRequestsTable');
     renderRequests(pendingR, 'pendingRequestsTable');
-    renderRequests(completedR, 'completedRequestsTable');
+  renderCompletedByMonth(completedR, 'completedRequestsTable');
     showTable('new');
 }
+
 // Словарь отображаемых названий типов работ
 const workTypeNames = {
     both: "Установка столбов и освещения",
     repair: "Ремонт повреждения электрических сетей"
 };
+function returnToPending(createdAt) {
+    if (!confirm('Вернуть заявку в "В ожидании"? Товары вернутся на склад.')) return;
 
- 
-// Функция рендеринга заявок
-function renderRequests(requests, tableId) {
-  const tbody = document.getElementById(tableId).querySelector('tbody');
-  tbody.innerHTML = '';
+    let requests = JSON.parse(localStorage.getItem('requests')) || [];
+    let warehouse = JSON.parse(localStorage.getItem('warehouse')) || [];
 
-  requests.forEach(r => {
-    const itemsStr = r.items && r.items.length > 0
-      ? r.items.map(i => {
-        const info = i.info ? ` — ${i.info}` : ''; // Если есть описание
-        return `${i.name} (x${i.qty})${info}`;
-      }).join(', ')
-      : '-';
+    const req = requests.find(r => r.createdAt === createdAt);
+    if (!req) return alert('Заявка не найдена');
 
-    const row = document.createElement('tr');
+    // 🔥 Возвращаем товары обратно на склад
+    if (req.items && req.items.length > 0) {
+        req.items.forEach(item => {
+            let parent = warehouse.find(w => w.children?.some(c => c.name === item.name));
+            if (!parent) return;
 
-    // Если это таблица "Ожидающие", показываем "Дата звонка" и "Дата завершения"
-    if (tableId === 'pendingRequestsTable') {
-      row.innerHTML = `
-        <td>${r.lastname} ${r.firstname}</td>
-        <td>${r.phone}</td>
-        <td>${workTypeNames[r.type] || r.type}</td>
-        <td>${itemsStr}</td>
-        <td>${r.callDate || ''}</td> <!-- Дата звонка -->
-        <td>${r.completionDate || ''}</td> <!-- Дата завершения -->
-        <td style="text-align: center;">
-          <button onclick="editRequest('${r.createdAt}')">Обработать</button> <!-- Кнопка обработать в колонке Действия -->
-        </td>
-      `;
-    } else {
-      // Если это таблица "Новые заявки"
-      row.innerHTML = `
-        <td>${r.lastname} ${r.firstname}</td>
-        <td>${r.phone}</td>
-        <td>${workTypeNames[r.type] || r.type}</td>
-        <td>${itemsStr}</td>
-        <td style="text-align: center;">
-          <button onclick="editRequest('${r.createdAt}')">Обработать</button>
-        </td>
-      `;
+            let child = parent.children.find(c => c.name === item.name);
+            if (!child) return;
+
+            child.qty += item.qty || 0;
+        });
     }
 
-    tbody.appendChild(row);
-  });
+    // меняем статус
+    req.status = 'В процессе';
+
+    // убираем дату завершения
+    req.completionDate = '';
+
+    // сохраняем
+    localStorage.setItem('warehouse', JSON.stringify(warehouse));
+    localStorage.setItem('requests', JSON.stringify(requests));
+
+    saveAllRequests();
+    loadWarehouse();
+    loadRequests();
+}
+
+
+function openReportPopup() {
+    const requests = JSON.parse(localStorage.getItem('requests')) || [];
+    const completed = requests.filter(r => r.status === 'Завершена');
+
+    const months = {};
+
+    completed.forEach(r => {
+        if (r.completionDate) {
+            const key = r.completionDate.slice(0, 7); // YYYY-MM
+            months[key] = true;
+        }
+    });
+
+    const container = document.getElementById('monthsList');
+    container.innerHTML = '';
+
+    Object.keys(months).sort().reverse().forEach(month => {
+        const [year, m] = month.split('-');
+        const label = `01.${m}.${year}`;
+
+        const div = document.createElement('div');
+
+        div.innerHTML = `
+            <label style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                width:100%;
+                padding:6px 8px;
+                box-sizing:border-box;
+            ">
+                <span>${label}</span>
+                <input type="checkbox" value="${month}" checked>
+            </label>
+        `;
+
+        container.appendChild(div);
+    });
+
+    document.getElementById('reportPopup').style.display = 'flex';
+}
+
+function selectAllMonths(state) {
+    document.querySelectorAll('#monthsList input').forEach(cb => {
+        cb.checked = state;
+    });
+}
+
+function closeReportPopup() {
+    document.getElementById('reportPopup').style.display = 'none';
+}
+
+async function downloadSelectedReport() {
+    const selected = Array.from(document.querySelectorAll('#monthsList input:checked'))
+        .map(cb => cb.value);
+
+    if (selected.length === 0) {
+        alert('Выберите хотя бы один месяц');
+        return;
+    }
+
+    const requests = JSON.parse(localStorage.getItem('requests')) || [];
+
+    const filtered = requests.filter(r => {
+        if (r.status !== 'Завершена' || !r.completionDate) return false;
+        const key = r.completionDate.slice(0, 7);
+        return selected.includes(key);
+    });
+
+    if (filtered.length === 0) {
+        alert('Нет данных за выбранные месяцы');
+        return;
+    }
+
+    // 🔥 используем твою старую функцию, но передаём данные
+    generateExcelFromRequests(filtered);
+
+    closeReportPopup();
+}
+function renderCompletedByMonth(requests, tableId) {
+    const tbody = document.getElementById(tableId).querySelector('tbody');
+    tbody.innerHTML = '';
+
+    const groups = {};
+
+    requests.forEach(r => {
+        const key = r.completionDate ? r.completionDate.slice(0, 7) : 'no-date';
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(r);
+    });
+
+    const sortedMonths = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+
+    sortedMonths.forEach(monthKey => {
+        const group = groups[monthKey];
+
+        group.sort((a, b) => (b.completionDate || '').localeCompare(a.completionDate || ''));
+
+        let monthLabel = 'Без даты';
+        if (monthKey !== 'no-date') {
+            const [year, month] = monthKey.split('-');
+            monthLabel = `01.${month}.${year}`;
+        }
+
+        const parentRow = document.createElement('tr');
+        parentRow.style.background = '#eee';
+		parentRow.dataset.role = "parent";
+        parentRow.innerHTML = `
+            <td colspan="5" style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="cursor:pointer;" class="month-toggle">
+                    ▶ ${monthLabel} (${group.length})
+                </span>
+                <button onclick="deleteMonth('${monthKey}')">🗑</button>
+            </td>
+        `;
+
+        tbody.appendChild(parentRow);
+
+        const childRows = [];
+        let opened = false;
+
+        group.forEach(r => {
+
+            // ===== ОПИСАНИЕ + ТОВАРЫ =====
+            let parts = [];
+
+            if (r.problemDescription && r.problemDescription.trim() !== '') {
+                parts.push(`📝 ${r.problemDescription.trim()}`);
+            }
+
+            if (r.items && r.items.length > 0) {
+                const itemsText = r.items.map(i => {
+                    const info = i.info ? ` — ${i.info}` : '';
+                    return `${i.name} (x${i.qty})${info}`;
+                }).join('\n');
+
+                parts.push(itemsText);
+            }
+
+            const itemsStr = parts.length > 0 ? parts.join('\n\n') : '-';
+
+            const row = document.createElement('tr');
+            row.style.display = 'none';
+
+            row.innerHTML = `
+                <td>${r.lastname} ${r.firstname}</td>
+                <td>${r.phone}</td>
+                <td>${workTypeNames[r.type] || r.type}</td>
+                <td style="white-space:pre-line;">${itemsStr}</td>
+                <td>${r.completionDate || ''}</td>
+                <td>
+                    <button onclick="returnToPending('${r.createdAt}')">↩ В ожидание</button>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+            childRows.push(row);
+        });
+
+        parentRow.querySelector('.month-toggle').onclick = () => {
+ opened = !opened;
+parentRow.dataset.open = opened ? "1" : "0";
+
+parentRow.querySelector('.month-toggle').innerHTML =
+    `${opened ? '▼' : '▶'} ${monthLabel} (${group.length})`;
+
+childRows.forEach(row => {
+    row.style.display = opened ? "table-row" : "none";
+});
+        };
+    });
+}
+
+function deleteMonth(monthKey) {
+    if (!confirm('Удалить ВСЕ заявки этого месяца?')) return;
+
+    let requests = JSON.parse(localStorage.getItem('requests')) || [];
+
+    // удаляем все заявки этого месяца
+    requests = requests.filter(r => {
+        const key = r.completionDate ? r.completionDate.slice(0, 7) : 'no-date';
+        return key !== monthKey;
+    });
+
+    localStorage.setItem('requests', JSON.stringify(requests));
+
+    // сохранить на сервер
+    saveAllRequests();
+
+    // перерисовать
+    loadRequests();
+}
+function filterByType(value) {
+    const tables = [
+        'newRequestsTable',
+        'pendingRequestsTable',
+        'completedRequestsTable'
+    ];
+
+    tables.forEach(tableId => {
+        const table = document.getElementById(tableId);
+        const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+        let currentParent = null;
+        let parentHasMatch = false;
+
+        rows.forEach(row => {
+
+            const isParent = row.dataset.role === "parent";
+
+            // ===== ПАРЕНТ =====
+            if (isParent) {
+
+                // показываем родителя всегда
+                row.style.display = '';
+
+                currentParent = row;
+                parentHasMatch = false;
+                return;
+            }
+
+            // ===== ДЕТИ =====
+            const typeCell = row.children[2];
+            const typeText = typeCell ? typeCell.innerText.trim() : '';
+
+            const match = !value || typeText === value;
+
+            row.style.display = match ? '' : 'none';
+
+            if (match) parentHasMatch = true;
+        });
+
+        // (опционально) можно скрывать пустые группы
+        if (currentParent && !parentHasMatch) {
+            // ничего не делаем — родитель остаётся видимым
+        }
+    });
+}
+
+function resetFiltersAndRestoreView() {
+    document.getElementById('requestSearch').value = '';
+
+    const tables = [
+        'newRequestsTable',
+        'pendingRequestsTable',
+        'completedRequestsTable'
+    ];
+
+    tables.forEach(tableId => {
+        const table = document.getElementById(tableId);
+        if (!table) return;
+
+        const rows = table.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            row.style.display = ''; // 🔥 вернуть ВСЕ строки
+        });
+    });
+}
+// Функция рендеринга заявок
+function renderRequests(requests, tableId) {
+    const tbody = document.getElementById(tableId).querySelector('tbody');
+    tbody.innerHTML = '';
+
+    requests.forEach(r => {
+
+        // ===== ОПИСАНИЕ + ТОВАРЫ =====
+        let parts = [];
+
+        // описание проблемы
+        if (r.problemDescription && r.problemDescription.trim() !== '') {
+            parts.push(`📝 ${r.problemDescription.trim()}`);
+        }
+
+        // товары
+        if (r.items && r.items.length > 0) {
+            const itemsText = r.items.map(i => {
+                const info = i.info ? ` — ${i.info}` : '';
+                return `${i.name} (x${i.qty})${info}`;
+            }).join('\n');
+
+            parts.push(itemsText);
+        }
+
+        const itemsStr = parts.length > 0 ? parts.join('\n\n') : '-';
+
+        const row = document.createElement('tr');
+
+        if (tableId === 'pendingRequestsTable') {
+            row.innerHTML = `
+                <td>${r.lastname} ${r.firstname}</td>
+                <td>${r.phone}</td>
+                <td>${workTypeNames[r.type] || r.type}</td>
+                <td style="white-space:pre-line;">${itemsStr}</td>
+                <td>${r.callDate || ''}</td>
+                <td>${r.completionDate || ''}</td>
+                <td style="text-align: center;">
+                    <button onclick="editRequest('${r.createdAt}')">Обработать</button>
+                </td>
+            `;
+        } else {
+            row.innerHTML = `
+                <td>${r.lastname} ${r.firstname}</td>
+                <td>${r.phone}</td>
+                <td>${workTypeNames[r.type] || r.type}</td>
+                <td style="white-space:pre-line;">${itemsStr}</td>
+                <td style="text-align: center;">
+                    <button onclick="editRequest('${r.createdAt}')">Обработать</button>
+                </td>
+            `;
+        }
+
+        tbody.appendChild(row);
+    });
 }
 // ==== Редактирование заявки ====
 function editRequest(createdAt){
@@ -506,39 +1196,52 @@ function editRequest(createdAt){
 
     currentRequestCopy = JSON.parse(JSON.stringify(req));
 
-    // ======== Вставка сюда ========
-let updatedRequest = JSON.parse(localStorage.getItem("currentAdminRequest"));
-if (updatedRequest && updatedRequest.items) {
-    if (!currentRequestCopy.items) currentRequestCopy.items = [];
-    updatedRequest.items.forEach(newItem => {
-        let existing = currentRequestCopy.items.find(i => i.name === newItem.name);
-        if (existing) {
-            existing.qty += newItem.qty;
-        } else {
-            currentRequestCopy.items.push(newItem);
-        }
-    });
-    renderSelectedItems();
-    localStorage.removeItem("currentAdminRequest");
-}
-    // ======== конец вставки ========
+    // ===== восстановление товаров из временного хранилища =====
+    let updatedRequest = JSON.parse(localStorage.getItem("currentAdminRequest"));
+    if (updatedRequest && updatedRequest.items) {
+        if (!currentRequestCopy.items) currentRequestCopy.items = [];
 
-    // Заполняем поля попапа
-    document.getElementById('editLastname').value = currentRequestCopy.lastname;
-    document.getElementById('editFirstname').value = currentRequestCopy.firstname;
-    document.getElementById('editPhone').value = currentRequestCopy.phone;
-    document.getElementById('editEmail').value = currentRequestCopy.email;
-    document.getElementById('editAddress').value = currentRequestCopy.address;
-    document.getElementById('editWorkType').value = currentRequestCopy.type;
+        updatedRequest.items.forEach(newItem => {
+            let existing = currentRequestCopy.items.find(i => i.name === newItem.name);
+            if (existing) {
+                existing.qty += newItem.qty;
+            } else {
+                currentRequestCopy.items.push(newItem);
+            }
+        });
+
+        localStorage.removeItem("currentAdminRequest");
+    }
+
+    // ===== заполнение полей =====
+    document.getElementById('editLastname').value = currentRequestCopy.lastname || '';
+    document.getElementById('editFirstname').value = currentRequestCopy.firstname || '';
+    document.getElementById('editPhone').value = currentRequestCopy.phone || '';
+    document.getElementById('editEmail').value = currentRequestCopy.email || '';
+    document.getElementById('editAddress').value = currentRequestCopy.address || '';
+    document.getElementById('editWorkType').value = currentRequestCopy.type || '';
     document.getElementById('editCallDate').value = currentRequestCopy.callDate || '';
     document.getElementById('editCompletionDate').value = currentRequestCopy.completionDate || '';
 
-    renderSelectedItems();
-    const statusBtn = document.getElementById('statusActionBtn');
-    if(currentRequestCopy.status == 'Новая'){ statusBtn.textContent='Отправить в ожидание'; statusBtn.onclick=sendToPending; }
-    else if(currentRequestCopy.status == 'В процессе'){ statusBtn.textContent='Выполнено'; statusBtn.onclick=sendToCompleted; }
+    // ⭐ новое поле: описание проблемы
+    document.getElementById('editProblemDescription').value =
+        currentRequestCopy.problemDescription || '';
 
-    document.getElementById('overlay').style.display='flex';
+    renderSelectedItems();
+
+    // кнопка статуса
+    const statusBtn = document.getElementById('statusActionBtn');
+
+if(currentRequestCopy.status === 'Новая'){
+    statusBtn.textContent = 'Отправить в ожидание';
+    statusBtn.onclick = sendToPending;
+}
+    else if(currentRequestCopy.status === 'В процессе'){
+        statusBtn.textContent = 'Выполнено';
+        statusBtn.onclick = sendToCompleted;
+    }
+
+    document.getElementById('overlay').style.display = 'flex';
 }
 
 // ==== Выбранные предметы в заявке с раскрытием детей ====
@@ -547,53 +1250,95 @@ function renderSelectedItems() {
     const div = document.getElementById('selectedItems');
     div.innerHTML = '';
 
+    // ===== общий контейнер =====
+    const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    wrapper.style.gap = '10px';
+
+    // ===== описание проблемы =====
+    const problemDiv = document.createElement('div');
+    problemDiv.style.padding = '10px';
+    problemDiv.style.border = '1px solid #ddd';
+    problemDiv.style.borderRadius = '10px';
+    problemDiv.style.background = '#f5f5f5';
+
+    const problemText = currentRequestCopy.problemDescription?.trim();
+
+    problemDiv.innerHTML = `
+        <strong>Описание проблемы:</strong><br>
+        ${problemText ? problemText : '<span style="color:#888;">Не указано</span>'}
+    `;
+
+    wrapper.appendChild(problemDiv);
+
+    // ===== если нет товаров =====
     if (!currentRequestCopy.items || currentRequestCopy.items.length === 0) {
-        // Если items пусто, показываем описание проблемы (если оно есть)
-        div.innerHTML = currentRequestCopy.problemDescription || 'Нет выбранных предметов';
-    } else {
-        currentRequestCopy.items.forEach((item, index) => {
-            const itemDiv = document.createElement('div');
-            itemDiv.style.flexDirection = 'column';
+        const emptyDiv = document.createElement('div');
+        emptyDiv.style.padding = '10px';
+        emptyDiv.style.color = '#777';
+        emptyDiv.textContent = 'Нет выбранных предметов';
 
-            // Формируем строку с предметом и его количеством
-            const mainRow = document.createElement('div');
-            mainRow.style.display = 'flex';
-            mainRow.style.justifyContent = 'space-between';
-            mainRow.style.alignItems = 'center';
-
-            // Если есть описание проблемы (problemDescription), добавляем его
-            const problemDescription = currentRequestCopy.problemDescription 
-                ? `<span>${currentRequestCopy.problemDescription}</span>` 
-                : ''; // Если описания проблемы нет, ничего не добавляем
-
-            mainRow.innerHTML = `<span>${item.name} (x${item.qty})${problemDescription}</span>
-                <div>
-                    <button onclick="changeQty(${index}, 1)">+</button>
-                    <button onclick="changeQty(${index}, -1)">-</button>
-                    <button onclick="removeSelected(${index})">Удалить</button>
-                </div>`;
-            itemDiv.appendChild(mainRow);
-
-            // Дочерние объекты (если есть)
-            const childrenDiv = document.createElement('div');
-            childrenDiv.style.display = 'none';
-            childrenDiv.style.paddingLeft = '15px';
-
-            if (item.children && item.children.length > 0) {
-                item.children.forEach(c => {
-                    const childEl = document.createElement('div');
-                    childEl.style.whiteSpace = "pre-wrap"; // сохраняем переносы строк
-                    childrenDiv.appendChild(childEl);
-                });
-                mainRow.onclick = () => {
-                    childrenDiv.style.display = childrenDiv.style.display === 'none' ? 'block' : 'none';
-                };
-            }
-
-            itemDiv.appendChild(childrenDiv);
-            div.appendChild(itemDiv);
-        });
+        wrapper.appendChild(emptyDiv);
+        div.appendChild(wrapper);
+        return;
     }
+
+    // ===== товары =====
+    currentRequestCopy.items.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.style.display = 'flex';
+        itemDiv.style.flexDirection = 'column';
+        itemDiv.style.marginBottom = '8px';
+        itemDiv.style.border = '1px solid #e5e5e5';
+        itemDiv.style.borderRadius = '8px';
+        itemDiv.style.padding = '8px';
+        itemDiv.style.background = '#fff';
+
+        const mainRow = document.createElement('div');
+        mainRow.style.display = 'flex';
+        mainRow.style.justifyContent = 'space-between';
+        mainRow.style.alignItems = 'center';
+
+        mainRow.innerHTML = `
+            <span>${item.name} (x${item.qty})</span>
+            <div>
+                <button onclick="changeQty(${index}, 1)">+</button>
+                <button onclick="changeQty(${index}, -1)">-</button>
+                <button onclick="removeSelected(${index})">Удалить</button>
+            </div>
+        `;
+
+        itemDiv.appendChild(mainRow);
+
+        // ===== дочерние =====
+        const childrenDiv = document.createElement('div');
+        childrenDiv.style.display = 'none';
+        childrenDiv.style.paddingLeft = '15px';
+        childrenDiv.style.marginTop = '5px';
+
+        if (item.children && item.children.length > 0) {
+            item.children.forEach((c) => {
+                const childEl = document.createElement('div');
+                childEl.style.whiteSpace = "pre-wrap";
+                childEl.style.fontSize = "13px";
+                childEl.style.color = "#555";
+                childEl.textContent = c.name + (c.qty ? ` (x${c.qty})` : '');
+                childrenDiv.appendChild(childEl);
+            });
+
+            mainRow.style.cursor = 'pointer';
+            mainRow.onclick = () => {
+                childrenDiv.style.display =
+                    childrenDiv.style.display === 'none' ? 'block' : 'none';
+            };
+        }
+
+        itemDiv.appendChild(childrenDiv);
+        wrapper.appendChild(itemDiv);
+    });
+
+    div.appendChild(wrapper);
 }
 
 function changeQty(index,delta){ 
@@ -610,28 +1355,126 @@ function removeSelected(index){
   renderSelectedItems(); 
 }
 function saveRequestChanges(){
-  currentRequestCopy.lastname=document.getElementById('editLastname').value.trim();
-  currentRequestCopy.firstname=document.getElementById('editFirstname').value.trim();
-  currentRequestCopy.phone=document.getElementById('editPhone').value.trim();
-  currentRequestCopy.email=document.getElementById('editEmail').value.trim();
-  currentRequestCopy.address=document.getElementById('editAddress').value.trim();
-  currentRequestCopy.type=document.getElementById('editWorkType').value.trim();
-  currentRequestCopy.callDate=document.getElementById('editCallDate').value;
-  currentRequestCopy.completionDate=document.getElementById('editCompletionDate').value;
 
-  let requests=JSON.parse(localStorage.getItem('requests'))||[];
-  requests=requests.map(r=>r.createdAt===currentRequestCopy.createdAt?currentRequestCopy:r);
-  localStorage.setItem('requests',JSON.stringify(requests));
-  saveAllRequests();
+    // ===== сохраняем данные формы =====
+    currentRequestCopy.lastname = document.getElementById('editLastname').value.trim();
+    currentRequestCopy.firstname = document.getElementById('editFirstname').value.trim();
+    currentRequestCopy.phone = document.getElementById('editPhone').value.trim();
+    currentRequestCopy.email = document.getElementById('editEmail').value.trim();
+    currentRequestCopy.address = document.getElementById('editAddress').value.trim();
+    currentRequestCopy.type = document.getElementById('editWorkType').value.trim();
+    currentRequestCopy.callDate = document.getElementById('editCallDate').value;
+    currentRequestCopy.completionDate = document.getElementById('editCompletionDate').value;
 
-  closePopup();
-  loadRequests();
+    // ⭐ новое поле: описание проблемы
+    currentRequestCopy.problemDescription =
+        document.getElementById('editProblemDescription').value.trim();
+
+    // ===== обновление массива заявок =====
+    let requests = JSON.parse(localStorage.getItem('requests')) || [];
+
+    requests = requests.map(r =>
+        r.createdAt === currentRequestCopy.createdAt ? currentRequestCopy : r
+    );
+
+    localStorage.setItem('requests', JSON.stringify(requests));
+
+    // ===== синхронизация с сервером =====
+    saveAllRequests();
+
+    // ===== закрытие и обновление UI =====
+    closePopup();
+    loadRequests();
 }
 
 function goToMainMenu() {
   window.location.href = 'index.html';
 }
+function filterRequests() {
+    const value = document.getElementById('requestSearch').value.toLowerCase().trim();
 
+    // ===== ЕСЛИ ПУСТО — ВСЁ ВОЗВРАЩАЕМ =====
+    if (!value) {
+        loadRequests();
+        loadWarehouse();
+        return;
+    }
+
+    // =========================
+    // 🔎 1. ФИЛЬТР ЗАЯВОК
+    // =========================
+    const tables = [
+        'newRequestsTable',
+        'pendingRequestsTable',
+        'completedRequestsTable'
+    ];
+
+    tables.forEach(tableId => {
+        const table = document.getElementById(tableId);
+        const rows = table.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            if (row.dataset.role === "parent") return;
+
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(value) ? '' : 'none';
+        });
+    });
+
+    // =========================
+    // 🏗️ 2. ФИЛЬТР СКЛАДА
+    // =========================
+const warehouseRows = document.querySelectorAll("#warehouseTable tbody tr");
+
+let currentParent = null;
+let parentHasMatch = false;
+
+warehouseRows.forEach(row => {
+
+    const isParent = row.innerText.includes("▶ ");
+    const isChild = row.innerText.includes("↳ ");
+
+    // ======================
+    // 🟦 РОДИТЕЛЬ (товар)
+    // ======================
+    if (isParent) {
+        currentParent = row;
+        parentHasMatch = false;
+
+        const name = row.innerText.toLowerCase();
+
+        if (!value || name.includes(value)) {
+            row.style.display = '';
+            parentHasMatch = true;
+        } else {
+            row.style.display = 'none';
+        }
+
+        return;
+    }
+
+    // ======================
+    // 🟨 ДОЧЕРНИЙ ОБЪЕКТ
+    // ======================
+    if (isChild) {
+        const text = row.innerText.toLowerCase();
+
+        const match = value && text.includes(value);
+
+        if (currentParent && (parentHasMatch || match)) {
+            currentParent.style.display = '';
+            row.style.display = match || !value ? '' : 'none';
+        } else {
+            row.style.display = 'none';
+        }
+
+        if (match) {
+            parentHasMatch = true;
+            if (currentParent) currentParent.style.display = '';
+        }
+    }
+});
+}
 function logout() {
   sessionStorage.removeItem('username');
         alert('Вы вышли из системы.');
@@ -640,12 +1483,18 @@ function logout() {
 function sendToPending() {
     if (!currentRequestCopy || !currentRequestCopy.items) return;
 
+    // Проверка даты
+    const callDate = document.getElementById('editCallDate').value;
+    if (!callDate) {
+        alert('Сначала укажите дату звонка, только потом можно отправить заявку в ожидание.');
+        document.getElementById('editCallDate').focus();
+        return;
+    }
+
     let warehouse = JSON.parse(localStorage.getItem('warehouse')) || [];
     let missingItems = [];
 
-    // Проверяем наличие каждого предмета
     currentRequestCopy.items.forEach(requestItem => {
-        // Находим родителя с таким дочерним элементом
         let parent = warehouse.find(w => w.children?.some(c => c.name === requestItem.name));
         if (!parent) {
             missingItems.push(`${requestItem.name} (родитель не найден)`);
@@ -663,26 +1512,21 @@ function sendToPending() {
         }
     });
 
-    // Если есть недостающие предметы — выводим уведомление и выходим
     if (missingItems.length > 0) {
         alert("Не хватает следующих предметов на складе:\n" + missingItems.join("\n"));
         return;
     }
 
-    // Если всё в наличии — вычитаем со склада
     currentRequestCopy.items.forEach(requestItem => {
         let parent = warehouse.find(w => w.children?.some(c => c.name === requestItem.name));
         let child = parent.children.find(c => c.name === requestItem.name);
         child.qty -= requestItem.qty || 0;
     });
-	saveAllRequests();
 
     localStorage.setItem('warehouse', JSON.stringify(warehouse));
-    loadWarehouse();
-
-    // Меняем статус заявки
     currentRequestCopy.status = 'В процессе';
     saveRequestChanges();
+    loadWarehouse();
 }
 function sendToCompleted() {
     // Изменяем статус текущего запроса на 'Завершена'
@@ -783,9 +1627,16 @@ function loadWarehouse() {
             row.onclick = function () {
                 opened = !opened;
                 row.cells[0].innerHTML = (opened ? "▼ " : "▶ ") + item.name;
-                childRows.forEach(r => {
-                    r.style.display = opened ? "table-row" : "none";
-                });
+          childRows.forEach(r => {
+    r.style.display = opened ? "table-row" : "none";
+});
+
+// 💥 принудительная синхронизация состояния
+if (!opened) {
+    childRows.forEach(r => {
+        r.style.display = "none";
+    });
+}
             };
         });
 
@@ -798,6 +1649,19 @@ function loadWarehouse() {
             });
         };
     });
+}
+
+
+function updateSearchPlaceholder(tab) {
+    const input = document.getElementById('requestSearch');
+
+    if (tab === 'requests') {
+        input.placeholder = 'Поиск по ФИО или телефону...';
+    }
+
+    if (tab === 'warehouse') {
+        input.placeholder = 'Поиск по названию товара...';
+    }
 }
 
 function renderProductChildren() {
@@ -1062,9 +1926,8 @@ function deleteRequest() {
 		saveAllRequests();
 
 }
-async function downloadStyledReportExcel() {
-    const requests = JSON.parse(localStorage.getItem('requests')) || [];
-    const completed = requests.filter(r => r.status === 'Завершена');
+async function generateExcelFromRequests(completed) {
+  
 
     if (completed.length === 0) {
         alert("Нет выполненных заявок для отчета");
