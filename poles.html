@@ -1,536 +1,773 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<link rel="icon" href="favicon.png" type="image/png">
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Опоры - Тёмная тема</title>
-
-<style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 30px;
-    background: linear-gradient(135deg, #1c1c1c, #2a2a2a);
-    color: #eee;
-    box-sizing: border-box;
-    position: relative;
-}
-
-h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 2.5rem;
-    color: #FFD700;
-    animation: fadeInUp 0.5s ease;
-}
-
-/* ===== СЕТКА ПЕРВОГО УРОВНЯ ===== */
-.grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: flex-start;
-}
-
-.grid .card {
-    flex: 0 0 calc(25% - 20px);
-    min-width: 200px;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.5s forwards;
-}
-
-.grid .card:nth-child(1) { animation-delay: 0.05s; }
-.grid .card:nth-child(2) { animation-delay: 0.1s; }
-.grid .card:nth-child(3) { animation-delay: 0.15s; }
-.grid .card:nth-child(4) { animation-delay: 0.2s; }
-
-/* ===== ДОЧЕРНИЕ (GRID) ===== */
-.size-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    width: 100%;
-    animation: fadeInUp 0.5s ease;
-}
-
-.size-grid .card {
-    width: 100%;
-}
-
-/* ===== CARD ===== */
-.card {
-    background-color: #2f2f2f;
-    border: 1px solid #444;
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.card:hover {
-    transform: scale(1.05) translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-    border-color: #FFD700;
-}
-
-.card img {
-    width: 100%;
-    height: 280px;
-    object-fit: contain;
-    border-bottom: 1px solid #444;
-    background-color: #1c1c1c;
-    transition: transform 0.5s ease;
-}
-
-.card:hover img {
-    transform: scale(1.05);
-}
-
-.card h3 {
-    margin: 12px;
-    font-size: 1.3rem;
-    color: #FFD700;
-}
-
-.qty-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #FFD700;
-    color: #000;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: bold;
-    animation: popIn 0.5s ease;
-}
-
-/* кнопки */
-button {
-    margin-top: 20px;
-    padding: 12px 25px;
-    background-color: #FFD700;
-    color: #000;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-button:hover {
-    background-color: #FFC300;
-}
-
-button.back-btn {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: #28a745;
-    color: #fff;
-    padding: 10px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: bold;
-    z-index: 10;
-}
-
-button.back-btn:hover {
-    background-color: #218838;
-}
-
-/* ===== ДЕТАЛИ ===== */
-.details-container {
-    display: flex;
-    flex-direction: row;
-    gap: 40px;
-    margin-top: 20px;
-    align-items: flex-start;
-    flex-wrap: nowrap;
-    justify-content: center;
-    animation: fadeIn 0.5s ease;
-}
-
-.details-container .image {
-    width: 550px;
-    flex: 0 0 550px;
-    animation: slideInLeft 0.5s ease;
-}
-
-.details-container .image img {
-    width: 100%;
-    height: 400px;
-    object-fit: contain;
-    display: block;
-    border-radius: 12px;
-    border: 1px solid #444;
-}
-
-.details-container .info {
-    width: 600px;
-    flex: 0 0 600px;
-    padding: 20px 15px;
-    background-color: #2f2f2f;
-    border: 1px solid #444;
-    border-radius: 12px;
-    animation: slideInRight 0.5s ease;
-}
-
-.details-container table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-.details-container td:first-child {
-    width: 180px;
-    font-weight: bold;
-    color: #FFD700;
-}
-
-/* 📱 адаптация */
-@media (max-width: 1200px) {
-    .grid .card {
-        flex: 0 0 calc(33.33% - 20px);
-    }
-
-    .size-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 900px) {
-    .grid .card {
-        flex: 0 0 calc(50% - 20px);
-    }
-
-    .size-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 600px) {
-    .grid .card {
-        flex: 0 0 100%;
-    }
-
-    .size-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .details-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .details-container .image,
-    .details-container .info {
-        width: 100%;
-        flex: none;
-    }
-
-    .details-container .image img {
-        height: auto;
-        max-height: 300px;
-    }
-}
-
-/* ===== МОДАЛКА ===== */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(12px);
-    background: rgba(0,0,0,0.75);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    animation: fadeIn 0.3s ease;
-}
-
-.hidden {
-    display: none;
-}
-
-.modal-content {
-    background: rgba(47,47,47,0.9);
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    backdrop-filter: blur(10px);
-    padding: 30px 25px;
-    border-radius: 16px;
-    text-align: center;
-    color: #eee;
-    width: 340px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
-    animation: scaleIn 0.3s ease;
-}
-
-.modal-content h3 {
-    color: #FFD700;
-    margin-bottom: 10px;
-    font-size: 26px;
-}
-
-.modal-content p {
-    font-size: 18px;
-    color: #ccc;
-}
-
-.modal-buttons {
-    margin-top: 20px;
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-buttons button {
-    flex: 1;
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 15px;
-    transition: transform 0.2s ease, background 0.3s ease;
-}
-
-.modal-buttons button:hover {
-    transform: scale(1.05);
-}
-
-.modal-buttons button:first-child {
-    background: #444;
-    color: #fff;
-}
-
-.modal-buttons button:last-child {
-    background: #FFD700;
-    color: #000;
-}
-
-.close-btn {
-    position: absolute;
-    top: 12px;
-    right: 14px;
-    cursor: pointer;
-    font-size: 20px;
-    color: #aaa;
-    transition: 0.3s;
-}
-
-.close-btn:hover {
-    color: #fff;
-    transform: rotate(90deg);
-}
-
-/* ===== АНИМАЦИИ ===== */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes scaleIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-@keyframes slideInLeft {
-    from { opacity: 0; transform: translateX(-30px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes slideInRight {
-    from { opacity: 0; transform: translateX(30px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes popIn {
-    from { opacity: 0; transform: scale(0.5); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-</style>
-</head>
-
-<body>
-
-<h2>Опоры</h2>
-
-<button id="menuBtn" class="back-btn" onclick="goToMenu()">Главное меню</button>
-
-<div class="grid" id="grid"></div>
-
-<!-- МОДАЛКА -->
-<div id="authModal" class="modal hidden">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeAuthModal()">✖</span>
-        <h3>Требуется авторизация</h3>
-        <p>Чтобы оставить заявку, нужно войти или зарегистрироваться</p>
-
-        <div class="modal-buttons">
-            <button onclick="goToRegister()">Регистрация</button>
-            <button onclick="goToLogin()">Вход</button>
-        </div>
-    </div>
-</div>
-
-<script>
-const warehouseKey = 'warehouse';
-const grid = document.getElementById("grid");
-const urlParams = new URLSearchParams(window.location.search);
-const fromIndex = urlParams.get('from') === 'index';
-
-function goToMenu() { window.location.href = "index.html"; }
-function toggleMenuBtn(show) { document.getElementById("menuBtn").style.display = show ? "block" : "none"; }
-function isUserLoggedIn() { return sessionStorage.getItem("username") !== null; }
-function openAuthModal() { document.getElementById("authModal").classList.remove("hidden"); }
-function closeAuthModal() { document.getElementById("authModal").classList.add("hidden"); }
-function goToLogin() { window.location.href = "login.html"; }
-function goToRegister() { window.location.href = "register.html"; }
-
-async function loadWarehouse() {
-    try {
-        const response = await fetch('./warehouse.json');
-        const data = await response.json();
-        localStorage.setItem(warehouseKey, JSON.stringify(data));
-        loadGrid();
-    } catch {
-        const warehouseLS = localStorage.getItem(warehouseKey);
-        if (warehouseLS) loadGrid();
-        else alert("Данные недоступны!");
-    }
-}
-
-function loadGrid() {
-    toggleMenuBtn(true);
-    const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-    const poles = warehouse.filter(item => item.category === 'pole');
-
-    grid.innerHTML = '';
-    document.querySelector('h2').textContent = 'Опоры';
-
-    poles.forEach((item, index) => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `<img src="${item.img}"><h3>${item.name}</h3>`;
-        card.onclick = () => showChildren(index);
-        grid.appendChild(card);
-    });
-}
-
-function showChildren(index) {
-    toggleMenuBtn(false);
-    const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-    const parent = warehouse[index];
-    const children = parent.children || [];
-    document.querySelector('h2').textContent = `Длина ${parent.name}`;
-
-    grid.innerHTML = `
-        <div class="size-grid">
-            ${children.map((c, childIndex) => {
-                const img = c.img || parent.img;
-                return `
-                <div class="card" onclick="showProductDetails(${index}, ${childIndex})">
-                    <img src="${img}">
-                    <h3>${c.name}</h3>
-                    <span class="qty-badge">${c.qty}</span>
-                </div>`;
-            }).join('')}
-        </div>
-        <button class="back-btn" onclick="loadGrid()">Назад</button>
-    `;
-}
-
-function handleAction(parentIndex, childIndex) {
-    const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-    const parent = warehouse[parentIndex];
-    const child = parent.children[childIndex];
-
-    if (fromIndex) {
-        if (!isUserLoggedIn()) { openAuthModal(); return; }
-        localStorage.setItem("requestItem", JSON.stringify({ name: child.name, price: child.price, img: child.img || parent.img }));
-        window.location.href = "submit_request.html";
-    } else {
-        if (child.qty < 1) { alert("Нет в наличии"); return; }
-        let selected = JSON.parse(localStorage.getItem("selectedItems")) || [];
-        let exist = selected.find(i => i.name === child.name);
-        if (exist) exist.qty += 1;
-        else selected.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
-        localStorage.setItem("selectedItems", JSON.stringify(selected));
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const isAdmin = urlParams.get('forAdmin') === '1';
-
-        if (isAdmin) {
-            let request = JSON.parse(localStorage.getItem("currentAdminRequest")) || {};
-            request.items = Array.isArray(request.items) ? request.items : [];
-            let exist2 = request.items.find(i => i.name === child.name);
-
-            if (exist2) exist2.qty += 1;
-            else request.items.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
-
-            localStorage.setItem("currentAdminRequest", JSON.stringify(request));
-            alert(`Добавлено: ${child.name}`);
-
-            if (window.opener && typeof window.opener.refreshAdminUI === "function") {
-                window.opener.refreshAdminUI();
+    <link rel="icon" href="favicon.png" type="image/png">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Опоры</title>
+
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+            touch-action: pan-y;
+        }
+
+        html {
+            overflow-y: scroll;
+            scrollbar-gutter: stable;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #1c1c1c, #2a2a2a);
+            color: #eee;
+            min-height: 100vh;
+            padding-top: 20px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+            overflow-anchor: none;
+        }
+
+        .page-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            max-width: 1200px;
+            margin: 0 auto 18px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        h2 {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+            font-size: 1.9rem;
+            color: #FFD700;
+            font-weight: 700;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        button.menu-btn,
+        button.back-btn {
+            background: rgba(40, 167, 69, 0.9);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            margin-top: 0;
+            z-index: 2;
+            white-space: nowrap;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .card:hover {
+                transform: scale(1.03);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+                border-color: #FFD700;
+                z-index: 10;
+            }
+
+            button.menu-btn:hover,
+            button.back-btn:hover {
+                transform: translateY(-1px);
+                background: rgba(50, 190, 80, 0.95);
+                box-shadow: 0 8px 18px rgba(0,0,0,0.28);
             }
         }
 
-        window.close();
-    }
-}
+        .hidden {
+            display: none !important;
+        }
 
-function showProductDetails(parentIndex, childIndex) {
-    toggleMenuBtn(false);
-    const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
-    const child = warehouse[parentIndex].children[childIndex];
-    const parent = warehouse[parentIndex];
+        .grid,
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-x: hidden;
+        }
 
-    let infoTableHTML = '<table>';
-    if (child.info) {
-        child.info.split('\n').forEach(line => {
-            if (!line.trim()) return;
-            const parts = line.split(':');
-            if (parts.length >= 2) infoTableHTML += `<tr><td>${parts[0]}</td><td>${parts.slice(1).join(':')}</td></tr>`;
-            else infoTableHTML += `<tr><td colspan="2">${line}</td></tr>`;
-        });
-    } else infoTableHTML += '<tr><td colspan="2">Информация отсутствует</td></tr>';
-    infoTableHTML += '</table>';
+        .grid.details-mode {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+            overflow-x: hidden;
+        }
 
-    grid.innerHTML = `
-    <div class="details-container">
-        <div class="image"><img src="${child.img || parent.img}"></div>
-        <div class="info">
-            <p><strong>Название:</strong> ${child.name}</p>
-            <p><strong>В наличии:</strong> ${child.qty}</p>
-            <p><strong>Информация:</strong></p>
-            ${infoTableHTML}
-            <button onclick="handleAction(${parentIndex}, ${childIndex})">
-                ${fromIndex ? "Оставить заявку" : "Выбрать"}
-            </button>
+        .grid.details-mode > .details-container {
+            width: 100%;
+        }
+
+        .grid > .size-grid {
+            grid-column: 1 / -1;
+            width: 100%;
+        }
+
+        .grid .card,
+        .size-grid .card {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .card {
+            background-color: #2f2f2f;
+            border: 1px solid #444;
+            border-radius: 12px;
+            overflow: hidden;
+            text-align: left;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .card img {
+            width: 100%;
+            height: 280px;
+            object-fit: contain;
+            background-color: #1c1c1c;
+            border-bottom: 1px solid #444;
+            display: block;
+        }
+
+        .card h3 {
+            margin: 12px;
+            font-size: 1.3rem;
+            color: #FFD700;
+            overflow-wrap: anywhere;
+        }
+
+        .qty-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #FFD700;
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            animation: popIn 0.35s ease;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #FFC300;
+        }
+
+        button.menu-btn,
+        button.back-btn {
+            background: rgba(40, 167, 69, 0.9);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            white-space: nowrap;
+            margin-top: 0;
+        }
+
+        button.menu-btn:active,
+        button.back-btn:active {
+            transform: scale(0.97);
+        }
+
+        .details-container {
+            display: flex;
+            gap: 30px;
+            margin: 40px auto 0;
+            justify-content: center;
+            align-items: flex-start;
+            max-width: 1100px;
+            width: 100%;
+            animation: fadeSoft 0.35s ease;
+            overflow-x: hidden;
+        }
+
+        .details-container .image {
+            width: 550px;
+            flex: 0 1 550px;
+            animation: fadeScale 0.35s ease;
+            min-width: 0;
+        }
+
+        .details-container .image img {
+            width: 100%;
+            height: 400px;
+            object-fit: contain;
+            display: block;
+            border-radius: 12px;
+            border: 1px solid #444;
+        }
+
+        .details-container .info {
+            width: 600px;
+            flex: 0 1 600px;
+            padding: 20px 15px;
+            background-color: #2f2f2f;
+            border: 1px solid #444;
+            border-radius: 12px;
+            animation: fadeScale 0.35s ease;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .details-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            table-layout: fixed;
+        }
+
+        .details-container td {
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            vertical-align: top;
+            padding: 4px 6px;
+        }
+
+        .details-container td:first-child {
+            width: 180px;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        @media (max-width: 1200px) {
+            .grid,
+            .size-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .grid,
+            .size-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding-top: 12px;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 8px 12px;
+                gap: 8px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+                text-align: center;
+                order: -1;
+                position: static;
+                transform: none;
+                pointer-events: auto;
+            }
+
+            .grid,
+            .size-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .card img {
+                height: 230px;
+            }
+
+            .details-container {
+                flex-direction: column;
+                align-items: center;
+                margin-left: 0;
+                gap: 18px;
+                width: 100%;
+            }
+
+            .details-container .image,
+            .details-container .info {
+                width: 100%;
+                max-width: 100%;
+                flex: none;
+            }
+
+            .details-container .image img {
+                height: auto;
+                max-height: 300px;
+            }
+
+            .details-container .info {
+                padding: 15px 10px;
+            }
+
+            .details-container td:first-child {
+                width: 120px;
+            }
+
+            button.menu-btn,
+            button.back-btn {
+                width: 100%;
+                font-size: 13px;
+                padding: 11px;
+                border-radius: 12px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            h2 {
+                font-size: 1.35rem;
+            }
+
+            .topbar {
+                padding: 6px 8px;
+            }
+
+            button.menu-btn,
+            button.back-btn {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            .card h3 {
+                font-size: 1.1rem;
+            }
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(12px);
+            background: rgba(0,0,0,0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeSoft 0.25s ease;
+        }
+
+        .modal-content {
+            background: rgba(47,47,47,0.9);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 30px 25px;
+            border-radius: 16px;
+            text-align: center;
+            color: #eee;
+            width: min(340px, calc(100vw - 24px));
+            animation: scaleIn 0.25s ease;
+            position: relative;
+        }
+
+        .modal-content h3 {
+            color: #FFD700;
+            margin-bottom: 10px;
+            font-size: 26px;
+        }
+
+        .modal-content p {
+            font-size: 18px;
+            color: #ccc;
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 0;
+        }
+
+        .modal-buttons button:first-child {
+            background: #444;
+            color: #fff;
+        }
+
+        .modal-buttons button:last-child {
+            background: #FFD700;
+            color: #000;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #aaa;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeSoft {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeScale {
+            from {
+                opacity: 0;
+                transform: scale(0.965);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.7); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Родители */
+        .grid .card {
+            opacity: 0;
+            transform: scale(0.96);
+            animation: parentIn 0.32s ease forwards;
+            will-change: transform, opacity;
+        }
+
+        @keyframes parentIn {
+            from {
+                opacity: 0;
+                transform: scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Подродители */
+        .size-grid .card {
+            opacity: 0;
+            transform: scale(0.92);
+            animation: childIn 0.26s ease forwards;
+            will-change: transform, opacity;
+        }
+
+        @keyframes childIn {
+            from {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        <div class="topbar">
+            <button id="menuBtn" class="menu-btn" onclick="goToMenu()">Главное меню</button>
+            <button id="backBtn" class="back-btn hidden">Назад</button>
+            <h2>Опоры</h2>
+        </div>
+
+        <div class="grid" id="grid"></div>
+
+        <div id="authModal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeAuthModal()">✖</span>
+                <h3>Требуется авторизация</h3>
+                <p>Чтобы оставить заявку, нужно войти или зарегистрироваться</p>
+
+                <div class="modal-buttons">
+                    <button onclick="goToRegister()">Зарегистрироваться</button>
+                    <button onclick="goToLogin()">Войти</button>
+                </div>
+            </div>
         </div>
     </div>
-    <button class="back-btn" onclick="showChildren(${parentIndex})">Назад</button>`;
-}
 
-loadWarehouse();
-</script>
+    <script>
+        const warehouseKey = 'warehouse';
+        const grid = document.getElementById("grid");
+        const menuBtn = document.getElementById("menuBtn");
+        const backBtn = document.getElementById("backBtn");
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAdmin = urlParams.get('forAdmin') === '1';
+        const fromIndex = urlParams.get('from') === 'index';
 
+        let currentPoles = [];
+        let backAction = null;
+
+        backBtn.onclick = () => {
+            if (typeof backAction === "function") backAction();
+        };
+
+        function goToMenu() {
+            window.location.href = "index.html";
+        }
+
+        function showMenuBtn(show) {
+            menuBtn.classList.toggle("hidden", !show);
+        }
+
+        function showBackBtn(show) {
+            backBtn.classList.toggle("hidden", !show);
+        }
+
+        function isUserLoggedIn() {
+            return sessionStorage.getItem("username") !== null;
+        }
+
+        function openAuthModal() {
+            document.getElementById("authModal").classList.remove("hidden");
+        }
+
+        function closeAuthModal() {
+            document.getElementById("authModal").classList.add("hidden");
+        }
+
+        function goToLogin() {
+            window.location.href = "login.html";
+        }
+
+        function goToRegister() {
+            window.location.href = "register.html";
+        }
+
+        async function loadWarehouse() {
+            try {
+                const response = await fetch('./warehouse.json');
+                const data = await response.json();
+                localStorage.setItem(warehouseKey, JSON.stringify(data));
+                loadGrid();
+            } catch {
+                const warehouseLS = localStorage.getItem(warehouseKey);
+                if (warehouseLS) loadGrid();
+                else alert("Данные недоступны!");
+            }
+        }
+
+        function loadGrid() {
+            grid.classList.remove("details-mode");
+            showMenuBtn(true);
+            showBackBtn(false);
+            backAction = null;
+
+            const warehouse = JSON.parse(localStorage.getItem(warehouseKey)) || [];
+            currentPoles = warehouse.filter(item => item.category === 'pole');
+            grid.innerHTML = '';
+
+            document.querySelector('h2').textContent = 'Опоры';
+
+            currentPoles.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = `${index * 0.06}s`;
+                card.innerHTML = `<img src="${item.img}"><h3>${item.name}</h3>`;
+                card.onclick = () => showChildren(index);
+                grid.appendChild(card);
+            });
+        }
+
+        function showChildren(parentIndex) {
+            grid.classList.remove("details-mode");
+            showMenuBtn(false);
+            showBackBtn(true);
+            backAction = loadGrid;
+
+            const parent = currentPoles[parentIndex];
+            const children = parent.children || [];
+
+            document.querySelector('h2').textContent = `Длина ${parent.name}`;
+
+            let html = `<div class="size-grid">`;
+
+            children.forEach((child, childIndex) => {
+                html += `
+                    <div class="card"
+                         style="animation-delay: ${childIndex * 0.06}s"
+                         onclick="showProductDetails(${parentIndex}, ${childIndex})">
+                        <img src="${child.img || parent.img}">
+                        <h3>${child.name}</h3>
+                        <span class="qty-badge">${child.qty}</span>
+                    </div>`;
+            });
+
+            html += `</div>`;
+            grid.innerHTML = html;
+        }
+
+        function showProductDetails(parentIndex, childIndex) {
+            grid.classList.add("details-mode");
+            showMenuBtn(false);
+            showBackBtn(true);
+            backAction = () => showChildren(parentIndex);
+
+            const parent = currentPoles[parentIndex];
+            const child = parent.children[childIndex];
+
+            let infoTableHTML = '<table>';
+
+            if (child.info) {
+                child.info.split('\n').forEach(line => {
+                    if (!line.trim()) return;
+                    const parts = line.split(':');
+                    if (parts.length >= 2) {
+                        infoTableHTML += `<tr><td>${parts[0]}</td><td>${parts.slice(1).join(':')}</td></tr>`;
+                    } else {
+                        infoTableHTML += `<tr><td colspan="2">${line}</td></tr>`;
+                    }
+                });
+            } else {
+                infoTableHTML += '<tr><td colspan="2">Информация отсутствует</td></tr>';
+            }
+
+            infoTableHTML += '</table>';
+
+            grid.innerHTML = `
+                <div class="details-container">
+                    <div class="image">
+                        <img src="${child.img || parent.img}">
+                    </div>
+                    <div class="info">
+                        <p><strong>Название:</strong> ${child.name}</p>
+                        <p><strong>В наличии:</strong> ${child.qty}</p>
+                        <p><strong>Информация:</strong></p>
+                        ${infoTableHTML}
+                        <button onclick="handleAction(${parentIndex}, ${childIndex})">
+                            ${fromIndex ? "Оставить заявку" : "Выбрать"}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleAction(parentIndex, childIndex) {
+            const parent = currentPoles[parentIndex];
+            if (!parent) return alert("Ошибка: родительский элемент не найден");
+
+            const child = parent.children?.[childIndex];
+            if (!child) return alert("Ошибка: дочерний элемент не найден");
+
+            if (fromIndex) {
+                if (!isUserLoggedIn()) {
+                    openAuthModal();
+                    return;
+                }
+
+                localStorage.setItem("requestItem", JSON.stringify({
+                    name: child.name,
+                    price: child.price,
+                    img: child.img || parent.img
+                }));
+
+                window.location.href = "submit_request.html";
+            } else {
+                if (child.qty < 1) {
+                    alert("Нет в наличии");
+                    return;
+                }
+
+                let selected = JSON.parse(localStorage.getItem("selectedItems")) || [];
+                let exist = selected.find(i => i.name === child.name);
+
+                if (exist) exist.qty += 1;
+                else selected.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
+
+                localStorage.setItem("selectedItems", JSON.stringify(selected));
+
+                if (isAdmin) {
+                    let request = JSON.parse(localStorage.getItem("currentAdminRequest")) || {};
+                    request.items = Array.isArray(request.items) ? request.items : [];
+
+                    let exist2 = request.items.find(i => i.name === child.name);
+
+                    if (exist2) exist2.qty += 1;
+                    else request.items.push({ name: child.name, price: child.price, qty: 1, img: parent.img });
+
+                    localStorage.setItem("currentAdminRequest", JSON.stringify(request));
+                    alert(`Добавлено: ${child.name}`);
+
+                    if (window.opener && typeof window.opener.refreshAdminUI === "function") {
+                        window.opener.refreshAdminUI();
+                    }
+                }
+
+                window.close();
+                loadGrid();
+            }
+        }
+
+        loadWarehouse();
+    </script>
 </body>
 </html>
