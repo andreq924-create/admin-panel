@@ -512,12 +512,18 @@
             lightBtn.style.display = 'block';
             problemDiv.style.display = 'none';
             result.innerHTML = '<p>Вы выбрали установку столбов и светильников.</p>';
-        } else if (type === 'repair') {
-            polesBtn.style.display = 'none';
-            lightBtn.style.display = 'none';
-            problemDiv.style.display = 'block';
-            result.innerHTML = '<p>Вы выбрали ремонт повреждения электрических сетей. Пожалуйста, опишите проблему.</p>';
-        } else {
+       } else if (type === 'repair') {
+    polesBtn.style.display = 'none';
+    lightBtn.style.display = 'none';
+    problemDiv.style.display = 'block';
+
+    // 🔥 ОЧИСТКА ВЫБРАННЫХ ТОВАРОВ
+    localStorage.removeItem("selectedItems");
+    render();
+
+    result.innerHTML = '<p>Вы выбрали ремонт повреждения электрических сетей. Пожалуйста, опишите проблему.</p>';
+}
+        else {
             polesBtn.style.display = 'none';
             lightBtn.style.display = 'none';
             problemDiv.style.display = 'none';
