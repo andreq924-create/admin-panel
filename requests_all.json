@@ -651,8 +651,10 @@
     "type": "repair",
     "problemDescription": "АВП",
     "items": [],
-    "status": "Новая",
+    "status": "В процессе",
     "createdAt": "2026-04-19T10:29:48.720Z",
-    "expectedCallTime": "2026-04-19T10:34:48.720Z"
+    "expectedCallTime": "2026-04-19T10:34:48.720Z",
+    "callDate": "2026-04-19",
+    "completionDate": "2026-04-30"
   }
 ]
