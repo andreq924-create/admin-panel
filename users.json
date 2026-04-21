@@ -1,3 +1,10 @@
 [
- 
+  {
+    "username": "asd123",
+    "password": "asd123!321"
+  },
+  {
+    "username": "фыв123",
+    "password": "12345фыв!"
+  }
 ]
