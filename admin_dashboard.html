@@ -1193,7 +1193,6 @@ function renderRequests(requests, tableId) {
         tbody.appendChild(row);
     });
 }
-// ==== Редактирование заявки ====
 function editRequest(createdAt){
     let requests = JSON.parse(localStorage.getItem('requests')) || [];
     const req = requests.find(r => r.createdAt === createdAt);
@@ -1201,18 +1200,15 @@ function editRequest(createdAt){
 
     currentRequestCopy = JSON.parse(JSON.stringify(req));
 
-    // ===== восстановление товаров из временного хранилища =====
+    // ===== восстановление товаров =====
     let updatedRequest = JSON.parse(localStorage.getItem("currentAdminRequest"));
     if (updatedRequest && updatedRequest.items) {
         if (!currentRequestCopy.items) currentRequestCopy.items = [];
 
         updatedRequest.items.forEach(newItem => {
             let existing = currentRequestCopy.items.find(i => i.name === newItem.name);
-            if (existing) {
-                existing.qty += newItem.qty;
-            } else {
-                currentRequestCopy.items.push(newItem);
-            }
+            if (existing) existing.qty += newItem.qty;
+            else currentRequestCopy.items.push(newItem);
         });
 
         localStorage.removeItem("currentAdminRequest");
@@ -1228,24 +1224,63 @@ function editRequest(createdAt){
     document.getElementById('editCallDate').value = currentRequestCopy.callDate || '';
     document.getElementById('editCompletionDate').value = currentRequestCopy.completionDate || '';
 
-    // ⭐ новое поле: описание проблемы
     document.getElementById('editProblemDescription').value =
         currentRequestCopy.problemDescription || '';
 
     renderSelectedItems();
 
-    // кнопка статуса
+    // ===== кнопка статуса =====
     const statusBtn = document.getElementById('statusActionBtn');
 
-if(currentRequestCopy.status === 'Новая'){
-    statusBtn.textContent = 'Отправить в ожидание';
-    statusBtn.onclick = sendToPending;
-}
+    if(currentRequestCopy.status === 'Новая'){
+        statusBtn.textContent = 'Отправить в ожидание';
+        statusBtn.onclick = sendToPending;
+    }
     else if(currentRequestCopy.status === 'В процессе'){
         statusBtn.textContent = 'Выполнено';
         statusBtn.onclick = sendToCompleted;
     }
 
+    // =========================
+    // 🔒 ОГРАНИЧЕНИЯ ДАТ
+    // =========================
+    const callDateInput = document.getElementById('editCallDate');
+    const completionInput = document.getElementById('editCompletionDate');
+
+    // 👉 1. запрет на прошлые даты звонка
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+    callDateInput.min = todayStr;
+
+    // 👉 2. логика для даты завершения
+    callDateInput.onchange = function () {
+        const callDate = this.value;
+
+        if (callDate) {
+            const nextDay = new Date(callDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+
+            const y = nextDay.getFullYear();
+            const m = String(nextDay.getMonth() + 1).padStart(2, '0');
+            const d = String(nextDay.getDate()).padStart(2, '0');
+
+            completionInput.min = `${y}-${m}-${d}`;
+
+            // 💥 чистим если дата некорректная
+            if (completionInput.value && completionInput.value <= callDate) {
+                completionInput.value = '';
+            }
+        }
+    };
+
+    // 👉 применяем сразу
+    callDateInput.dispatchEvent(new Event('change'));
+
+    // ===== открываем окно =====
     document.getElementById('overlay').style.display = 'flex';
 }
 

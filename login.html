@@ -290,17 +290,10 @@
     // Загружаем пользователей
     let users = [];
 
-    window.addEventListener('load', async () => {
-        try {
-            const response = await fetch('./users.json', { cache: 'no-store' });
-            if (!response.ok) throw new Error('Ошибка загрузки users.json');
+window.addEventListener('load', () => {
+    users = JSON.parse(localStorage.getItem('users')) || [];
+});
 
-            users = await response.json();
-        } catch (error) {
-            console.error(error);
-            showModal('Ошибка загрузки пользователей', 'error');
-        }
-    });
 
     // Логика входа с ограничением
     loginForm.addEventListener('submit', (event) => {
