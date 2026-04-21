@@ -835,42 +835,47 @@ const workTypeNames = {
     both: "Установка столбов и освещения",
     repair: "Ремонт повреждения электрических сетей"
 };
-function returnToPending(createdAt) {
-    if (!confirm('Вернуть заявку в "В ожидании"? Товары вернутся на склад.')) return;
+
+async function returnToPending(createdAt) {
+    if (!confirm('Вернуть заявку в "В ожидании"?')) return;
 
     let requests = JSON.parse(localStorage.getItem('requests')) || [];
     let warehouse = JSON.parse(localStorage.getItem('warehouse')) || [];
 
-    const req = requests.find(r => r.createdAt === createdAt);
-    if (!req) return alert('Заявка не найдена');
+    const index = requests.findIndex(r => r.createdAt === createdAt);
+    if (index === -1) return alert('Заявка не найдена');
 
-    // 🔥 Возвращаем товары обратно на склад
-    if (req.items && req.items.length > 0) {
+    const req = requests[index];
+
+    // 🔥 ВОЗВРАТ ТОВАРОВ
+    if (req.items) {
         req.items.forEach(item => {
-            let parent = warehouse.find(w => w.children?.some(c => c.name === item.name));
-            if (!parent) return;
-
-            let child = parent.children.find(c => c.name === item.name);
-            if (!child) return;
-
-            child.qty += item.qty || 0;
+            const found = findChildByName(warehouse, item.name);
+            if (found) {
+                found.child.qty += item.qty || 0;
+            }
         });
     }
 
-    // меняем статус
-    req.status = 'В процессе';
-
-    // убираем дату завершения
-    req.completionDate = '';
+    // 🔥 ВАЖНО: меняем прямо в массиве
+    requests[index] = {
+        ...req,
+        status: 'В процессе',
+        completionDate: null // лучше null чем ''
+    };
 
     // сохраняем
     localStorage.setItem('warehouse', JSON.stringify(warehouse));
     localStorage.setItem('requests', JSON.stringify(requests));
 
-    saveAllRequests();
+    // если есть сервер
+    await saveRequestsAll(requests);
+
     loadWarehouse();
     loadRequests();
 }
+
+
 
 
 function openReportPopup() {
