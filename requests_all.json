@@ -57,10 +57,17 @@
         "name": "Опора ОТФ 2",
         "qty": 2,
         "img": "images/OporaOTF.png"
+      },
+      {
+        "name": "Светильник Gelllious 200",
+        "qty": 1,
+        "img": "images/Светильник Gelllious 50.png"
       }
     ],
-    "status": "Новая",
+    "status": "В процессе",
     "createdAt": "2026-04-21T08:59:38.124Z",
-    "expectedCallTime": "2026-04-21T09:04:38.124Z"
+    "expectedCallTime": "2026-04-21T09:04:38.124Z",
+    "callDate": "2026-04-21",
+    "completionDate": "2026-04-22"
   }
 ]
