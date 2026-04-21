@@ -745,6 +745,34 @@ let editIndex = null;
 let productChildren = []; // дочерние элементы товара
 let productName, productCategory, productQty;
 
+function buildWarehouseIndex(warehouse) {
+    const map = {};
+
+    warehouse.forEach(parent => {
+        if (!parent.children) return;
+
+        parent.children.forEach(child => {
+            map[child.name] = child;
+        });
+    });
+
+    return map;
+}
+
+// 🔥 ПОИСК ДОЧЕРНЕГО ТОВАРА ПО ИМЕНИ
+function findChildByName(warehouse, name) {
+    for (let parent of warehouse) {
+        if (!parent.children) continue;
+
+        for (let child of parent.children) {
+            if (child.name === name) {
+                return { parent, child };
+            }
+        }
+    }
+    return null;
+}
+
 // ==== Табы ====
 // Функция для переключения верхних вкладок: Заявки / Склад
 function showMainTab(tab) {
@@ -850,10 +878,18 @@ async function returnToPending(createdAt) {
     // 🔥 ВОЗВРАТ ТОВАРОВ
     if (req.items) {
         req.items.forEach(item => {
-            const found = findChildByName(warehouse, item.name);
-            if (found) {
-                found.child.qty += item.qty || 0;
-            }
+         const index = buildWarehouseIndex(warehouse);
+
+req.items.forEach(item => {
+    const child = index[item.name];
+
+    if (child) {
+        child.qty += item.qty || 0;
+    } else {
+        console.warn('Не найден:', item.name);
+    }
+});
+
         });
     }
 
@@ -1396,7 +1432,60 @@ function removeSelected(index){
 }
 function saveRequestChanges(){
 
-    // ===== сохраняем данные формы =====
+    let requests = JSON.parse(localStorage.getItem('requests')) || [];
+    let warehouse = JSON.parse(localStorage.getItem('warehouse')) || [];
+
+    const oldRequest = requests.find(r => r.createdAt === currentRequestCopy.createdAt);
+
+    // 🔥 строим быстрый индекс
+    const index = buildWarehouseIndex(warehouse);
+
+    // =========================
+    // 🔄 1. ВОЗВРАЩАЕМ СТАРЫЕ ТОВАРЫ НА СКЛАД
+    // =========================
+    if (oldRequest && oldRequest.items) {
+        oldRequest.items.forEach(item => {
+            const child = index[item.name];
+            if (child) {
+                child.qty += item.qty || 0;
+            }
+        });
+    }
+
+    // =========================
+    // ❗ 2. ПРОВЕРЯЕМ НОВЫЕ ТОВАРЫ
+    // =========================
+    if (currentRequestCopy.items) {
+        for (let item of currentRequestCopy.items) {
+            const child = index[item.name];
+
+            if (!child) {
+                alert(`Товар не найден: ${item.name}`);
+                return;
+            }
+
+            if (child.qty < (item.qty || 0)) {
+                alert(`Недостаточно на складе: ${item.name} (осталось ${child.qty})`);
+                return;
+            }
+        }
+    }
+
+    // =========================
+    // ➖ 3. СПИСЫВАЕМ НОВЫЕ ТОВАРЫ
+    // =========================
+    if (currentRequestCopy.items) {
+        currentRequestCopy.items.forEach(item => {
+            const child = index[item.name];
+            if (child) {
+                child.qty -= item.qty || 0;
+            }
+        });
+    }
+
+    // =========================
+    // 📝 4. СОХРАНЯЕМ ДАННЫЕ ФОРМЫ
+    // =========================
     currentRequestCopy.lastname = document.getElementById('editLastname').value.trim();
     currentRequestCopy.firstname = document.getElementById('editFirstname').value.trim();
     currentRequestCopy.phone = document.getElementById('editPhone').value.trim();
@@ -1406,26 +1495,28 @@ function saveRequestChanges(){
     currentRequestCopy.callDate = document.getElementById('editCallDate').value;
     currentRequestCopy.completionDate = document.getElementById('editCompletionDate').value;
 
-    // ⭐ новое поле: описание проблемы
     currentRequestCopy.problemDescription =
         document.getElementById('editProblemDescription').value.trim();
 
-    // ===== обновление массива заявок =====
-    let requests = JSON.parse(localStorage.getItem('requests')) || [];
-
+    // =========================
+    // 💾 5. СОХРАНЯЕМ ВСЁ
+    // =========================
     requests = requests.map(r =>
         r.createdAt === currentRequestCopy.createdAt ? currentRequestCopy : r
     );
 
     localStorage.setItem('requests', JSON.stringify(requests));
+    localStorage.setItem('warehouse', JSON.stringify(warehouse));
 
-    // ===== синхронизация с сервером =====
+    // сервер
     saveAllRequests();
 
-    // ===== закрытие и обновление UI =====
+    // UI
     closePopup();
     loadRequests();
+    loadWarehouse();
 }
+
 
 function goToMainMenu() {
   window.location.href = 'index.html';
@@ -1517,8 +1608,7 @@ warehouseRows.forEach(row => {
 }
 function logout() {
   sessionStorage.removeItem('username');
-        alert('Вы вышли из системы.');
-        window.location.href = 'index.html';
+         window.location.href = 'index.html';
 }
 function sendToPending() {
     if (!currentRequestCopy || !currentRequestCopy.items) return;
