@@ -76,7 +76,7 @@
     "email": "kirivc@gmail.com",
     "address": "Вятский государственный университет, Спасская улица, Октябрьский район, Киров, городской округ Киров, Кировская область,",
     "type": "both",
-    "problemDescription": "",
+    "problemDescription": "поменять освешения токо",
     "items": [
       {
         "name": "Светодиодный светильник Street 100",
@@ -86,6 +86,8 @@
     ],
     "status": "Новая",
     "createdAt": "2026-04-21T10:26:05.925Z",
-    "expectedCallTime": "2026-04-21T10:31:05.925Z"
+    "expectedCallTime": "2026-04-21T10:31:05.925Z",
+    "callDate": "",
+    "completionDate": ""
   }
 ]
