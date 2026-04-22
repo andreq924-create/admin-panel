@@ -1865,7 +1865,7 @@ function deleteChildFromPopup() {
     localStorage.setItem('warehouse', JSON.stringify(data));
 
     // Сохраняем на GitHub
-    saveWarehouseToGitHub(data);
+await saveWarehouseToGitHub(data);
 
     closeChildEditPopup();
     renderProductChildren();
@@ -1927,7 +1927,7 @@ function deleteChild(parentIndex, childIndex){
   localStorage.setItem('warehouse', JSON.stringify(data));
 
   // Сохраняем на GitHub
-  saveWarehouseToGitHub(data);
+await saveWarehouseToGitHub(data);
 
   loadWarehouse();
 }
@@ -2012,7 +2012,7 @@ function saveProduct() {
     localStorage.setItem('warehouse', JSON.stringify(data));
     closeProductPopup();
     loadWarehouse();
-	 saveWarehouseToGitHub(data);
+await saveWarehouseToGitHub(data);
  }
 function clearChildInputs(){
     document.getElementById('productChildSize').value='';
@@ -2317,14 +2317,14 @@ function editProduct(i){
   document.getElementById('productPopup').style.display='flex'; 
 }
  
- function deleteProduct(i){ 
+async function deleteProduct(i){
   if(!confirm('Удалить товар?')) return; 
   const data=JSON.parse(localStorage.getItem('warehouse'))||[]; 
   data.splice(i,1); 
   localStorage.setItem('warehouse',JSON.stringify(data)); 
 
   // Сохраняем на GitHub
-  saveWarehouseToGitHub(data);
+await saveWarehouseToGitHub(data);
 
   loadWarehouse(); 
 }
@@ -2525,6 +2525,8 @@ async function loadRequestsFromFile() {
 
 async function saveWarehouseToGitHub(updatedData) {
     try {
+        document.body.style.pointerEvents = "none"; // блок UI
+
         const response = await fetch('/api/updateWarehouse', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -2534,17 +2536,16 @@ async function saveWarehouseToGitHub(updatedData) {
         const result = await response.json();
 
         if (!response.ok) {
-            console.error('Ошибка сервера:', result.error || result);
-            alert('Не удалось сохранить склад');
-            return;
+            throw new Error(result.error || 'Ошибка сервера');
         }
 
-        console.log('Склад обновлён:', result);
     } catch (err) {
-        console.error('Ошибка:', err);
-        alert('Ошибка соединения с сервером');
+        alert('Ошибка сохранения: ' + err.message);
+    } finally {
+        document.body.style.pointerEvents = "auto"; // разблок
     }
 }
+
 // Пример Node.js / Netlify Function
  
 function downloadAllRequests() {
