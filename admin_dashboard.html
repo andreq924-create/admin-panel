@@ -1855,7 +1855,7 @@ function changeChildQty(add = true) {
 }
 
 // Удаление дочернего объекта из попапа
-function deleteChildFromPopup() {
+async function deleteChildFromPopup() {
     if (currentChildIndex === null || editIndex === null) return;
 
     if (!confirm('Удалить дочерний объект?')) return;
@@ -1864,13 +1864,14 @@ function deleteChildFromPopup() {
     data[editIndex].children.splice(currentChildIndex, 1);
     localStorage.setItem('warehouse', JSON.stringify(data));
 
-    // Сохраняем на GitHub
-await saveWarehouseToGitHub(data);
+    // Сохраняем на GitHub (ждём!)
+    await saveWarehouseToGitHub(data);
 
     closeChildEditPopup();
     renderProductChildren();
     loadWarehouse();
 }
+
 
 function saveChildEdit() {
     if (currentChildIndex === null || editIndex === null) return;
@@ -1920,17 +1921,19 @@ function editChild(parentIndex, childIndex){
 }
 
 // ==== Удаление дочернего объекта ====
-function deleteChild(parentIndex, childIndex){
+async function deleteChild(parentIndex, childIndex){
   if(!confirm('Удалить дочерний объект?')) return;
+
   const data = JSON.parse(localStorage.getItem('warehouse'))||[];
   data[parentIndex].children.splice(childIndex,1);
   localStorage.setItem('warehouse', JSON.stringify(data));
 
   // Сохраняем на GitHub
-await saveWarehouseToGitHub(data);
+  await saveWarehouseToGitHub(data);
 
   loadWarehouse();
 }
+
 // ==== Дочерние объекты товара ====
 function addProductChild() {
     const name = document.getElementById('productChildSize').value.trim();
@@ -1964,12 +1967,11 @@ function addProductChild() {
 
 
 
-function saveProduct() {
+async function saveProduct() {
     const name = productName.value.trim();
     const category = productCategory.value;
     const fileInput = document.getElementById('productFile');
 
-    // путь к PNG родителя
     let imgPath = '';
     if (fileInput.files[0]) {
         imgPath = `images/${fileInput.files[0].name}`;
@@ -1987,7 +1989,6 @@ function saveProduct() {
         return;
     }
 
-    // массив детей с правильными путями к PNG
     const children = productChildren.map(c => ({
         name: c.name,
         qty: c.qty,
@@ -2010,10 +2011,14 @@ function saveProduct() {
     }
 
     localStorage.setItem('warehouse', JSON.stringify(data));
+
+    // ⏳ ЖДЁМ сохранение
+    await saveWarehouseToGitHub(data);
+
     closeProductPopup();
     loadWarehouse();
-await saveWarehouseToGitHub(data);
- }
+}
+
 function clearChildInputs(){
     document.getElementById('productChildSize').value='';
     document.getElementById('productChildQty').value='';
@@ -2299,32 +2304,15 @@ async function generateExcelFromRequests(completed) {
     saveAs(blob, "styled_completed_requests_report.xlsx");
 }
 function closeProductPopup(){ document.getElementById('productPopup').style.display='none'; }
-function editProduct(i){ 
-  let data = JSON.parse(localStorage.getItem('warehouse')) || []; 
-  editIndex = i; 
-  let item = data[i]; 
-  productChildren = item.children || []; 
-  renderProductChildren();
-
-  productName.value = item.name; 
-  productCategory.value = item.category; 
- 
- 
-
-  // Показываем блок дочерних объектов при редактировании
-  document.getElementById('productChildrenContainer').style.display = 'block';
-
-  document.getElementById('productPopup').style.display='flex'; 
-}
- 
-async function deleteProduct(i){
+async function deleteProduct(i){ 
   if(!confirm('Удалить товар?')) return; 
-  const data=JSON.parse(localStorage.getItem('warehouse'))||[]; 
-  data.splice(i,1); 
-  localStorage.setItem('warehouse',JSON.stringify(data)); 
 
-  // Сохраняем на GitHub
-await saveWarehouseToGitHub(data);
+  const data = JSON.parse(localStorage.getItem('warehouse')) || []; 
+  data.splice(i,1); 
+  localStorage.setItem('warehouse', JSON.stringify(data)); 
+
+  // ⏳ ЖДЁМ сохранение
+  await saveWarehouseToGitHub(data);
 
   loadWarehouse(); 
 }
@@ -2525,8 +2513,6 @@ async function loadRequestsFromFile() {
 
 async function saveWarehouseToGitHub(updatedData) {
     try {
-        document.body.style.pointerEvents = "none"; // блок UI
-
         const response = await fetch('/api/updateWarehouse', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -2539,10 +2525,12 @@ async function saveWarehouseToGitHub(updatedData) {
             throw new Error(result.error || 'Ошибка сервера');
         }
 
+        console.log('Склад обновлён:', result);
+
     } catch (err) {
+        console.error('Ошибка:', err);
         alert('Ошибка сохранения: ' + err.message);
-    } finally {
-        document.body.style.pointerEvents = "auto"; // разблок
+        throw err; // 👈 важно!
     }
 }
 
