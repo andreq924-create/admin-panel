@@ -159,5 +159,11 @@
     "category": "light",
     "img": "images/светильник Cobra 30.png",
     "children": []
+  },
+  {
+    "name": "3123",
+    "category": "light",
+    "img": "images/5fe8a20a776c9849531069.png",
+    "children": []
   }
 ]
