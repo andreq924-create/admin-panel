@@ -232,7 +232,7 @@
 <main>
     <div class="form-container">
         <h2 class="form-title">Добро пожаловать!</h2>
- 
+
         <form id="loginForm" autocomplete="off" novalidate>
             <div class="field">
                 <label for="username">Имя пользователя:</label>
@@ -262,122 +262,94 @@
 </div>
 
 <script>
-    const loginForm = document.getElementById('loginForm');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    
+const loginForm = document.getElementById('loginForm');
+const closeModalBtn = document.getElementById('closeModalBtn');
+
+// Модалка для отображения ошибок
+function showModal(message, type = "error") {
+    const modal = document.getElementById('modal');
+    const box = document.getElementById('modalBox');
+    const text = document.getElementById('modalText');
+
+    text.innerText = message;
+
+    box.classList.remove('success', 'error');
+    box.classList.add(type);
+
+    modal.style.display = "flex";
+}
+
+// Закрытие модалки
+function closeModal() {
+    document.getElementById('modal').style.display = "none";
+}
+
+loginForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!username || !password) {
+        showModal('Пожалуйста, заполните все поля!', 'error');
+        return;
+    }
+
     let failedAttempts = parseInt(sessionStorage.getItem('failedAttempts')) || 0;
     let blockTime = parseInt(sessionStorage.getItem('blockTime')) || 0;
+    const currentTime = Date.now();
 
-    let users = [];
-    let usersLoaded = false;
-
-    // Модалка для отображения ошибок
-    function showModal(message, type = "error") {
-        const modal = document.getElementById('modal');
-        const box = document.getElementById('modalBox');
-        const text = document.getElementById('modalText');
-
-        text.innerText = message;
-
-        box.classList.remove('success', 'error');
-        box.classList.add(type);
-
-        modal.style.display = "flex";
+    if (blockTime > currentTime) {
+        const remainingTime = Math.floor((blockTime - currentTime) / 1000);
+        showModal(`Вы заблокированы на ${remainingTime} секунд!`, 'error');
+        return;
     }
 
-    // Закрытие модалки
-    function closeModal() {
-        document.getElementById('modal').style.display = "none";
+    // Проверка специальных пользователей
+    if ((username === '111' && password === '111') || (username === 'Admin' && password === 'Admin')) {
+        sessionStorage.setItem('username', username);
+        window.location.href = username === 'Admin' ? "admin_dashboard.html" : "user_dashboard.html";
+        return;
     }
 
-    // Загружаем пользователей из users.json (с уникальным параметром для предотвращения кэширования)
-    async function loadUsers() {
+    // Задержка 1 секунда перед загрузкой пользователей
+    setTimeout(async () => {
+        let users = [];
         try {
-            const uniqueParam = new Date().getTime(); // Генерируем уникальный параметр для запроса
-            const res = await fetch(`users.json?nocache=${uniqueParam}`);
+            // Добавляем уникальный параметр времени к запросу
+            const res = await fetch('users.json?' + new Date().getTime());
+
             if (!res.ok) throw new Error('Не удалось загрузить users.json');
             users = await res.json();
-            usersLoaded = true;
-            console.log('Users loaded:', users);
         } catch (e) {
-            console.error('Ошибка загрузки users.json:', e);
-            showModal('Не удалось загрузить users.json', 'error');
+            console.error(e);
+            showModal('Не удалось загрузить пользователей', 'error');
+            return;
         }
-    }
 
-    // Логика входа с ограничением
-    loginForm.addEventListener('submit', (event) => {
-        event.preventDefault();
+        // Проверка логина по JSON
+        const user = users.find(u => u.username === username && u.password === password);
 
-        // Сбрасываем список пользователей и флаг загрузки перед новым запросом
-        users = [];
-        usersLoaded = false;
+        if (user) {
+            sessionStorage.setItem('username', user.username);
+            window.location.href = "user_dashboard.html";
+        } else {
+            failedAttempts++;
+            sessionStorage.setItem('failedAttempts', failedAttempts);
 
-        // Задержка в 3 секунды перед загрузкой данных
-        setTimeout(async () => {
-            await loadUsers();
-
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-
-            // Проверка на пустые данные
-            if (!username || !password) {
-                showModal('Пожалуйста, заполните все поля!', 'error');
-                return;
-            }
-
-            // Проверка, загрузился ли JSON
-            if (!usersLoaded) {
-                showModal('Пользователи ещё загружаются, попробуйте через секунду', 'error');
-                return;
-            }
-
-            const currentTime = Date.now();
-
-            // Проверка на блокировку
-            if (blockTime > currentTime) {
-                const remainingTime = Math.floor((blockTime - currentTime) / 1000);
-                showModal(`Вы заблокированы на ${remainingTime} секунд!`, 'error');
-                return;
-            }
-
-            // Сбросить неудачные попытки после блокировки
-            if (blockTime <= currentTime && failedAttempts >= 5) {
-                failedAttempts = 0;
-            }
-
-            // Проверка на дефолтного пользователя
-            if (username === '111' && password === '111') {
-                window.location.href = "user_dashboard.html";
-                return;
-            }
-
-            // Проверка на админа
-            if (username === 'Admin' && password === 'Admin') {
-                window.location.href = "admin_dashboard.html";
-                return;
-            }
-
-            // Проверка пользователей из users.json
-            const user = users.find(u => u.username === username && u.password === password);
-
-            if (user) {
-                window.location.href = "user_dashboard.html";
+            if (failedAttempts >= 5) {
+                blockTime = currentTime + 10000; // блокировка 10 секунд
+                sessionStorage.setItem('blockTime', blockTime);
+                showModal('Превышено количество попыток! Блокировка на 10 секунд.', 'error');
             } else {
-                failedAttempts++;
-                if (failedAttempts >= 5) {
-                    blockTime = currentTime + 5000; // блокировка на 5 секунд
-                    showModal('Превышено количество попыток! Блокировка на 5 секунд.', 'error');
-                } else {
-                    showModal('Неверный логин или пароль!', 'error');
-                }
+                showModal('Неверный логин или пароль!', 'error');
             }
-        }, 3000); // Задержка 3 секунды перед загрузкой
-    });
+        }
+    }, 1000); // Задержка 1 секунда
+});
 
-    closeModalBtn.addEventListener('click', closeModal);
+closeModalBtn.addEventListener('click', closeModal);
 </script>
-
 </body>
 
 </html>
