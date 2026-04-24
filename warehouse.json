@@ -213,5 +213,11 @@
     "category": "light",
     "img": "images/OporaCGK.png",
     "children": []
+  },
+  {
+    "name": "123444",
+    "category": "light",
+    "img": "images/дая.png",
+    "children": []
   }
 ]
