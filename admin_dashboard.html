@@ -1780,7 +1780,29 @@ if (!opened) {
         };
     });
 }
+function editProduct(index) {
+    const warehouse = JSON.parse(localStorage.getItem('warehouse')) || [];
+    const product = warehouse[index];
 
+    if (!product) {
+        alert('Товар не найден');
+        return;
+    }
+
+    // заполняем поля попапа
+    document.getElementById('productName').value = product.name || '';
+    document.getElementById('productCategory').value = product.category || 'light';
+
+    // дочерние элементы
+    productChildren = product.children ? [...product.children] : [];
+    renderProductChildren();
+
+    // сохраняем индекс редактируемого товара
+    editIndex = index;
+
+    // открываем попап
+    document.getElementById('productPopup').style.display = 'flex';
+}
 
 function updateSearchPlaceholder(tab) {
     const input = document.getElementById('requestSearch');
