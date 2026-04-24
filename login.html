@@ -305,69 +305,74 @@
         }
     }
 
-    window.addEventListener('load', async () => {
-        await loadUsers();
-    });
-
     // Логика входа с ограничением
     loginForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value.trim();
+        // Сбрасываем список пользователей и флаг загрузки перед новым запросом
+        users = [];
+        usersLoaded = false;
 
-        // Проверка на пустые данные
-        if (!username || !password) {
-            showModal('Пожалуйста, заполните все поля!', 'error');
-            return;
-        }
+        // Задержка в 3 секунды перед загрузкой данных
+        setTimeout(async () => {
+            await loadUsers();
 
-        // Проверка, загрузился ли JSON
-        if (!usersLoaded) {
-            showModal('Пользователи ещё загружаются, попробуйте через секунду', 'error');
-            return;
-        }
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
 
-        const currentTime = Date.now();
-
-        // Проверка на блокировку
-        if (blockTime > currentTime) {
-            const remainingTime = Math.floor((blockTime - currentTime) / 1000);
-            showModal(`Вы заблокированы на ${remainingTime} секунд!`, 'error');
-            return;
-        }
-
-        // Сбросить неудачные попытки после блокировки
-        if (blockTime <= currentTime && failedAttempts >= 5) {
-            failedAttempts = 0;
-        }
-
-        // Проверка на дефолтного пользователя
-        if (username === '111' && password === '111') {
-            window.location.href = "user_dashboard.html";
-            return;
-        }
-
-        // Проверка на админа
-        if (username === 'Admin' && password === 'Admin') {
-            window.location.href = "admin_dashboard.html";
-            return;
-        }
-
-        // Проверка пользователей из users.json
-        const user = users.find(u => u.username === username && u.password === password);
-
-        if (user) {
-            window.location.href = "user_dashboard.html";
-        } else {
-            failedAttempts++;
-            if (failedAttempts >= 5) {
-                blockTime = currentTime + 5000; // блокировка на 5 секунд
-                showModal('Превышено количество попыток! Блокировка на 5 секунд.', 'error');
-            } else {
-                showModal('Неверный логин или пароль!', 'error');
+            // Проверка на пустые данные
+            if (!username || !password) {
+                showModal('Пожалуйста, заполните все поля!', 'error');
+                return;
             }
-        }
+
+            // Проверка, загрузился ли JSON
+            if (!usersLoaded) {
+                showModal('Пользователи ещё загружаются, попробуйте через секунду', 'error');
+                return;
+            }
+
+            const currentTime = Date.now();
+
+            // Проверка на блокировку
+            if (blockTime > currentTime) {
+                const remainingTime = Math.floor((blockTime - currentTime) / 1000);
+                showModal(`Вы заблокированы на ${remainingTime} секунд!`, 'error');
+                return;
+            }
+
+            // Сбросить неудачные попытки после блокировки
+            if (blockTime <= currentTime && failedAttempts >= 5) {
+                failedAttempts = 0;
+            }
+
+            // Проверка на дефолтного пользователя
+            if (username === '111' && password === '111') {
+                window.location.href = "user_dashboard.html";
+                return;
+            }
+
+            // Проверка на админа
+            if (username === 'Admin' && password === 'Admin') {
+                window.location.href = "admin_dashboard.html";
+                return;
+            }
+
+            // Проверка пользователей из users.json
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                window.location.href = "user_dashboard.html";
+            } else {
+                failedAttempts++;
+                if (failedAttempts >= 5) {
+                    blockTime = currentTime + 5000; // блокировка на 5 секунд
+                    showModal('Превышено количество попыток! Блокировка на 5 секунд.', 'error');
+                } else {
+                    showModal('Неверный логин или пароль!', 'error');
+                }
+            }
+        }, 3000); // Задержка 3 секунды перед загрузкой
     });
 
     closeModalBtn.addEventListener('click', closeModal);
@@ -375,4 +380,4 @@
 
 </body>
 
-</html>  
+</html>
