@@ -268,7 +268,7 @@
     let failedAttempts = parseInt(sessionStorage.getItem('failedAttempts')) || 0;
     let blockTime = parseInt(sessionStorage.getItem('blockTime')) || 0;
     let users = [];
-    let usersLoaded = false;
+    let usersLoaded = false;  // Флаг загрузки данных о пользователях
 
     // Модалка для отображения ошибок
     function showModal(message, type = "error") {
@@ -305,8 +305,15 @@
 
     // Логика входа с ограничением
     loginForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
+        event.preventDefault(); // Отменяем стандартное поведение формы
 
+        // Если данные не загружены, загрузить их перед проверкой
+        if (!usersLoaded) {
+            showModal('Данные загружаются... Пожалуйста, подождите.', 'error');
+            await loadUsers(); // Загружаем пользователей
+        }
+
+        // Получаем данные из формы
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
 
@@ -314,11 +321,6 @@
         if (!username || !password) {
             showModal('Пожалуйста, заполните все поля!', 'error');
             return;
-        }
-
-        // Загружаем пользователей только при отправке формы
-        if (!usersLoaded) {
-            await loadUsers();
         }
 
         const currentTime = Date.now();
@@ -336,26 +338,12 @@
             sessionStorage.setItem('failedAttempts', failedAttempts);
         }
 
-        // Проверка на дефолтного пользователя
-        if (username === '111' && password === '111') {
-            sessionStorage.setItem('username', username);
-            window.location.href = "user_dashboard.html";
-            return;
-        }
-
-        // Проверка на админа
-        if (username === 'Admin' && password === 'Admin') {
-            sessionStorage.setItem('username', username);
-            window.location.href = "admin_dashboard.html";
-            return;
-        }
-
         // Проверка пользователей из users.json
         const user = users.find(u => u.username === username && u.password === password);
 
         if (user) {
             sessionStorage.setItem('username', user.username);
-            window.location.href = "user_dashboard.html";
+            window.location.href = "user_dashboard.html"; // Переход на страницу пользователя
         } else {
             failedAttempts++;
             sessionStorage.setItem('failedAttempts', failedAttempts);
