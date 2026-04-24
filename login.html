@@ -8,7 +8,6 @@
     <title>Вход</title>
 
     <style>
-        /* Ваши стили остаются прежними */
         :root {
             --bg-1: #1e2a38;
             --bg-2: #2f3f52;
@@ -167,7 +166,6 @@
             font-size: 14px;
         }
 
-        /* МОДАЛКА */
         #modal {
             position: fixed;
             top: 0;
@@ -232,7 +230,6 @@
 <main>
     <div class="form-container">
         <h2 class="form-title">Добро пожаловать!</h2>
-
         <form id="loginForm" autocomplete="off" novalidate>
             <div class="field">
                 <label for="username">Имя пользователя:</label>
@@ -253,7 +250,6 @@
     <p>&copy; 2026 МКУ "Кировсвет". Все права защищены.</p>
 </footer>
 
-<!-- МОДАЛЬНОЕ ОКНО -->
 <div id="modal">
     <div id="modalBox">
         <div id="modalText"></div>
@@ -262,91 +258,80 @@
 </div>
 
 <script>
-    const loginForm = document.getElementById('loginForm');
-    const closeModalBtn = document.getElementById('closeModalBtn');
+const loginForm = document.getElementById('loginForm');
+const closeModalBtn = document.getElementById('closeModalBtn');
 
-    let failedAttempts = parseInt(sessionStorage.getItem('failedAttempts')) || 0;
-    let blockTime = parseInt(sessionStorage.getItem('blockTime')) || 0;
+// Модальные окна
+function showModal(message, type = "error") {
+    const modal = document.getElementById('modal');
+    const box = document.getElementById('modalBox');
+    const text = document.getElementById('modalText');
+    text.innerText = message;
+    box.classList.remove('success', 'error');
+    box.classList.add(type);
+    modal.style.display = "flex";
+}
 
-    function showModal(message, type = "error") {
-        const modal = document.getElementById('modal');
-        const box = document.getElementById('modalBox');
-        const text = document.getElementById('modalText');
+function closeModal() {
+    document.getElementById('modal').style.display = "none";
+}
 
-        text.innerText = message;
-        box.classList.remove('success', 'error');
-        box.classList.add(type);
-        modal.style.display = "flex";
+// Основные массивы пользователей
+let users = [];
+let tempUsers = []; // новые пользователи текущей сессии
+let usersLoaded = false;
+
+// Загружаем users.json
+window.addEventListener('load', async () => {
+    try {
+        const res = await fetch('users.json');
+        if (!res.ok) throw new Error('Не удалось загрузить users.json');
+        users = await res.json();
+        usersLoaded = true;
+    } catch (e) {
+        console.error('Ошибка загрузки users.json:', e);
+        showModal('Не удалось загрузить users.json', 'error');
+    }
+});
+
+// Логика входа
+loginForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!username || !password) {
+        showModal('Пожалуйста, заполните все поля!', 'error');
+        return;
     }
 
-    function closeModal() {
-        document.getElementById('modal').style.display = "none";
+    if (!usersLoaded) {
+        showModal('Пользователи ещё загружаются, попробуйте через секунду', 'error');
+        return;
     }
 
-    loginForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
+    // Проверяем массив всех пользователей (JSON + временные)
+    const allUsers = [...users, ...tempUsers];
 
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value.trim();
+    // Проверка дефолтного пользователя
+    if ((username === '111' && password === '111') || (username === 'Admin' && password === 'Admin')) {
+        sessionStorage.setItem('username', username);
+        window.location.href = username === 'Admin' ? "admin_dashboard.html" : "user_dashboard.html";
+        return;
+    }
 
-        if (!username || !password) {
-            showModal('Пожалуйста, заполните все поля!', 'error');
-            return;
-        }
+    const user = allUsers.find(u => u.username === username && u.password === password);
 
-        const currentTime = Date.now();
-
-        if (blockTime > currentTime) {
-            const remainingTime = Math.floor((blockTime - currentTime) / 1000);
-            showModal(`Вы заблокированы на ${remainingTime} секунд!`, 'error');
-            return;
-        }
-
-        // Проверка дефолтного пользователя
-        if (username === '111' && password === '111') {
-            sessionStorage.setItem('username', username);
-            window.location.href = "user_dashboard.html";
-            return;
-        }
-
-        if (username === 'Admin' && password === 'Admin') {
-            sessionStorage.setItem('username', username);
-            window.location.href = "admin_dashboard.html";
-            return;
-        }
-
-        // Загрузка users.json при нажатии на кнопку
-        let users = [];
-        try {
-            const res = await fetch('users.json');
-            if (!res.ok) throw new Error('Не удалось загрузить users.json');
-            users = await res.json();
-        } catch (e) {
-            showModal('Не удалось загрузить пользователей', 'error');
-            return;
-        }
-
-        const user = users.find(u => u.username === username && u.password === password);
-        if (user) {
-            sessionStorage.setItem('username', user.username);
-            window.location.href = "user_dashboard.html";
-        } else {
-            failedAttempts++;
-            sessionStorage.setItem('failedAttempts', failedAttempts);
-
-            if (failedAttempts >= 5) {
-                blockTime = currentTime + 10000;
-                sessionStorage.setItem('blockTime', blockTime);
-                showModal('Превышено количество попыток! Блокировка на 10 секунд.', 'error');
-            } else {
-                showModal('Неверный логин или пароль!', 'error');
-            }
-        }
-    });
-
-    closeModalBtn.addEventListener('click', closeModal);
+    if (user) {
+        sessionStorage.setItem('username', user.username);
+        window.location.href = "user_dashboard.html";
+    } else {
+        showModal('Неверный логин или пароль!', 'error');
+    }
+});
+closeModalBtn.addEventListener('click', closeModal);
 </script>
 
 </body>
-
 </html>

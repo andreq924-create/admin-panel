@@ -618,16 +618,20 @@ registerForm.addEventListener('submit', async function(event) {
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Регистрация...';
+    submitBtn.textContent = 'Проверка...';
 
     try {
+        const newUser = { username, password };
+
+        // Отправка данных на сервер
         const response = await fetch(API_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify(newUser)
         });
 
-        const result = await response.json();
+        let result = {};
+        try { result = await response.json(); } catch (e) { result = {}; }
 
         if (!response.ok) {
             showModal('Ошибка: ' + (result.error || 'Неизвестная ошибка'), 'error');
