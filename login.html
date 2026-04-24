@@ -287,24 +287,39 @@
         document.getElementById('modal').style.display = "none";
     }
 
-    // Загружаем пользователей
+    // Загружаем пользователей из users.json
     let users = [];
+    let usersLoaded = false;
 
-window.addEventListener('load', () => {
-    users = JSON.parse(localStorage.getItem('users')) || [];
-});
-
+    window.addEventListener('load', async () => {
+        try {
+            const res = await fetch('users.json');
+            if (!res.ok) throw new Error('Не удалось загрузить users.json');
+            users = await res.json();
+            usersLoaded = true;
+            console.log('Users loaded:', users);
+        } catch (e) {
+            console.error('Ошибка загрузки users.json:', e);
+            showModal('Не удалось загрузить users.json', 'error');
+        }
+    });
 
     // Логика входа с ограничением
     loginForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
 
         // Проверка на пустые данные
         if (!username || !password) {
             showModal('Пожалуйста, заполните все поля!', 'error');
+            return;
+        }
+
+        // Проверка, загрузился ли JSON
+        if (!usersLoaded) {
+            showModal('Пользователи ещё загружаются, попробуйте через секунду', 'error');
             return;
         }
 
@@ -337,7 +352,7 @@ window.addEventListener('load', () => {
             return;
         }
 
-        // Проверка пользователей из файла
+        // Проверка пользователей из users.json
         const user = users.find(u => u.username === username && u.password === password);
 
         if (user) {
