@@ -171,5 +171,11 @@
     "category": "light",
     "img": "images/светильник Cobra 30.png",
     "children": []
+  },
+  {
+    "name": "3п45",
+    "category": "light",
+    "img": "images/OporaCGK.png",
+    "children": []
   }
 ]
