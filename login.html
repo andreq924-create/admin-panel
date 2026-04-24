@@ -262,89 +262,89 @@
 </div>
 
 <script>
-const loginForm = document.getElementById('loginForm');
-const closeModalBtn = document.getElementById('closeModalBtn');
-
-// Модалка для отображения ошибок
-function showModal(message, type = "error") {
-    const modal = document.getElementById('modal');
-    const box = document.getElementById('modalBox');
-    const text = document.getElementById('modalText');
-
-    text.innerText = message;
-
-    box.classList.remove('success', 'error');
-    box.classList.add(type);
-
-    modal.style.display = "flex";
-}
-
-// Закрытие модалки
-function closeModal() {
-    document.getElementById('modal').style.display = "none";
-}
-
-loginForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-
-    if (!username || !password) {
-        showModal('Пожалуйста, заполните все поля!', 'error');
-        return;
-    }
+    const loginForm = document.getElementById('loginForm');
+    const closeModalBtn = document.getElementById('closeModalBtn');
 
     let failedAttempts = parseInt(sessionStorage.getItem('failedAttempts')) || 0;
     let blockTime = parseInt(sessionStorage.getItem('blockTime')) || 0;
-    const currentTime = Date.now();
 
-    if (blockTime > currentTime) {
-        const remainingTime = Math.floor((blockTime - currentTime) / 1000);
-        showModal(`Вы заблокированы на ${remainingTime} секунд!`, 'error');
-        return;
+    function showModal(message, type = "error") {
+        const modal = document.getElementById('modal');
+        const box = document.getElementById('modalBox');
+        const text = document.getElementById('modalText');
+
+        text.innerText = message;
+        box.classList.remove('success', 'error');
+        box.classList.add(type);
+        modal.style.display = "flex";
     }
 
-    // Проверка специальных пользователей
-    if ((username === '111' && password === '111') || (username === 'Admin' && password === 'Admin')) {
-        sessionStorage.setItem('username', username);
-        window.location.href = username === 'Admin' ? "admin_dashboard.html" : "user_dashboard.html";
-        return;
+    function closeModal() {
+        document.getElementById('modal').style.display = "none";
     }
 
-    // Загрузка users.json при нажатии на кнопку
-    let users = [];
-    try {
-        const res = await fetch('users.json');
-        if (!res.ok) throw new Error('Не удалось загрузить users.json');
-        users = await res.json();
-    } catch (e) {
-        console.error(e);
-        showModal('Не удалось загрузить пользователей', 'error');
-        return;
-    }
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-    // Проверка логина по JSON
-    const user = users.find(u => u.username === username && u.password === password);
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
 
-    if (user) {
-        sessionStorage.setItem('username', user.username);
-        window.location.href = "user_dashboard.html";
-    } else {
-        failedAttempts++;
-        sessionStorage.setItem('failedAttempts', failedAttempts);
-
-        if (failedAttempts >= 5) {
-            blockTime = currentTime + 10000; // блокировка 10 секунд
-            sessionStorage.setItem('blockTime', blockTime);
-            showModal('Превышено количество попыток! Блокировка на 10 секунд.', 'error');
-        } else {
-            showModal('Неверный логин или пароль!', 'error');
+        if (!username || !password) {
+            showModal('Пожалуйста, заполните все поля!', 'error');
+            return;
         }
-    }
-});
 
-closeModalBtn.addEventListener('click', closeModal);
+        const currentTime = Date.now();
+
+        if (blockTime > currentTime) {
+            const remainingTime = Math.floor((blockTime - currentTime) / 1000);
+            showModal(`Вы заблокированы на ${remainingTime} секунд!`, 'error');
+            return;
+        }
+
+        // Проверка дефолтного пользователя
+        if (username === '111' && password === '111') {
+            sessionStorage.setItem('username', username);
+            window.location.href = "user_dashboard.html";
+            return;
+        }
+
+        if (username === 'Admin' && password === 'Admin') {
+            sessionStorage.setItem('username', username);
+            window.location.href = "admin_dashboard.html";
+            return;
+        }
+
+        // Загрузка users.json при нажатии на кнопку
+        let users = [];
+        try {
+            const res = await fetch('users.json');
+            if (!res.ok) throw new Error('Не удалось загрузить users.json');
+            users = await res.json();
+        } catch (e) {
+            showModal('Не удалось загрузить пользователей', 'error');
+            return;
+        }
+
+        const user = users.find(u => u.username === username && u.password === password);
+        if (user) {
+            sessionStorage.setItem('username', user.username);
+            window.location.href = "user_dashboard.html";
+        } else {
+            failedAttempts++;
+            sessionStorage.setItem('failedAttempts', failedAttempts);
+
+            if (failedAttempts >= 5) {
+                blockTime = currentTime + 10000;
+                sessionStorage.setItem('blockTime', blockTime);
+                showModal('Превышено количество попыток! Блокировка на 10 секунд.', 'error');
+            } else {
+                showModal('Неверный логин или пароль!', 'error');
+            }
+        }
+    });
+
+    closeModalBtn.addEventListener('click', closeModal);
 </script>
 
 </body>
