@@ -267,8 +267,6 @@
     
     let failedAttempts = parseInt(sessionStorage.getItem('failedAttempts')) || 0;
     let blockTime = parseInt(sessionStorage.getItem('blockTime')) || 0;
-    let users = [];
-    let usersLoaded = false;  // Флаг загрузки данных о пользователях
 
     // Модалка для отображения ошибок
     function showModal(message, type = "error") {
@@ -290,7 +288,10 @@
     }
 
     // Загружаем пользователей из users.json
-    async function loadUsers() {
+    let users = [];
+    let usersLoaded = false;
+
+    window.addEventListener('load', async () => {
         try {
             const res = await fetch('users.json');
             if (!res.ok) throw new Error('Не удалось загрузить users.json');
@@ -301,25 +302,24 @@
             console.error('Ошибка загрузки users.json:', e);
             showModal('Не удалось загрузить users.json', 'error');
         }
-    }
+    });
 
     // Логика входа с ограничением
-    loginForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Отменяем стандартное поведение формы
+    loginForm.addEventListener('submit', (event) => {
+        event.preventDefault();
 
-        // Если данные не загружены, загрузить их перед проверкой
-        if (!usersLoaded) {
-            showModal('Данные загружаются... Пожалуйста, подождите.', 'error');
-            await loadUsers(); // Загружаем пользователей
-        }
-
-        // Получаем данные из формы
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
 
         // Проверка на пустые данные
         if (!username || !password) {
             showModal('Пожалуйста, заполните все поля!', 'error');
+            return;
+        }
+
+        // Проверка, загрузился ли JSON
+        if (!usersLoaded) {
+            showModal('Пользователи ещё загружаются, попробуйте через секунду', 'error');
             return;
         }
 
@@ -338,12 +338,26 @@
             sessionStorage.setItem('failedAttempts', failedAttempts);
         }
 
+        // Проверка на дефолтного пользователя
+        if (username === '111' && password === '111') {
+            sessionStorage.setItem('username', username);
+            window.location.href = "user_dashboard.html";
+            return;
+        }
+
+        // Проверка на админа
+        if (username === 'Admin' && password === 'Admin') {
+            sessionStorage.setItem('username', username);
+            window.location.href = "admin_dashboard.html";
+            return;
+        }
+
         // Проверка пользователей из users.json
         const user = users.find(u => u.username === username && u.password === password);
 
         if (user) {
             sessionStorage.setItem('username', user.username);
-            window.location.href = "user_dashboard.html"; // Переход на страницу пользователя
+            window.location.href = "user_dashboard.html";
         } else {
             failedAttempts++;
             sessionStorage.setItem('failedAttempts', failedAttempts);

@@ -631,11 +631,10 @@ registerForm.addEventListener('submit', async function(event) {
     try {
         registerAttempt();
 
- 
-     const newUser = {
-    username: username,
-    password: password
-};
+        const newUser = {
+            username: username,
+            password: password
+        };
 
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
@@ -674,10 +673,6 @@ registerForm.addEventListener('submit', async function(event) {
         localStorage.setItem('users', JSON.stringify(users));
 
         showModal('Регистрация успешна!', 'success');
-
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 1500);
 
     } catch (err) {
         console.error(err);
