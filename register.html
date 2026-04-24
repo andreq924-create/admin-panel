@@ -590,9 +590,7 @@ registerForm.addEventListener('submit', async function(event) {
     const password = regPassword.value;
     const password2 = regPassword2.value;
 
-    if (hiddenField.value.trim() !== '') {
-        return;
-    }
+    if (hiddenField.value.trim() !== '') return;
 
     if (!username || !password || !password2) {
         showModal('Пожалуйста, заполните все поля!', 'error');
@@ -619,59 +617,22 @@ registerForm.addEventListener('submit', async function(event) {
         return;
     }
 
-    const cooldown = canAttemptRegister();
-    if (!cooldown.ok) {
-        showModal(cooldown.message, 'error');
-        return;
-    }
-
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Проверка...';
+    submitBtn.textContent = 'Регистрация...';
 
     try {
-        registerAttempt();
-
- 
-     const newUser = {
-    username: username,
-    password: password
-};
-
-        let users = JSON.parse(localStorage.getItem('users')) || [];
-
-        const existingUser = users.find(user => user.username === username);
-        if (existingUser) {
-            showModal('Пользователь уже существует!', 'error');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Зарегистрироваться';
-            return;
-        }
-
-        users.push(newUser);
-
         const response = await fetch(API_ENDPOINT, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ users: users })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
         });
 
-        let result = {};
-        try {
-            result = await response.json();
-        } catch (e) {
-            result = {};
-        }
+        const result = await response.json();
 
         if (!response.ok) {
             showModal('Ошибка: ' + (result.error || 'Неизвестная ошибка'), 'error');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Зарегистрироваться';
             return;
         }
-
-        localStorage.setItem('users', JSON.stringify(users));
 
         showModal('Регистрация успешна!', 'success');
 
