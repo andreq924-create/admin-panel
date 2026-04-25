@@ -60,11 +60,12 @@
             flex-wrap: wrap;
         }
 
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            transition: color 0.2s ease, opacity 0.2s ease;
-        }
+    nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold; /* ← ВОТ ЭТО ДОБАВЛЯЕТ ЖИРНЫЙ ШРИФТ */
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
 
         nav a:hover {
             color: #FFD700;
@@ -423,6 +424,8 @@ const COOLDOWN_MS = 30000;
 const WINDOW_MS = 60000;
 const MAX_ATTEMPTS = 5;
 
+let afterCloseAction = null;
+
 function showModal(message, type = 'success') {
     const modal = document.getElementById('modal');
     const box = document.getElementById('modalBox');
@@ -560,8 +563,6 @@ function registerAttempt() {
     localStorage.setItem('lastRegisterAttempt', String(now));
 }
 
- 
-
 togglePassBtn.addEventListener('click', () => {
     const show = regPassword.type === 'password';
     regPassword.type = show ? 'text' : 'password';
@@ -574,7 +575,15 @@ regUsername.addEventListener('input', updateUsernameHint);
 updateStrength('');
 updateUsernameHint();
 
-closeModalBtn.addEventListener('click', closeModal);
+closeModalBtn.addEventListener('click', () => {
+    closeModal();
+    if (afterCloseAction) {
+        const action = afterCloseAction;
+        afterCloseAction = null;
+        action();
+    }
+});
+
 document.getElementById('modal').addEventListener('click', (e) => {
     if (e.target.id === 'modal') closeModal();
 });
@@ -672,9 +681,12 @@ registerForm.addEventListener('submit', async function(event) {
 
         localStorage.setItem('users', JSON.stringify(users));
 
-        // Сохраняем данные пользователя в sessionStorage и перенаправляем
+        // Показываем сообщение об успешной регистрации и переводим на index.html после нажатия ОК
         sessionStorage.setItem('username', username);
-        window.location.href = 'index.html';
+        afterCloseAction = () => {
+            window.location.href = 'index.html';
+        };
+        showModal('Вы успешно зарегистрировались!', 'success');
 
     } catch (err) {
         console.error(err);
