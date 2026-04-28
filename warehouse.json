@@ -153,11 +153,5 @@
         "img": "images/Светильник Gelllious 50.png"
       }
     ]
-  },
-  {
-    "name": "123",
-    "category": "light",
-    "img": "images/oporaCT.png",
-    "children": []
   }
 ]

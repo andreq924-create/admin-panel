@@ -1677,36 +1677,120 @@ function closePopup(){ document.getElementById('overlay').style.display='none'; 
 
 // ==== Склад ====
 function loadWarehouse() {
+
     const data = JSON.parse(localStorage.getItem('warehouse')) || [];
     const tbody = document.querySelector("#warehouseTable tbody");
     tbody.innerHTML = '';
 
+    // =========================
+    // 🔥 1. СОБИРАЕМ МАЛЫЕ ОСТАТКИ
+    // =========================
+    let lowStockChildren = [];
+
+    data.forEach(item => {
+        if (item.children) {
+            item.children.forEach(c => {
+                if ((c.qty || 0) < 5) {
+                    lowStockChildren.push({
+                        ...c,
+                        parentName: item.name
+                    });
+                }
+            });
+        }
+    });
+
+    // сортировка (самые маленькие сверху)
+    lowStockChildren.sort((a, b) => a.qty - b.qty);
+
+    // =========================
+    // 🔥 2. БЛОК "ЗАКАНЧИВАЕТСЯ"
+    // =========================
+    if (lowStockChildren.length > 0) {
+
+        let opened = false;
+
+        const lowRow = document.createElement('tr');
+        lowRow.style.cursor = "pointer";
+        lowRow.style.background = "#ffe5e5";
+        lowRow.style.fontWeight = "bold";
+
+        lowRow.innerHTML = `<td colspan="6">▶ ⚠️ Заканчивается (<5)</td>`;
+        tbody.appendChild(lowRow);
+
+        let childRows = [];
+
+        lowStockChildren.forEach(c => {
+
+            const childRow = document.createElement('tr');
+            childRow.style.display = "none";
+            childRow.style.background = "#fffafa";
+
+            const imgSrc = c.imgFileName
+                ? `images/${c.imgFileName}`
+                : (c.img || '');
+
+            // цвет по критичности
+            let color = "orange";
+            if (c.qty <= 2) color = "red";
+
+            childRow.innerHTML = `
+                <td style="padding-left:30px">
+                    ↳ ${c.name}
+                    <div style="font-size:11px;color:#777">${c.parentName}</div>
+                </td>
+                <td>${imgSrc ? `<img src="${imgSrc}" class="preview">` : '-'}</td>
+                <td style="color:${color}; font-weight:bold;">⚠️</td>
+                <td style="color:${color}; font-weight:bold;">${c.qty}</td>
+                <td></td>
+            `;
+
+            tbody.appendChild(childRow);
+            childRows.push(childRow);
+        });
+
+        // раскрытие
+        lowRow.onclick = function () {
+            opened = !opened;
+            lowRow.cells[0].innerHTML =
+                (opened ? "▼ " : "▶ ") + "⚠️ Заканчивается (<5)";
+
+            childRows.forEach(r => {
+                r.style.display = opened ? "table-row" : "none";
+            });
+        };
+    }
+
+    // =========================
+    // 📦 3. ОСНОВНОЙ СКЛАД
+    // =========================
     const categories = {
         light: { name: "Освещение", opened: false },
         pole: { name: "Столбы", opened: false }
     };
 
-    // Группируем товары по категориям
     const grouped = {
         light: data.filter(i => i.category === 'light'),
         pole: data.filter(i => i.category === 'pole')
     };
 
     Object.keys(categories).forEach(catKey => {
+
         let cat = categories[catKey];
         let items = grouped[catKey];
 
-        // ===== строка категории =====
         const catRow = document.createElement('tr');
         catRow.style.cursor = "pointer";
-        catRow.style.background = "#eee";
+        catRow.style.background = "#f0f0f0";
+        catRow.style.fontWeight = "bold";
+
         catRow.innerHTML = `<td colspan="6">▶ ${cat.name}</td>`;
         tbody.appendChild(catRow);
 
         let itemRows = [];
 
-        // ===== товары внутри категории =====
-        items.forEach((item, i) => {
+        items.forEach(item => {
+
             const realIndex = data.indexOf(item);
             let opened = false;
 
@@ -1714,12 +1798,11 @@ function loadWarehouse() {
             row.style.display = "none";
             row.style.cursor = "pointer";
 
-            const parentImgSrc = item.img ? item.img : ''; // используем img родителя
             row.innerHTML = `
                 <td style="padding-left:20px">▶ ${item.name}</td>
-                <td>${parentImgSrc ? `<img src="${parentImgSrc}" class="preview">` : '-'}</td>
+                <td>${item.img ? `<img src="${item.img}" class="preview">` : '-'}</td>
                 <td>${item.category === 'light' ? 'Освещение' : 'Столбы'}</td>
-                 <td>${item.qty}</td>
+                <td>${item.qty || '-'}</td>
                 <td>
                     <button onclick="event.stopPropagation(); editProduct(${realIndex})">✏️</button> 
                     <button onclick="event.stopPropagation(); deleteProduct(${realIndex})">🗑</button>
@@ -1728,52 +1811,52 @@ function loadWarehouse() {
             tbody.appendChild(row);
             itemRows.push(row);
 
-            // ===== дочерние объекты товара =====
             let childRows = [];
-            if (item.children && item.children.length > 0) {
+
+            if (item.children) {
                 item.children.forEach((c, ci) => {
+
                     const childRow = document.createElement('tr');
                     childRow.style.display = "none";
 
-                    // используем imgFileName как основной путь
-                    const childImgSrc = c.imgFileName ? `images/${c.imgFileName}` : (c.img || '');
+                    const imgSrc = c.imgFileName
+                        ? `images/${c.imgFileName}`
+                        : (c.img || '');
 
-                 childRow.innerHTML = `
-    <td style="padding-left:40px">↳ ${c.name}</td>
-    <td>${childImgSrc ? `<img src="${childImgSrc}" class="preview">` : '-'}</td>
-    <td>-</td>
-    <td>${c.qty}</td>
-    <td>
-	<button onclick="event.stopPropagation(); editChildSettings(${realIndex}, ${ci});">⚙️</button>
-        <button onclick="event.stopPropagation(); deleteChild(${realIndex},${ci})">🗑</button>
-    </td>
-`;
+                    childRow.innerHTML = `
+                        <td style="padding-left:40px">↳ ${c.name}</td>
+                        <td>${imgSrc ? `<img src="${imgSrc}" class="preview">` : '-'}</td>
+                        <td>-</td>
+                        <td>${c.qty}</td>
+                        <td>
+                            <button onclick="event.stopPropagation(); editChildSettings(${realIndex}, ${ci});">⚙️</button>
+                            <button onclick="event.stopPropagation(); deleteChild(${realIndex},${ci})">🗑</button>
+                        </td>
+                    `;
+
                     tbody.appendChild(childRow);
                     childRows.push(childRow);
                 });
             }
 
-            // ===== раскрытие товара =====
+            // раскрытие товара
             row.onclick = function () {
                 opened = !opened;
-                row.cells[0].innerHTML = (opened ? "▼ " : "▶ ") + item.name;
-          childRows.forEach(r => {
-    r.style.display = opened ? "table-row" : "none";
-});
+                row.cells[0].innerHTML =
+                    (opened ? "▼ " : "▶ ") + item.name;
 
-// 💥 принудительная синхронизация состояния
-if (!opened) {
-    childRows.forEach(r => {
-        r.style.display = "none";
-    });
-}
+                childRows.forEach(r => {
+                    r.style.display = opened ? "table-row" : "none";
+                });
             };
         });
 
-        // ===== раскрытие категории =====
+        // раскрытие категории
         catRow.onclick = function () {
             cat.opened = !cat.opened;
-            catRow.cells[0].innerHTML = (cat.opened ? "▼ " : "▶ ") + cat.name;
+            catRow.cells[0].innerHTML =
+                (cat.opened ? "▼ " : "▶ ") + cat.name;
+
             itemRows.forEach(r => {
                 r.style.display = cat.opened ? "table-row" : "none";
             });
